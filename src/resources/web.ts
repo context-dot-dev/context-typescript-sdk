@@ -200,11 +200,12 @@ export class Web extends APIResource {
   }
 
   /**
-   * Crawl an entire website's sitemap and return all discovered page URLs. Pass
-   * `search` to have the crawled sitemap filtered down to the pages about a phrase
-   * (for example `pricing and plans` or `api authentication docs`), most relevant
-   * first — a searched crawl scans the whole sitemap and costs 2 credits instead
-   * of 1.
+   * Crawl an entire website's sitemap and return all discovered page URLs. Set
+   * `includeSubdomains=true` to also discover public pages and sitemaps on child
+   * hosts such as `docs.example.com` or `brand.example.com`. Pass `search` to have
+   * the discovered URLs filtered down to the pages about a phrase (for example
+   * `pricing and plans` or `api authentication docs`), most relevant first — a
+   * searched crawl scans the whole sitemap and costs 2 credits instead of 1.
    *
    * @example
    * ```ts
@@ -4668,6 +4669,12 @@ export interface WebWebScrapeSitemapParams {
    * is bypassed: the result is neither read from nor written to cache.
    */
   headers?: { [key: string]: string };
+
+  /**
+   * When true, discover and include public pages and sitemaps on subdomains of the
+   * requested domain. Defaults to false.
+   */
+  includeSubdomains?: boolean;
 
   /**
    * Maximum number of links to return from the sitemap crawl. Defaults to 10,000.
