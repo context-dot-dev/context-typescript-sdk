@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.15.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.14.0...v2.15.0) (2026-09-03)
+
+
+### Features
+
+* **sitemap:** add subdomain discovery ([dcd655a](https://github.com/context-dot-dev/context-typescript-sdk/commit/dcd655aa389a76d728842ca17437222cb67ed4b2))
+
+
+### Bug Fixes
+
+* **openapi:** strip empty-object defaults from the generated spec ([01a5153](https://github.com/context-dot-dev/context-typescript-sdk/commit/01a515383a6d31d619cb1217911d659c9a52ff21))
+
 ## [2.14.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.13.0...v2.14.0) (2026-08-27)
 
 
