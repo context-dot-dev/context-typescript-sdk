@@ -110,6 +110,7 @@ import {
   WebWebScrapeSitemapParams,
   WebWebScrapeSitemapResponse,
 } from './resources/web';
+import { RetryConfig, Webhooks } from './resources/webhooks/webhooks';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -841,6 +842,7 @@ export class ContextDev {
    * Scrape many pages or crawl a site asynchronously.
    */
   batch: API.Batch = new API.Batch(this);
+  webhooks: API.Webhooks = new API.Webhooks(this);
   people: API.People = new API.People(this);
   /**
    * Search live first-party RSS and free historical news data by company identity.
@@ -856,6 +858,7 @@ ContextDev.Industry = Industry;
 ContextDev.Utility = Utility;
 ContextDev.Monitors = Monitors;
 ContextDev.Batch = Batch;
+ContextDev.Webhooks = Webhooks;
 ContextDev.People = People;
 ContextDev.News = News;
 
@@ -968,6 +971,8 @@ export declare namespace ContextDev {
     type BatchGetResultsParams as BatchGetResultsParams,
     type BatchSubmitParams as BatchSubmitParams,
   };
+
+  export { Webhooks as Webhooks, type RetryConfig as RetryConfig };
 
   export {
     People as People,

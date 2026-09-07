@@ -2,6 +2,7 @@
 
 import { APIResource } from '../core/resource';
 import * as MonitorsAPI from './monitors';
+import * as WebhooksAPI from './webhooks/webhooks';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 import { path } from '../internal/utils/path';
@@ -251,6 +252,12 @@ export interface WebhookDelivery {
    * the URL failed the public-endpoint safety check.
    */
   status: 'delivered' | 'rejected' | 'failed' | 'skipped_unsafe_url';
+
+  /**
+   * Retained delivery ID for GET /webhooks/deliveries/{delivery_id}. Omitted for
+   * historical or unretained deliveries.
+   */
+  delivery_id?: string;
 }
 
 export namespace WebhookDelivery {
@@ -579,6 +586,13 @@ export namespace MonitorCreateResponse {
      * to `["change.detected"]` when omitted.
      */
     events?: Array<'change.detected' | 'run.completed'>;
+
+    /**
+     * Opt into durable webhook delivery. An empty object uses the default retry
+     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
+     * snapshotted for each event.
+     */
+    retry?: WebhooksAPI.RetryConfig;
 
     /**
      * Signing secret used to verify webhook authenticity. Each delivery includes an
@@ -930,6 +944,13 @@ export namespace MonitorRetrieveResponse {
     events?: Array<'change.detected' | 'run.completed'>;
 
     /**
+     * Opt into durable webhook delivery. An empty object uses the default retry
+     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
+     * snapshotted for each event.
+     */
+    retry?: WebhooksAPI.RetryConfig;
+
+    /**
      * Signing secret used to verify webhook authenticity. Each delivery includes an
      * `X-Context-Signature: t=<unix>,v1=<hmac>` header, where the HMAC is SHA-256 over
      * `"{t}.{rawRequestBody}"` keyed by this secret. Recompute it with a constant-time
@@ -1277,6 +1298,13 @@ export namespace MonitorUpdateResponse {
      * to `["change.detected"]` when omitted.
      */
     events?: Array<'change.detected' | 'run.completed'>;
+
+    /**
+     * Opt into durable webhook delivery. An empty object uses the default retry
+     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
+     * snapshotted for each event.
+     */
+    retry?: WebhooksAPI.RetryConfig;
 
     /**
      * Signing secret used to verify webhook authenticity. Each delivery includes an
@@ -1628,6 +1656,13 @@ export namespace MonitorListResponse {
       events?: Array<'change.detected' | 'run.completed'>;
 
       /**
+       * Opt into durable webhook delivery. An empty object uses the default retry
+       * schedule. Omit retry to preserve legacy delivery behavior. The policy is
+       * snapshotted for each event.
+       */
+      retry?: WebhooksAPI.RetryConfig;
+
+      /**
        * Signing secret used to verify webhook authenticity. Each delivery includes an
        * `X-Context-Signature: t=<unix>,v1=<hmac>` header, where the HMAC is SHA-256 over
        * `"{t}.{rawRequestBody}"` keyed by this secret. Recompute it with a constant-time
@@ -1844,6 +1879,14 @@ export namespace MonitorListAccountRunsResponse {
      * attempted, including historical runs created before delivery tracking was added.
      */
     webhook_delivery?: MonitorsAPI.WebhookDelivery;
+
+    /**
+     * Retained webhook deliveries for this run. Inspect their live state and attempt
+     * history through /webhooks/deliveries. With webhook.retry configured, delivery is
+     * asynchronous and the legacy webhook_delivery/webhook_deliveries outcomes are
+     * omitted.
+     */
+    webhook_delivery_ids?: Array<string>;
   }
 
   export namespace Data {
@@ -1980,6 +2023,14 @@ export namespace MonitorListRunsResponse {
      * attempted, including historical runs created before delivery tracking was added.
      */
     webhook_delivery?: MonitorsAPI.WebhookDelivery;
+
+    /**
+     * Retained webhook deliveries for this run. Inspect their live state and attempt
+     * history through /webhooks/deliveries. With webhook.retry configured, delivery is
+     * asynchronous and the legacy webhook_delivery/webhook_deliveries outcomes are
+     * omitted.
+     */
+    webhook_delivery_ids?: Array<string>;
   }
 
   export namespace Data {
@@ -2290,6 +2341,13 @@ export namespace MonitorCreateParams {
      * to `["change.detected"]` when omitted.
      */
     events?: Array<'change.detected' | 'run.completed'>;
+
+    /**
+     * Opt into durable webhook delivery. An empty object uses the default retry
+     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
+     * snapshotted for each event.
+     */
+    retry?: WebhooksAPI.RetryConfig;
   }
 }
 
@@ -2485,6 +2543,13 @@ export namespace MonitorUpdateParams {
      * to `["change.detected"]` when omitted.
      */
     events?: Array<'change.detected' | 'run.completed'>;
+
+    /**
+     * Opt into durable webhook delivery. An empty object uses the default retry
+     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
+     * snapshotted for each event.
+     */
+    retry?: WebhooksAPI.RetryConfig;
   }
 }
 

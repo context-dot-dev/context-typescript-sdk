@@ -42,7 +42,11 @@ describe('resource monitors', () => {
         unit: 'hours',
       },
       tags: ['pricing', 'competitor'],
-      webhook: { url: 'https://example.com/webhook', events: ['change.detected', 'run.completed'] },
+      webhook: {
+        url: 'https://example.com/webhook',
+        events: ['change.detected', 'run.completed'],
+        retry: { delays_seconds: [10, 60, 300, 1800, 7200, 21600, 57600] },
+      },
     });
   });
 

@@ -145,6 +145,30 @@ Methods:
 - <code title="get /batch/{batch_id}/results">client.batch.<a href="./src/resources/batch.ts">getResults</a>(batchID, { ...params }) -> BatchGetResultsResponse</code>
 - <code title="post /batch/submit">client.batch.<a href="./src/resources/batch.ts">submit</a>({ ...params }) -> BatchSubmitResponse</code>
 
+# Webhooks
+
+Types:
+
+- <code><a href="./src/resources/webhooks/webhooks.ts">RetryConfig</a></code>
+
+## Deliveries
+
+Types:
+
+- <code><a href="./src/resources/webhooks/deliveries.ts">Attempt</a></code>
+- <code><a href="./src/resources/webhooks/deliveries.ts">Delivery</a></code>
+- <code><a href="./src/resources/webhooks/deliveries.ts">DeliveryRetrieveResponse</a></code>
+- <code><a href="./src/resources/webhooks/deliveries.ts">DeliveryListResponse</a></code>
+- <code><a href="./src/resources/webhooks/deliveries.ts">DeliveryListAttemptsResponse</a></code>
+- <code><a href="./src/resources/webhooks/deliveries.ts">DeliveryRetryResponse</a></code>
+
+Methods:
+
+- <code title="get /webhooks/deliveries/{delivery_id}">client.webhooks.deliveries.<a href="./src/resources/webhooks/deliveries.ts">retrieve</a>(deliveryID, { ...params }) -> DeliveryRetrieveResponse</code>
+- <code title="get /webhooks/deliveries">client.webhooks.deliveries.<a href="./src/resources/webhooks/deliveries.ts">list</a>({ ...params }) -> DeliveryListResponse</code>
+- <code title="get /webhooks/deliveries/{delivery_id}/attempts">client.webhooks.deliveries.<a href="./src/resources/webhooks/deliveries.ts">listAttempts</a>(deliveryID, { ...params }) -> DeliveryListAttemptsResponse</code>
+- <code title="post /webhooks/deliveries/{delivery_id}/retry">client.webhooks.deliveries.<a href="./src/resources/webhooks/deliveries.ts">retry</a>(deliveryID, { ...params }) -> DeliveryRetryResponse</code>
+
 # People
 
 Types:

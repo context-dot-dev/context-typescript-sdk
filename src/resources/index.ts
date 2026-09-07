@@ -93,3 +93,4 @@ export {
   type WebWebScrapeMdParams,
   type WebWebScrapeSitemapParams,
 } from './web';
+export { Webhooks, type RetryConfig } from './webhooks/webhooks';

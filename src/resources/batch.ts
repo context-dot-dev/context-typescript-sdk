@@ -2,6 +2,7 @@
 
 import { APIResource } from '../core/resource';
 import * as BatchAPI from './batch';
+import * as WebhooksAPI from './webhooks/webhooks';
 import { APIPromise } from '../core/api-promise';
 import { buildHeaders } from '../internal/headers';
 import { RequestOptions } from '../internal/request-options';
@@ -328,6 +329,12 @@ export interface BatchRetrieveResponse {
    * API key usage for this request.
    */
   key_metadata?: BatchRetrieveResponse.KeyMetadata;
+
+  /**
+   * Retained completion delivery ID. Inspect or retry it through
+   * /webhooks/deliveries/{delivery_id}. Present once the delivery has been retained.
+   */
+  webhook_delivery_id?: string;
 }
 
 export namespace BatchRetrieveResponse {
@@ -1334,7 +1341,14 @@ export interface BatchSubmitParams {
   tags?: Array<string>;
 
   /**
-   * Body param: URL notified when the batch finishes.
+   * Body param: Completion webhook settings. Cannot be combined with webhookUrl.
+   * Omitting retry preserves legacy delivery; retry: {} opts into durable retries.
+   */
+  webhook?: BatchSubmitParams.Webhook;
+
+  /**
+   * Body param: Legacy URL notified when the batch finishes. Preserves one
+   * best-effort attempt. Cannot be combined with webhook.
    */
   webhookUrl?: string;
 
@@ -2882,6 +2896,21 @@ export namespace BatchSubmitParams {
         }
       }
     }
+  }
+
+  /**
+   * Completion webhook settings. Cannot be combined with webhookUrl. Omitting retry
+   * preserves legacy delivery; retry: {} opts into durable retries.
+   */
+  export interface Webhook {
+    url: string;
+
+    /**
+     * Opt into durable webhook delivery. An empty object uses the default retry
+     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
+     * snapshotted for each event.
+     */
+    retry?: WebhooksAPI.RetryConfig;
   }
 }
 
