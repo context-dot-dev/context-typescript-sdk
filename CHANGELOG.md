@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.16.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.15.0...v2.16.0) (2026-09-08)
+
+
+### Features
+
+* **webhooks:** add configurable retries and manual replay ([da20ddb](https://github.com/context-dot-dev/context-typescript-sdk/commit/da20ddbcc80c966aaed048ddb3bef70e5c2d8e8e))
+* **webhooks:** simplify delivery APIs ([680fd86](https://github.com/context-dot-dev/context-typescript-sdk/commit/680fd86d86fc05ec1d0f0a7bb5993b13834bdb70))
+
 ## [2.15.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.14.0...v2.15.0) (2026-09-03)
 
 
