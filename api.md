@@ -157,6 +157,7 @@ Types:
 
 - <code><a href="./src/resources/webhooks/deliveries.ts">Attempt</a></code>
 - <code><a href="./src/resources/webhooks/deliveries.ts">Delivery</a></code>
+- <code><a href="./src/resources/webhooks/deliveries.ts">DeliverySummary</a></code>
 - <code><a href="./src/resources/webhooks/deliveries.ts">DeliveryRetrieveResponse</a></code>
 - <code><a href="./src/resources/webhooks/deliveries.ts">DeliveryListResponse</a></code>
 - <code><a href="./src/resources/webhooks/deliveries.ts">DeliveryListAttemptsResponse</a></code>
@@ -165,7 +166,7 @@ Types:
 Methods:
 
 - <code title="get /webhooks/deliveries/{delivery_id}">client.webhooks.deliveries.<a href="./src/resources/webhooks/deliveries.ts">retrieve</a>(deliveryID, { ...params }) -> DeliveryRetrieveResponse</code>
-- <code title="get /webhooks/deliveries">client.webhooks.deliveries.<a href="./src/resources/webhooks/deliveries.ts">list</a>({ ...params }) -> DeliveryListResponse</code>
+- <code title="post /webhooks/deliveries">client.webhooks.deliveries.<a href="./src/resources/webhooks/deliveries.ts">list</a>({ ...params }) -> DeliveryListResponse</code>
 - <code title="get /webhooks/deliveries/{delivery_id}/attempts">client.webhooks.deliveries.<a href="./src/resources/webhooks/deliveries.ts">listAttempts</a>(deliveryID, { ...params }) -> DeliveryListAttemptsResponse</code>
 - <code title="post /webhooks/deliveries/{delivery_id}/retry">client.webhooks.deliveries.<a href="./src/resources/webhooks/deliveries.ts">retry</a>(deliveryID, { ...params }) -> DeliveryRetryResponse</code>
 

@@ -33,8 +33,8 @@ describe('resource deliveries', () => {
   });
 
   // Mock server tests are disabled
-  test.skip('list', async () => {
-    const responsePromise = client.webhooks.deliveries.list();
+  test.skip('list: only required params', async () => {
+    const responsePromise = client.webhooks.deliveries.list({ type: 'batch' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -45,22 +45,16 @@ describe('resource deliveries', () => {
   });
 
   // Mock server tests are disabled
-  test.skip('list: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.webhooks.deliveries.list(
-        {
-          batch_id: 'batch_id',
-          cursor: 'whd_210b9798eb53baa4e69d31c1071cf03d',
-          limit: 1,
-          monitor_id: 'monitor_id',
-          run_id: 'run_id',
-          status: 'pending',
-          tags: ['production', 'team-alpha'],
-        },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(ContextDev.NotFoundError);
+  test.skip('list: required and optional params', async () => {
+    const response = await client.webhooks.deliveries.list({
+      type: 'batch',
+      batch_id: 'batch_id',
+      created_after: '2026-09-01T00:00:00Z',
+      cursor: 'whd_210b9798eb53baa4e69d31c1071cf03d',
+      limit: 1,
+      status: 'pending',
+      tags: ['production', 'team-alpha'],
+    });
   });
 
   // Mock server tests are disabled

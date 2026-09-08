@@ -253,8 +253,7 @@ export interface WebExtractResponse {
   urls_analyzed: Array<string>;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebExtractResponse.KeyMetadata;
 }
@@ -327,17 +326,16 @@ export namespace WebExtractResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -365,8 +363,7 @@ export interface WebExtractCompetitorsResponse {
   target: WebExtractCompetitorsResponse.Target;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebExtractCompetitorsResponse.KeyMetadata;
 }
@@ -430,17 +427,16 @@ export namespace WebExtractCompetitorsResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -482,8 +478,7 @@ export interface WebExtractFontsResponse {
   fontLinks?: { [key: string]: WebExtractFontsResponse.FontLinks };
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebExtractFontsResponse.KeyMetadata;
 }
@@ -568,17 +563,16 @@ export namespace WebExtractFontsResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -603,8 +597,7 @@ export interface WebExtractStyleguideResponse {
   domain?: string;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebExtractStyleguideResponse.KeyMetadata;
 
@@ -639,17 +632,16 @@ export namespace WebExtractStyleguideResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -1168,8 +1160,7 @@ export interface WebScreenshotResponse {
   height?: number;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebScreenshotResponse.KeyMetadata;
 
@@ -1215,17 +1206,16 @@ export namespace WebScreenshotResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -1247,8 +1237,7 @@ export interface WebSearchResponse {
   results: Array<WebSearchResponse.Result>;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebSearchResponse.KeyMetadata;
 }
@@ -1318,17 +1307,16 @@ export namespace WebSearchResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -1347,8 +1335,7 @@ export interface WebWebCrawlMdResponse {
   results: Array<WebWebCrawlMdResponse.Result>;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebWebCrawlMdResponse.KeyMetadata;
 }
@@ -1572,17 +1559,16 @@ export namespace WebWebCrawlMdResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -1652,8 +1638,7 @@ export interface WebWebScrapeHTMLResponse {
   actionsHtmlStale?: boolean;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebWebScrapeHTMLResponse.KeyMetadata;
 }
@@ -1844,17 +1829,16 @@ export namespace WebWebScrapeHTMLResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -1889,8 +1873,7 @@ export interface WebWebScrapeImagesResponse {
   actionsApplied?: Array<WebWebScrapeImagesResponse.ActionsApplied>;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebWebScrapeImagesResponse.KeyMetadata;
 }
@@ -1997,17 +1980,16 @@ export namespace WebWebScrapeImagesResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -2067,8 +2049,7 @@ export interface WebWebScrapeMdResponse {
   html?: string;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebWebScrapeMdResponse.KeyMetadata;
 }
@@ -2259,17 +2240,16 @@ export namespace WebWebScrapeMdResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -2298,8 +2278,7 @@ export interface WebWebScrapeSitemapResponse {
   urls: Array<string>;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebWebScrapeSitemapResponse.KeyMetadata;
 }
@@ -2331,17 +2310,16 @@ export namespace WebWebScrapeSitemapResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -2534,9 +2512,8 @@ export interface WebExtractCompetitorsParams {
   numCompetitors?: number;
 
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 
@@ -2572,9 +2549,8 @@ export interface WebExtractFontsParams {
   maxAgeMs?: number | null;
 
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 
@@ -2617,9 +2593,8 @@ export interface WebExtractStyleguideParams {
   maxAgeMs?: number | null;
 
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 
@@ -2912,9 +2887,8 @@ export interface WebScreenshotParams {
   scrollOffset?: number | null;
 
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 
@@ -3988,9 +3962,8 @@ export interface WebWebScrapeHTMLParams {
   settleAnimations?: boolean;
 
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 
@@ -4148,9 +4121,8 @@ export interface WebWebScrapeImagesParams {
   maxAgeMs?: number | null;
 
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 
@@ -4542,9 +4514,8 @@ export interface WebWebScrapeMdParams {
   shortenBase64Images?: boolean;
 
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 
@@ -4696,9 +4667,8 @@ export interface WebWebScrapeSitemapParams {
   sitemapUrl?: string;
 
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 

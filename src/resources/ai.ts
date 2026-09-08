@@ -57,8 +57,7 @@ export interface AIExtractProductResponse {
   is_product_page?: boolean;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: AIExtractProductResponse.KeyMetadata;
 
@@ -93,17 +92,16 @@ export namespace AIExtractProductResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -216,8 +214,7 @@ export interface AIExtractProductsResponse {
   cache_metadata: AIExtractProductsResponse.CacheMetadata;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: AIExtractProductsResponse.KeyMetadata;
 
@@ -247,17 +244,16 @@ export namespace AIExtractProductsResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }

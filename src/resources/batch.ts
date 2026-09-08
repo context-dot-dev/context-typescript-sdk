@@ -331,8 +331,7 @@ export interface BatchRetrieveResponse {
   key_metadata?: BatchRetrieveResponse.KeyMetadata;
 
   /**
-   * Retained completion delivery ID. Inspect or retry it through
-   * /webhooks/deliveries/{delivery_id}. Present once the delivery has been retained.
+   * Batch completion delivery ID, when available.
    */
   webhook_delivery_id?: string;
 }
@@ -458,12 +457,12 @@ export namespace BatchRetrieveResponse {
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -481,8 +480,7 @@ export interface BatchListResponse {
   has_more?: boolean;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: BatchListResponse.KeyMetadata;
 
@@ -671,17 +669,16 @@ export namespace BatchListResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -699,25 +696,23 @@ export interface BatchDeleteResponse {
   deleted?: boolean;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: BatchDeleteResponse.KeyMetadata;
 }
 
 export namespace BatchDeleteResponse {
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -839,12 +834,12 @@ export namespace BatchCancelResponse {
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -862,8 +857,7 @@ export interface BatchGetResultsResponse {
   has_more?: boolean;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: BatchGetResultsResponse.KeyMetadata;
 
@@ -1137,17 +1131,16 @@ export namespace BatchGetResultsResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -1271,12 +1264,12 @@ export namespace BatchSubmitResponse {
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -2906,9 +2899,7 @@ export namespace BatchSubmitParams {
     url: string;
 
     /**
-     * Opt into durable webhook delivery. An empty object uses the default retry
-     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
-     * snapshotted for each event.
+     * Webhook retry settings. Use {} for the default schedule.
      */
     retry?: WebhooksAPI.RetryConfig;
   }

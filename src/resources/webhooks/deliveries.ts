@@ -1,7 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../../core/resource';
-import * as DeliveriesAPI from './deliveries';
 import * as WebhooksAPI from './webhooks';
 import { APIPromise } from '../../core/api-promise';
 import { buildHeaders } from '../../internal/headers';
@@ -9,13 +8,11 @@ import { RequestOptions } from '../../internal/request-options';
 import { path } from '../../internal/utils/path';
 
 /**
- * Inspect and retry batch and monitor webhook deliveries without rerunning the underlying work.
+ * Inspect and retry webhook deliveries. These endpoints cost no credits.
  */
 export class Deliveries extends APIResource {
   /**
-   * Get the live status, retry policy, latest attempt, and replay expiration for a
-   * retained delivery. Use the attempts endpoint for its complete paginated history.
-   * This endpoint costs no credits.
+   * Get a webhook delivery, including its status and latest attempt.
    *
    * @example
    * ```ts
@@ -33,28 +30,23 @@ export class Deliveries extends APIResource {
   }
 
   /**
-   * List retained batch and monitor webhook deliveries for your organization, newest
-   * first. Filter by at most one of batch_id, monitor_id, or run_id, optionally
-   * combined with status. Historical events without retained payloads are not
-   * listed. This endpoint costs no credits.
+   * List your batch or monitor webhook deliveries, newest first.
    *
    * @example
    * ```ts
-   * const deliveries = await client.webhooks.deliveries.list();
+   * const deliveries = await client.webhooks.deliveries.list({
+   *   type: 'batch',
+   *   limit: 25,
+   *   status: 'failed',
+   * });
    * ```
    */
-  list(
-    query: DeliveryListParams | null | undefined = {},
-    options?: RequestOptions,
-  ): APIPromise<DeliveryListResponse> {
-    return this._client.get('/webhooks/deliveries', { query, ...options });
+  list(body: DeliveryListParams, options?: RequestOptions): APIPromise<DeliveryListResponse> {
+    return this._client.post('/webhooks/deliveries', { body, ...options });
   }
 
   /**
-   * List individual HTTP attempts for a delivery, newest first, including their
-   * destination, timestamps, HTTP status, and error. An interrupted attempt may have
-   * reached the endpoint even when its outcome is unknown. This endpoint costs no
-   * credits.
+   * List delivery attempts, newest first.
    *
    * @example
    * ```ts
@@ -73,18 +65,7 @@ export class Deliveries extends APIResource {
   }
 
   /**
-   * Queue an immediate attempt without rerunning or billing the underlying batch or
-   * monitor. A waiting retry is brought forward. A failed delivery gets one
-   * additional attempt without restarting its automatic retry budget. Set force:
-   * true to resend an acknowledged delivery. An in-progress attempt cannot be
-   * duplicated. The stored event body, event ID, and creation time remain unchanged;
-   * each attempt receives a fresh signature. Monitor retries use the current URL and
-   * secret; removing the webhook cancels pending deliveries. Batch result URLs in
-   * old payloads may have expired: retrieve the batch to get fresh URLs. Replay is
-   * available for seven days. A successful attempt cancels remaining automatic
-   * retries. Idempotency-Key is scoped to your organization and retained with the
-   * delivery metadata; repeating the same key and input returns the original
-   * accepted response.
+   * Retry a webhook delivery within seven days of creation.
    *
    * @example
    * ```ts
@@ -111,219 +92,396 @@ export class Deliveries extends APIResource {
 }
 
 export interface Attempt {
-  id: string;
-
+  /**
+   * Attempt number, starting at 1.
+   */
   attempt: number;
 
+  /**
+   * Completion time, or null while in progress.
+   */
   completed_at: string | null;
 
+  /**
+   * Attempt error, or null if none.
+   */
   error: Attempt.Error | null;
 
+  /**
+   * HTTP response status, or null if no response was received.
+   */
   http_status: number | null;
 
+  /**
+   * Attempt start time.
+   */
   started_at: string;
 
+  /**
+   * What started this attempt.
+   */
   trigger: 'initial' | 'automatic' | 'manual';
 
+  /**
+   * URL used for this attempt.
+   */
   url: string;
 }
 
 export namespace Attempt {
+  /**
+   * Attempt error, or null if none.
+   */
   export interface Error {
+    /**
+     * Error code.
+     */
     code: string;
 
+    /**
+     * Error details.
+     */
     message: string;
   }
 }
 
 export interface Delivery {
+  /**
+   * Delivery ID.
+   */
   id: string;
 
   /**
-   * Number of delivery attempts started, including any attempt in progress.
+   * Event creation time.
    */
-  attempt_count: number;
-
   created_at: string;
 
   /**
-   * Most recent successful acknowledgment; retained if a later forced resend fails.
+   * Last successful delivery time, or null if never delivered.
    */
   delivered_at: string | null;
 
+  /**
+   * Webhook event type.
+   */
   event: 'batch.completed' | 'batch.failed' | 'batch.cancelled' | 'change.detected' | 'run.completed';
 
   /**
-   * Stable event ID. Unchanged across automatic and manual attempts; use it to
-   * deduplicate events.
+   * Stable event ID for deduplicating received webhooks.
    */
   event_id: string;
 
-  last_attempt: Delivery.LastAttempt;
+  /**
+   * Latest attempt, or null if none.
+   */
+  last_attempt: Attempt | null;
 
+  /**
+   * Latest delivery error, or null if none.
+   */
   last_error: Delivery.LastError | null;
 
+  /**
+   * Next scheduled attempt, or null if none.
+   */
   next_attempt_at: string | null;
 
   /**
-   * Opt into durable webhook delivery. An empty object uses the default retry
-   * schedule. Omit retry to preserve legacy delivery behavior. The policy is
-   * snapshotted for each event.
+   * Webhook retry settings. Use {} for the default schedule.
    */
   retry: WebhooksAPI.RetryConfig;
 
   /**
-   * Seven days after event creation. Manual retries after this time return 410.
-   * Delivery and attempt metadata remain available for up to 30 days.
+   * Manual retry deadline, seven days after event creation.
    */
   retry_expires_at: string;
 
-  source: Delivery.UnionMember0 | Delivery.UnionMember1;
+  /**
+   * Batch or monitor run that produced the event.
+   */
+  source: Delivery.Batch | Delivery.Monitor;
 
+  /**
+   * Current delivery status.
+   */
   status: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
 
   /**
-   * Destination recorded for this delivery. Each attempt records the URL it used.
-   * Monitor retries use the currently configured URL and signing secret.
+   * Webhook destination URL.
    */
   url: string;
 }
 
 export namespace Delivery {
-  export interface LastAttempt extends DeliveriesAPI.Attempt {}
-
+  /**
+   * Latest delivery error, or null if none.
+   */
   export interface LastError {
+    /**
+     * Error code.
+     */
     code: string;
 
+    /**
+     * Error details.
+     */
     message: string;
   }
 
-  export interface UnionMember0 {
+  export interface Batch {
+    /**
+     * Batch ID.
+     */
     batch_id: string;
 
+    /**
+     * Delivery source.
+     */
     type: 'batch';
   }
 
-  export interface UnionMember1 {
+  export interface Monitor {
+    /**
+     * Monitor ID.
+     */
     monitor_id: string;
 
+    /**
+     * Monitor run ID.
+     */
     run_id: string;
 
+    /**
+     * Delivery source.
+     */
+    type: 'monitor';
+  }
+}
+
+export interface DeliverySummary {
+  /**
+   * Delivery ID.
+   */
+  id: string;
+
+  /**
+   * Event creation time.
+   */
+  created_at: string;
+
+  /**
+   * Last successful delivery time, or null if never delivered.
+   */
+  delivered_at: string | null;
+
+  /**
+   * Webhook event type.
+   */
+  event: 'batch.completed' | 'batch.failed' | 'batch.cancelled' | 'change.detected' | 'run.completed';
+
+  /**
+   * Latest delivery error, or null if none.
+   */
+  last_error: DeliverySummary.LastError | null;
+
+  /**
+   * Next scheduled attempt, or null if none.
+   */
+  next_attempt_at: string | null;
+
+  /**
+   * Manual retry deadline, seven days after event creation.
+   */
+  retry_expires_at: string;
+
+  /**
+   * Batch or monitor run that produced the event.
+   */
+  source: DeliverySummary.Batch | DeliverySummary.Monitor;
+
+  /**
+   * Current delivery status.
+   */
+  status: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
+
+  /**
+   * Webhook destination URL.
+   */
+  url: string;
+}
+
+export namespace DeliverySummary {
+  /**
+   * Latest delivery error, or null if none.
+   */
+  export interface LastError {
+    /**
+     * Error code.
+     */
+    code: string;
+
+    /**
+     * Error details.
+     */
+    message: string;
+  }
+
+  export interface Batch {
+    /**
+     * Batch ID.
+     */
+    batch_id: string;
+
+    /**
+     * Delivery source.
+     */
+    type: 'batch';
+  }
+
+  export interface Monitor {
+    /**
+     * Monitor ID.
+     */
+    monitor_id: string;
+
+    /**
+     * Monitor run ID.
+     */
+    run_id: string;
+
+    /**
+     * Delivery source.
+     */
     type: 'monitor';
   }
 }
 
 export interface DeliveryRetrieveResponse extends Delivery {
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: DeliveryRetrieveResponse.KeyMetadata;
 }
 
 export namespace DeliveryRetrieveResponse {
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
 }
 
 export interface DeliveryListResponse {
-  data: Array<Delivery>;
+  /**
+   * Webhook deliveries.
+   */
+  data: Array<DeliverySummary>;
 
+  /**
+   * Whether more deliveries are available.
+   */
   has_more: boolean;
 
+  /**
+   * Next page cursor, or null on the last page.
+   */
   next_cursor: string | null;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: DeliveryListResponse.KeyMetadata;
 }
 
 export namespace DeliveryListResponse {
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
 }
 
 export interface DeliveryListAttemptsResponse {
+  /**
+   * Delivery attempts.
+   */
   data: Array<Attempt>;
 
+  /**
+   * Whether more attempts are available.
+   */
   has_more: boolean;
 
+  /**
+   * Next page cursor, or null on the last page.
+   */
   next_cursor: string | null;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: DeliveryListAttemptsResponse.KeyMetadata;
 }
 
 export namespace DeliveryListAttemptsResponse {
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
 }
 
-export interface DeliveryRetryResponse extends Delivery {
+export interface DeliveryRetryResponse {
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Delivery ID.
+   */
+  id: string;
+
+  /**
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: DeliveryRetryResponse.KeyMetadata;
 }
 
 export namespace DeliveryRetryResponse {
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -331,50 +489,116 @@ export namespace DeliveryRetryResponse {
 
 export interface DeliveryRetrieveParams {
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 }
 
-export interface DeliveryListParams {
-  batch_id?: string;
+export type DeliveryListParams = DeliveryListParams.ByBatch | DeliveryListParams.ByMonitor;
 
-  cursor?: string;
+export declare namespace DeliveryListParams {
+  export interface ByBatch {
+    /**
+     * Delivery source.
+     */
+    type: 'batch';
 
-  limit?: number;
+    /**
+     * Filter by batch ID.
+     */
+    batch_id?: string;
 
-  monitor_id?: string;
+    /**
+     * Only include events created after this ISO 8601 timestamp.
+     */
+    created_after?: string;
 
-  run_id?: string;
+    /**
+     * The next_cursor from the previous response.
+     */
+    cursor?: string;
 
-  status?: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
+    /**
+     * Number of deliveries to return.
+     */
+    limit?: number;
 
-  /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
-   */
-  tags?: Array<string>;
+    /**
+     * Filter by delivery status.
+     */
+    status?: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
+
+    /**
+     * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+     */
+    tags?: Array<string>;
+  }
+
+  export interface ByMonitor {
+    /**
+     * Delivery source.
+     */
+    type: 'monitor';
+
+    /**
+     * Only include events created after this ISO 8601 timestamp.
+     */
+    created_after?: string;
+
+    /**
+     * The next_cursor from the previous response.
+     */
+    cursor?: string;
+
+    /**
+     * Number of deliveries to return.
+     */
+    limit?: number;
+
+    /**
+     * Filter by monitor ID.
+     */
+    monitor_id?: string;
+
+    /**
+     * Filter by monitor run ID.
+     */
+    run_id?: string;
+
+    /**
+     * Filter by delivery status.
+     */
+    status?: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
+
+    /**
+     * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+     */
+    tags?: Array<string>;
+  }
 }
 
 export interface DeliveryListAttemptsParams {
+  /**
+   * The next_cursor from the previous response.
+   */
   cursor?: string;
 
+  /**
+   * Number of attempts to return.
+   */
   limit?: number;
 
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 }
 
 export interface DeliveryRetryParams {
   /**
-   * Body param
+   * Body param: Resend a delivery that already succeeded.
    */
   force?: boolean;
 
@@ -385,7 +609,7 @@ export interface DeliveryRetryParams {
   tags?: Array<string>;
 
   /**
-   * Header param
+   * Header param: Unique key to prevent duplicate retry requests.
    */
   'Idempotency-Key'?: string;
 }
@@ -394,6 +618,7 @@ export declare namespace Deliveries {
   export {
     type Attempt as Attempt,
     type Delivery as Delivery,
+    type DeliverySummary as DeliverySummary,
     type DeliveryRetrieveResponse as DeliveryRetrieveResponse,
     type DeliveryListResponse as DeliveryListResponse,
     type DeliveryListAttemptsResponse as DeliveryListAttemptsResponse,

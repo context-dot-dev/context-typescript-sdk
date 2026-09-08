@@ -40,8 +40,7 @@ export interface IndustryRetrieveNaicsResponse {
   domain?: string;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: IndustryRetrieveNaicsResponse.KeyMetadata;
 
@@ -75,17 +74,16 @@ export namespace IndustryRetrieveNaicsResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -110,8 +108,7 @@ export interface IndustryRetrieveSicResponse {
   domain?: string;
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: IndustryRetrieveSicResponse.KeyMetadata;
 
@@ -163,17 +160,16 @@ export namespace IndustryRetrieveSicResponse {
   }
 
   /**
-   * Metadata about the API key used for the request. Included in every response
-   * whenever a valid API key is provided, even when the response status is not 200.
+   * Credit usage, included whenever a valid API key is provided.
    */
   export interface KeyMetadata {
     /**
-     * The number of credits consumed by this request.
+     * Credits used by this request.
      */
     credits_consumed: number;
 
     /**
-     * The number of credits remaining for your organization after this request.
+     * Credits remaining for your organization.
      */
     credits_remaining: number;
   }
@@ -199,9 +195,8 @@ export interface IndustryRetrieveNaicsParams {
   minResults?: number;
 
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 
@@ -232,9 +227,8 @@ export interface IndustryRetrieveSicParams {
   minResults?: number;
 
   /**
-   * Optional comma-separated caller-defined tags for tracking this request. Tags are
-   * recorded on the request's usage log and can be used to filter usage on the
-   * dashboard usage page. Up to 20 tags, each 1-50 characters.
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
    */
   tags?: Array<string>;
 

@@ -4,6 +4,7 @@ export {
   Deliveries,
   type Attempt,
   type Delivery,
+  type DeliverySummary,
   type DeliveryRetrieveResponse,
   type DeliveryListResponse,
   type DeliveryListAttemptsResponse,

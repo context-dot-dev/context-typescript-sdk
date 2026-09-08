@@ -254,8 +254,7 @@ export interface WebhookDelivery {
   status: 'delivered' | 'rejected' | 'failed' | 'skipped_unsafe_url';
 
   /**
-   * Retained delivery ID for GET /webhooks/deliveries/{delivery_id}. Omitted for
-   * historical or unretained deliveries.
+   * Delivery ID for status checks and retries, when available.
    */
   delivery_id?: string;
 }
@@ -588,9 +587,7 @@ export namespace MonitorCreateResponse {
     events?: Array<'change.detected' | 'run.completed'>;
 
     /**
-     * Opt into durable webhook delivery. An empty object uses the default retry
-     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
-     * snapshotted for each event.
+     * Webhook retry settings. Use {} for the default schedule.
      */
     retry?: WebhooksAPI.RetryConfig;
 
@@ -944,9 +941,7 @@ export namespace MonitorRetrieveResponse {
     events?: Array<'change.detected' | 'run.completed'>;
 
     /**
-     * Opt into durable webhook delivery. An empty object uses the default retry
-     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
-     * snapshotted for each event.
+     * Webhook retry settings. Use {} for the default schedule.
      */
     retry?: WebhooksAPI.RetryConfig;
 
@@ -1300,9 +1295,7 @@ export namespace MonitorUpdateResponse {
     events?: Array<'change.detected' | 'run.completed'>;
 
     /**
-     * Opt into durable webhook delivery. An empty object uses the default retry
-     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
-     * snapshotted for each event.
+     * Webhook retry settings. Use {} for the default schedule.
      */
     retry?: WebhooksAPI.RetryConfig;
 
@@ -1656,9 +1649,7 @@ export namespace MonitorListResponse {
       events?: Array<'change.detected' | 'run.completed'>;
 
       /**
-       * Opt into durable webhook delivery. An empty object uses the default retry
-       * schedule. Omit retry to preserve legacy delivery behavior. The policy is
-       * snapshotted for each event.
+       * Webhook retry settings. Use {} for the default schedule.
        */
       retry?: WebhooksAPI.RetryConfig;
 
@@ -1881,10 +1872,7 @@ export namespace MonitorListAccountRunsResponse {
     webhook_delivery?: MonitorsAPI.WebhookDelivery;
 
     /**
-     * Retained webhook deliveries for this run. Inspect their live state and attempt
-     * history through /webhooks/deliveries. With webhook.retry configured, delivery is
-     * asynchronous and the legacy webhook_delivery/webhook_deliveries outcomes are
-     * omitted.
+     * Webhook delivery IDs for this run.
      */
     webhook_delivery_ids?: Array<string>;
   }
@@ -2025,10 +2013,7 @@ export namespace MonitorListRunsResponse {
     webhook_delivery?: MonitorsAPI.WebhookDelivery;
 
     /**
-     * Retained webhook deliveries for this run. Inspect their live state and attempt
-     * history through /webhooks/deliveries. With webhook.retry configured, delivery is
-     * asynchronous and the legacy webhook_delivery/webhook_deliveries outcomes are
-     * omitted.
+     * Webhook delivery IDs for this run.
      */
     webhook_delivery_ids?: Array<string>;
   }
@@ -2343,9 +2328,7 @@ export namespace MonitorCreateParams {
     events?: Array<'change.detected' | 'run.completed'>;
 
     /**
-     * Opt into durable webhook delivery. An empty object uses the default retry
-     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
-     * snapshotted for each event.
+     * Webhook retry settings. Use {} for the default schedule.
      */
     retry?: WebhooksAPI.RetryConfig;
   }
@@ -2545,9 +2528,7 @@ export namespace MonitorUpdateParams {
     events?: Array<'change.detected' | 'run.completed'>;
 
     /**
-     * Opt into durable webhook delivery. An empty object uses the default retry
-     * schedule. Omit retry to preserve legacy delivery behavior. The policy is
-     * snapshotted for each event.
+     * Webhook retry settings. Use {} for the default schedule.
      */
     retry?: WebhooksAPI.RetryConfig;
   }

@@ -14,6 +14,7 @@ import {
   DeliveryRetrieveResponse,
   DeliveryRetryParams,
   DeliveryRetryResponse,
+  DeliverySummary,
 } from './deliveries';
 
 export class Webhooks extends APIResource {
@@ -21,16 +22,12 @@ export class Webhooks extends APIResource {
 }
 
 /**
- * Opt into durable webhook delivery. An empty object uses the default retry
- * schedule. Omit retry to preserve legacy delivery behavior. The policy is
- * snapshotted for each event.
+ * Webhook retry settings. Use {} for the default schedule.
  */
 export interface RetryConfig {
   /**
-   * Wait in seconds after each failed attempt. The first attempt is immediate. At
-   * most 10 delays, each 1–86400 seconds, totaling at most 72 hours. Small jitter is
-   * added automatically. An empty array disables automatic retries; manual retries
-   * remain available.
+   * Retry delays in seconds, totaling at most 72 hours. Use [] to disable automatic
+   * retries.
    */
   delays_seconds?: Array<number>;
 }
@@ -44,6 +41,7 @@ export declare namespace Webhooks {
     Deliveries as Deliveries,
     type Attempt as Attempt,
     type Delivery as Delivery,
+    type DeliverySummary as DeliverySummary,
     type DeliveryRetrieveResponse as DeliveryRetrieveResponse,
     type DeliveryListResponse as DeliveryListResponse,
     type DeliveryListAttemptsResponse as DeliveryListAttemptsResponse,
