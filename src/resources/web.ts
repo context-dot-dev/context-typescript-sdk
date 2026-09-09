@@ -2907,7 +2907,8 @@ export interface WebScreenshotParams {
   /**
    * Optional browser wait time in milliseconds after initial page load before taking
    * the screenshot. Min: 0. Max: 30000 (30 seconds). Defaults to 3000 ms when
-   * omitted.
+   * omitted. When combined with timeoutMS, timeoutMS must be at least waitForMs +
+   * 10000 ms; a shorter deadline is rejected with 400 TIMEOUT_TOO_SHORT_FOR_WAIT.
    */
   waitForMs?: number | null;
 
@@ -3982,7 +3983,9 @@ export interface WebWebScrapeHTMLParams {
 
   /**
    * Optional browser wait time in milliseconds after initial page load. Min: 0. Max:
-   * 30000 (30 seconds).
+   * 30000 (30 seconds). When combined with timeoutMS, timeoutMS must be at least
+   * waitForMs + 10000 ms; a shorter deadline is rejected with 400
+   * TIMEOUT_TOO_SHORT_FOR_WAIT.
    */
   waitForMs?: number | null;
 
@@ -4135,7 +4138,9 @@ export interface WebWebScrapeImagesParams {
 
   /**
    * Optional browser wait time in milliseconds after initial page load before
-   * collecting images. Min: 0. Max: 30000 (30 seconds).
+   * collecting images. Min: 0. Max: 30000 (30 seconds). When combined with
+   * timeoutMS, timeoutMS must be at least waitForMs + 10000 ms; a shorter deadline
+   * is rejected with 400 TIMEOUT_TOO_SHORT_FOR_WAIT.
    */
   waitForMs?: number | null;
 }
@@ -4534,7 +4539,9 @@ export interface WebWebScrapeMdParams {
 
   /**
    * Optional browser wait time in milliseconds after initial page load before
-   * converting the page to Markdown. Min: 0. Max: 30000 (30 seconds).
+   * converting the page to Markdown. Min: 0. Max: 30000 (30 seconds). When combined
+   * with timeoutMS, timeoutMS must be at least waitForMs + 10000 ms; a shorter
+   * deadline is rejected with 400 TIMEOUT_TOO_SHORT_FOR_WAIT.
    */
   waitForMs?: number | null;
 
