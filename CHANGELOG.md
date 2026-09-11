@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.17.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.16.0...v2.17.0) (2026-09-11)
+
+
+### Features
+
+* **api:** return request_id on every response ([37e1f63](https://github.com/context-dot-dev/context-typescript-sdk/commit/37e1f63aeea80c7ece0a33029864fe2dd40637c4))
+* **logs:** expose request log endpoints in SDKs ([#1025](https://github.com/context-dot-dev/context-typescript-sdk/issues/1025)) ([ca7e22a](https://github.com/context-dot-dev/context-typescript-sdk/commit/ca7e22a3ba12d75961d940fb81d8a36ead6ea761))
+
+
+### Bug Fixes
+
+* **api:** reject timeoutMS too short for waitForMs ([a46905a](https://github.com/context-dot-dev/context-typescript-sdk/commit/a46905a650e7d357657b9d27cfca7cf9b784576f))
+
 ## [2.16.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.15.0...v2.16.0) (2026-09-08)
 
 
