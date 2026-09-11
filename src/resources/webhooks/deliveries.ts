@@ -358,6 +358,12 @@ export namespace DeliverySummary {
 
 export interface DeliveryRetrieveResponse extends Delivery {
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: DeliveryRetrieveResponse.KeyMetadata;
@@ -395,6 +401,12 @@ export interface DeliveryListResponse {
    * Next page cursor, or null on the last page.
    */
   next_cursor: string | null;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   /**
    * Credit usage, included whenever a valid API key is provided.
@@ -436,6 +448,12 @@ export interface DeliveryListAttemptsResponse {
   next_cursor: string | null;
 
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: DeliveryListAttemptsResponse.KeyMetadata;
@@ -463,6 +481,12 @@ export interface DeliveryRetryResponse {
    * Delivery ID.
    */
   id: string;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   /**
    * Credit usage, included whenever a valid API key is provided.

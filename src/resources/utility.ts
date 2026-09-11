@@ -27,6 +27,12 @@ export class Utility extends APIResource {
 
 export interface UtilityPrefetchResponse {
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * The domain that was queued for prefetching
    */
   domain?: string;

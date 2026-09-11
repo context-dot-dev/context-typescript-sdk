@@ -30,6 +30,12 @@ export class Industry extends APIResource {
 
 export interface IndustryRetrieveNaicsResponse {
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Array of NAICS codes and titles.
    */
   codes?: Array<IndustryRetrieveNaicsResponse.Code>;
@@ -90,6 +96,12 @@ export namespace IndustryRetrieveNaicsResponse {
 }
 
 export interface IndustryRetrieveSicResponse {
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
   /**
    * Echoes back which SIC dataset was used to classify the brand.
    */

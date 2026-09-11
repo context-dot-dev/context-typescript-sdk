@@ -52,6 +52,12 @@ export interface AIExtractProductResponse {
   cache_metadata: AIExtractProductResponse.CacheMetadata;
 
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Whether the given URL is a product detail page
    */
   is_product_page?: boolean;
@@ -212,6 +218,12 @@ export interface AIExtractProductsResponse {
    * oldest contributing hit.
    */
   cache_metadata: AIExtractProductsResponse.CacheMetadata;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   /**
    * Credit usage, included whenever a valid API key is provided.

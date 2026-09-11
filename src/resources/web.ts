@@ -238,6 +238,12 @@ export interface WebExtractResponse {
   metadata: WebExtractResponse.Metadata;
 
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Status of the response, e.g., 'ok'
    */
   status: string;
@@ -353,6 +359,12 @@ export interface WebExtractCompetitorsResponse {
   domain: string;
 
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Status of the response.
    */
   status: 'ok';
@@ -464,6 +476,12 @@ export interface WebExtractFontsResponse {
    * Array of font usage information
    */
   fonts: Array<WebExtractFontsResponse.Font>;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   /**
    * Status of the response, e.g., 'ok'
@@ -585,6 +603,12 @@ export interface WebExtractStyleguideResponse {
    * oldest contributing hit.
    */
   cache_metadata: WebExtractStyleguideResponse.CacheMetadata;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   /**
    * HTTP status code
@@ -1145,6 +1169,12 @@ export interface WebScreenshotResponse {
   cache_metadata: WebScreenshotResponse.CacheMetadata;
 
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * HTTP status code
    */
   code?: number;
@@ -1233,6 +1263,12 @@ export interface WebSearchResponse {
    * Echo of the original query (useful when fanout was enabled).
    */
   query: string;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   results: Array<WebSearchResponse.Result>;
 
@@ -1331,6 +1367,12 @@ export interface WebWebCrawlMdResponse {
   cache_metadata: WebWebCrawlMdResponse.CacheMetadata;
 
   metadata: WebWebCrawlMdResponse.Metadata;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   results: Array<WebWebCrawlMdResponse.Result>;
 
@@ -1593,6 +1635,12 @@ export interface WebWebScrapeHTMLResponse {
    * Metadata extracted from the scraped page HTML.
    */
   metadata: WebWebScrapeHTMLResponse.Metadata;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   /**
    * Indicates success
@@ -1858,6 +1906,12 @@ export interface WebWebScrapeImagesResponse {
   images: Array<WebWebScrapeImagesResponse.Image>;
 
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Always true on success.
    */
   success: true;
@@ -2019,6 +2073,12 @@ export interface WebWebScrapeMdResponse {
    * Metadata extracted from the scraped page HTML.
    */
   metadata: WebWebScrapeMdResponse.Metadata;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   /**
    * Indicates success
@@ -2265,6 +2325,12 @@ export interface WebWebScrapeSitemapResponse {
    * Metadata about the sitemap crawl operation
    */
   meta: WebWebScrapeSitemapResponse.Meta;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   /**
    * Indicates success

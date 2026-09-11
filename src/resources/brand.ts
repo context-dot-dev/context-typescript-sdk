@@ -65,6 +65,12 @@ export interface BrandRetrieveResponse {
   cache_metadata: BrandRetrieveResponse.CacheMetadata;
 
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Detailed brand information
    */
   brand?: BrandRetrieveResponse.Brand;
@@ -903,6 +909,12 @@ export interface BrandRetrieveSimplifiedResponse {
   cache_metadata: BrandRetrieveSimplifiedResponse.CacheMetadata;
 
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Simplified brand information
    */
   brand?: BrandRetrieveSimplifiedResponse.Brand;
@@ -1124,6 +1136,12 @@ export namespace BrandRetrieveSimplifiedResponse {
 }
 
 export interface BrandSearchResponse {
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
   /**
    * Up to 10 matching brands, name matches first, then domain matches, most popular
    * first within each group. Empty when nothing matches.
