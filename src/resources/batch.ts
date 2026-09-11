@@ -308,6 +308,12 @@ export interface BatchRetrieveResponse {
   progress: BatchRetrieveResponse.Progress;
 
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Download links, available once the batch reaches a final status and null before
    * then. GET /batch/{batch_id}/results serves the same records as paginated JSON.
    */
@@ -469,6 +475,12 @@ export namespace BatchRetrieveResponse {
 }
 
 export interface BatchListResponse {
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
   /**
    * Batches on this page.
    */
@@ -686,6 +698,12 @@ export namespace BatchListResponse {
 
 export interface BatchDeleteResponse {
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * ID of the deleted batch.
    */
   id?: string;
@@ -759,6 +777,12 @@ export interface BatchCancelResponse {
    * How far the batch got before cancellation.
    */
   progress: BatchCancelResponse.Progress;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   /**
    * Always `cancelling`. Work already in flight finishes; the batch reaches
@@ -846,6 +870,12 @@ export namespace BatchCancelResponse {
 }
 
 export interface BatchGetResultsResponse {
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
   /**
    * Result records on this page.
    */
@@ -1194,6 +1224,12 @@ export interface BatchSubmitResponse {
    * How pages will be selected.
    */
   mode: 'scrape' | 'crawl';
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
 
   /**
    * Always `queued`. An accepted batch has not started yet.

@@ -28,7 +28,7 @@ const client = new ContextDev({
 
 const brand = await client.brand.retrieve({ domain: 'REPLACE_ME', type: 'by_domain' });
 
-console.log(brand.cache_metadata);
+console.log(brand.request_id);
 ```
 
 ### Request & Response types
@@ -149,7 +149,7 @@ const { data: brand, response: raw } = await client.brand
   .retrieve({ domain: 'REPLACE_ME', type: 'by_domain' })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(brand.cache_metadata);
+console.log(brand.request_id);
 ```
 
 ### Logging

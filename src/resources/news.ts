@@ -53,6 +53,12 @@ export interface NewsSearchResponse {
   next_cursor: string | null;
 
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: NewsSearchResponse.KeyMetadata;

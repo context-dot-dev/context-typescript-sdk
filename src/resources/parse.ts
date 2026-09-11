@@ -55,6 +55,12 @@ export interface ParseHandleResponse {
   markdown: string;
 
   /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
    * Indicates success
    */
   success: true;
