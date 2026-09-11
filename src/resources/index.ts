@@ -39,6 +39,7 @@ export {
   type IndustryRetrieveNaicsParams,
   type IndustryRetrieveSicParams,
 } from './industry';
+export { Logs, type LogRetrieveResponse, type LogListResponse, type LogListParams } from './logs';
 export {
   Monitors,
   type WebhookDelivery,
