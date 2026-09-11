@@ -56,6 +56,7 @@ import {
   IndustryRetrieveSicParams,
   IndustryRetrieveSicResponse,
 } from './resources/industry';
+import { LogListParams, LogListResponse, LogRetrieveResponse, Logs } from './resources/logs';
 import {
   MonitorCreateParams,
   MonitorCreateResponse,
@@ -848,6 +849,10 @@ export class ContextDev {
    * Search live first-party RSS and free historical news data by company identity.
    */
   news: API.News = new API.News(this);
+  /**
+   * Read your organization's API request logs to debug failed calls. These endpoints cost no credits and use a separate rate limit.
+   */
+  logs: API.Logs = new API.Logs(this);
 }
 
 ContextDev.Parse = Parse;
@@ -861,6 +866,7 @@ ContextDev.Batch = Batch;
 ContextDev.Webhooks = Webhooks;
 ContextDev.People = People;
 ContextDev.News = News;
+ContextDev.Logs = Logs;
 
 export declare namespace ContextDev {
   export type RequestOptions = Opts.RequestOptions;
@@ -984,5 +990,12 @@ export declare namespace ContextDev {
     News as News,
     type NewsSearchResponse as NewsSearchResponse,
     type NewsSearchParams as NewsSearchParams,
+  };
+
+  export {
+    Logs as Logs,
+    type LogRetrieveResponse as LogRetrieveResponse,
+    type LogListResponse as LogListResponse,
+    type LogListParams as LogListParams,
   };
 }
