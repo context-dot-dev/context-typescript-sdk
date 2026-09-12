@@ -415,6 +415,23 @@ export namespace MonitorCreateResponse {
     url: string;
 
     /**
+     * CSS selectors for HTML regions to remove before text extraction. Applied after
+     * include_selectors; exclusion takes precedence when an element matches both. Omit
+     * or pass an empty array to apply no explicit exclusions. Changing these selectors
+     * creates a new baseline.
+     */
+    exclude_selectors?: Array<string>;
+
+    /**
+     * CSS selectors defining the HTML regions to monitor. Matching subtrees are
+     * combined in document order before text extraction, instead of automatic
+     * main-content selection. Omit or pass an empty array to use automatic
+     * main-content extraction. If the filtered page has no usable text, the run fails
+     * without replacing the baseline. Changing these selectors creates a new baseline.
+     */
+    include_selectors?: Array<string>;
+
+    /**
      * Plain-language goal describing which page changes matter. When provided without
      * change_detection, semantic detection is inferred.
      */
@@ -767,6 +784,23 @@ export namespace MonitorRetrieveResponse {
     type: 'page';
 
     url: string;
+
+    /**
+     * CSS selectors for HTML regions to remove before text extraction. Applied after
+     * include_selectors; exclusion takes precedence when an element matches both. Omit
+     * or pass an empty array to apply no explicit exclusions. Changing these selectors
+     * creates a new baseline.
+     */
+    exclude_selectors?: Array<string>;
+
+    /**
+     * CSS selectors defining the HTML regions to monitor. Matching subtrees are
+     * combined in document order before text extraction, instead of automatic
+     * main-content selection. Omit or pass an empty array to use automatic
+     * main-content extraction. If the filtered page has no usable text, the run fails
+     * without replacing the baseline. Changing these selectors creates a new baseline.
+     */
+    include_selectors?: Array<string>;
 
     /**
      * Plain-language goal describing which page changes matter. When provided without
@@ -1123,6 +1157,23 @@ export namespace MonitorUpdateResponse {
     url: string;
 
     /**
+     * CSS selectors for HTML regions to remove before text extraction. Applied after
+     * include_selectors; exclusion takes precedence when an element matches both. Omit
+     * or pass an empty array to apply no explicit exclusions. Changing these selectors
+     * creates a new baseline.
+     */
+    exclude_selectors?: Array<string>;
+
+    /**
+     * CSS selectors defining the HTML regions to monitor. Matching subtrees are
+     * combined in document order before text extraction, instead of automatic
+     * main-content selection. Omit or pass an empty array to use automatic
+     * main-content extraction. If the filtered page has no usable text, the run fails
+     * without replacing the baseline. Changing these selectors creates a new baseline.
+     */
+    include_selectors?: Array<string>;
+
+    /**
      * Plain-language goal describing which page changes matter. When provided without
      * change_detection, semantic detection is inferred.
      */
@@ -1475,6 +1526,23 @@ export namespace MonitorListResponse {
       type: 'page';
 
       url: string;
+
+      /**
+       * CSS selectors for HTML regions to remove before text extraction. Applied after
+       * include_selectors; exclusion takes precedence when an element matches both. Omit
+       * or pass an empty array to apply no explicit exclusions. Changing these selectors
+       * creates a new baseline.
+       */
+      exclude_selectors?: Array<string>;
+
+      /**
+       * CSS selectors defining the HTML regions to monitor. Matching subtrees are
+       * combined in document order before text extraction, instead of automatic
+       * main-content selection. Omit or pass an empty array to use automatic
+       * main-content extraction. If the filtered page has no usable text, the run fails
+       * without replacing the baseline. Changing these selectors creates a new baseline.
+       */
+      include_selectors?: Array<string>;
 
       /**
        * Plain-language goal describing which page changes matter. When provided without
@@ -2187,6 +2255,23 @@ export namespace MonitorCreateParams {
     url: string;
 
     /**
+     * CSS selectors for HTML regions to remove before text extraction. Applied after
+     * include_selectors; exclusion takes precedence when an element matches both. Omit
+     * or pass an empty array to apply no explicit exclusions. Changing these selectors
+     * creates a new baseline.
+     */
+    exclude_selectors?: Array<string>;
+
+    /**
+     * CSS selectors defining the HTML regions to monitor. Matching subtrees are
+     * combined in document order before text extraction, instead of automatic
+     * main-content selection. Omit or pass an empty array to use automatic
+     * main-content extraction. If the filtered page has no usable text, the run fails
+     * without replacing the baseline. Changing these selectors creates a new baseline.
+     */
+    include_selectors?: Array<string>;
+
+    /**
      * Plain-language goal describing which page changes matter. When provided without
      * change_detection, semantic detection is inferred.
      */
@@ -2420,6 +2505,23 @@ export namespace MonitorUpdateParams {
     type: 'page';
 
     url: string;
+
+    /**
+     * CSS selectors for HTML regions to remove before text extraction. Applied after
+     * include_selectors; exclusion takes precedence when an element matches both. Omit
+     * or pass an empty array to apply no explicit exclusions. Changing these selectors
+     * creates a new baseline.
+     */
+    exclude_selectors?: Array<string>;
+
+    /**
+     * CSS selectors defining the HTML regions to monitor. Matching subtrees are
+     * combined in document order before text extraction, instead of automatic
+     * main-content selection. Omit or pass an empty array to use automatic
+     * main-content extraction. If the filtered page has no usable text, the run fails
+     * without replacing the baseline. Changing these selectors creates a new baseline.
+     */
+    include_selectors?: Array<string>;
 
     /**
      * Plain-language goal describing which page changes matter. When provided without
