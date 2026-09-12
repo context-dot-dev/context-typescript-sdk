@@ -92,7 +92,9 @@ export class Batch extends APIResource {
    * ```ts
    * const response = await client.batch.submit({
    *   input: {
+   *     mode: 'scrape',
    *     data: {
+   *       format: 'markdown',
    *       urls: [
    *         {
    *           url: 'https://example.com/products/anvil',
