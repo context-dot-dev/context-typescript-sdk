@@ -9,6 +9,31 @@ const client = new ContextDev({
 
 describe('resource web', () => {
   // Mock server tests are disabled
+  test.skip('answers: only required params', async () => {
+    const responsePromise = client.web.answers({
+      task: 'Find the pricing page URL and plan names for context.dev.',
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Mock server tests are disabled
+  test.skip('answers: required and optional params', async () => {
+    const response = await client.web.answers({
+      task: 'Find the pricing page URL and plan names for context.dev.',
+      json_format: { pricing_page_url: 'bar', plans: 'bar' },
+      mode: 'fast',
+      tags: ['production', 'team-alpha'],
+      timeoutMS: 1000,
+    });
+  });
+
+  // Mock server tests are disabled
   test.skip('extract: only required params', async () => {
     const responsePromise = client.web.extract({
       schema: {

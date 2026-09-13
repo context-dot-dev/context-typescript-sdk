@@ -6,6 +6,28 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Web extends APIResource {
   /**
+   * Researches the live web and returns a sourced answer in your requested JSON
+   * shape. Select fast for a smaller research budget at 10 credits or ultra for
+   * deeper reasoning at 100 credits. Defaults to ultra. Fast research is limited to
+   * 30 seconds and ultra to 50 seconds; timeoutMS can shorten either deadline.
+   *
+   * @example
+   * ```ts
+   * const response = await client.web.answers({
+   *   task: 'Find the pricing page URL and plan names for context.dev.',
+   *   json_format: {
+   *     pricing_page_url: '',
+   *     plans: [{ name: '' }],
+   *   },
+   *   mode: 'fast',
+   * });
+   * ```
+   */
+  answers(body: WebAnswersParams, options?: RequestOptions): APIPromise<WebAnswersResponse> {
+    return this._client.post('/web/answers', { body, ...options });
+  }
+
+  /**
    * Crawl a website, use the provided JSON Schema and instructions to prioritize
    * relevant internal links, and extract structured data from the selected pages.
    *
@@ -219,6 +241,41 @@ export class Web extends APIResource {
     options?: RequestOptions,
   ): APIPromise<WebWebScrapeSitemapResponse> {
     return this._client.get('/web/scrape/sitemap', { query, ...options });
+  }
+}
+
+export interface WebAnswersResponse {
+  /**
+   * The answer, in the shape requested by json_format.
+   */
+  json_content: { [key: string]: unknown };
+
+  /**
+   * URLs that supplied search results or readable page content, in first-seen order.
+   * Unreadable pages are excluded.
+   */
+  sources: Array<string>;
+
+  /**
+   * Credit usage, included whenever a valid API key is provided.
+   */
+  key_metadata?: WebAnswersResponse.KeyMetadata;
+}
+
+export namespace WebAnswersResponse {
+  /**
+   * Credit usage, included whenever a valid API key is provided.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits used by this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
   }
 }
 
@@ -2389,6 +2446,42 @@ export namespace WebWebScrapeSitemapResponse {
      */
     credits_remaining: number;
   }
+}
+
+export interface WebAnswersParams {
+  /**
+   * What to research and answer, in plain language. Naming a domain in the task (for
+   * example "pricing on context.dev") makes the agent read that site before it
+   * searches.
+   */
+  task: string;
+
+  /**
+   * An example object with placeholder values (for example {"pricing_page_url": "",
+   * "plans": [{"name": "", "price": 0}]}). Object keys and value types are
+   * preserved; unknown values may be null. Empty arrays accept any JSON items.
+   * Defaults to {"result": ""}. Maximum 8 levels, 500 values, and 16000 characters.
+   */
+  json_format?: { [key: string]: unknown };
+
+  /**
+   * Research level: fast uses a smaller model and research budget for 10 credits;
+   * ultra uses deeper reasoning and research for 100 credits. Defaults to ultra.
+   * Only successful requests consume credits.
+   */
+  mode?: 'fast' | 'ultra';
+
+  /**
+   * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+   */
+  tags?: Array<string>;
+
+  /**
+   * Optional timeout in milliseconds for the request. If the request takes longer
+   * than this value, it will be aborted with a 408 status code. Maximum allowed
+   * value is 300000ms (5 minutes).
+   */
+  timeoutMS?: number;
 }
 
 export interface WebExtractParams {
@@ -4769,6 +4862,7 @@ export interface WebWebScrapeSitemapParams {
 
 export declare namespace Web {
   export {
+    type WebAnswersResponse as WebAnswersResponse,
     type WebExtractResponse as WebExtractResponse,
     type WebExtractCompetitorsResponse as WebExtractCompetitorsResponse,
     type WebExtractFontsResponse as WebExtractFontsResponse,
@@ -4780,6 +4874,7 @@ export declare namespace Web {
     type WebWebScrapeImagesResponse as WebWebScrapeImagesResponse,
     type WebWebScrapeMdResponse as WebWebScrapeMdResponse,
     type WebWebScrapeSitemapResponse as WebWebScrapeSitemapResponse,
+    type WebAnswersParams as WebAnswersParams,
     type WebExtractParams as WebExtractParams,
     type WebExtractCompetitorsParams as WebExtractCompetitorsParams,
     type WebExtractFontsParams as WebExtractFontsParams,
