@@ -71,6 +71,7 @@ export { People, type PersonEnrichResponse, type PersonEnrichParams } from './pe
 export { Utility, type UtilityPrefetchResponse, type UtilityPrefetchParams } from './utility';
 export {
   Web,
+  type WebAnswersResponse,
   type WebExtractResponse,
   type WebExtractCompetitorsResponse,
   type WebExtractFontsResponse,
@@ -82,6 +83,7 @@ export {
   type WebWebScrapeImagesResponse,
   type WebWebScrapeMdResponse,
   type WebWebScrapeSitemapResponse,
+  type WebAnswersParams,
   type WebExtractParams,
   type WebExtractCompetitorsParams,
   type WebExtractFontsParams,

@@ -88,6 +88,8 @@ import { People, PersonEnrichParams, PersonEnrichResponse } from './resources/pe
 import { Utility, UtilityPrefetchParams, UtilityPrefetchResponse } from './resources/utility';
 import {
   Web,
+  WebAnswersParams,
+  WebAnswersResponse,
   WebExtractCompetitorsParams,
   WebExtractCompetitorsResponse,
   WebExtractFontsParams,
@@ -879,6 +881,7 @@ export declare namespace ContextDev {
 
   export {
     Web as Web,
+    type WebAnswersResponse as WebAnswersResponse,
     type WebExtractResponse as WebExtractResponse,
     type WebExtractCompetitorsResponse as WebExtractCompetitorsResponse,
     type WebExtractFontsResponse as WebExtractFontsResponse,
@@ -890,6 +893,7 @@ export declare namespace ContextDev {
     type WebWebScrapeImagesResponse as WebWebScrapeImagesResponse,
     type WebWebScrapeMdResponse as WebWebScrapeMdResponse,
     type WebWebScrapeSitemapResponse as WebWebScrapeSitemapResponse,
+    type WebAnswersParams as WebAnswersParams,
     type WebExtractParams as WebExtractParams,
     type WebExtractCompetitorsParams as WebExtractCompetitorsParams,
     type WebExtractFontsParams as WebExtractFontsParams,
