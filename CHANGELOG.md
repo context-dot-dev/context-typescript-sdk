@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.18.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.17.0...v2.18.0) (2026-09-13)
+
+
+### Features
+
+* **answers:** add live web research with fast and ultra modes ([#954](https://github.com/context-dot-dev/context-typescript-sdk/issues/954)) ([8d9f488](https://github.com/context-dot-dev/context-typescript-sdk/commit/8d9f4882f87378e63dcfd8737e067c9b17770406))
+* **api-keys:** enforce scoped API key permissions ([#1038](https://github.com/context-dot-dev/context-typescript-sdk/issues/1038)) ([de5e60d](https://github.com/context-dot-dev/context-typescript-sdk/commit/de5e60dcc85e3754302cec35060cffe8c238cd8a))
+* **monitors:** add page selector filters ([#1037](https://github.com/context-dot-dev/context-typescript-sdk/issues/1037)) ([25fd26d](https://github.com/context-dot-dev/context-typescript-sdk/commit/25fd26d00df62cd2bc4fc04f246940494e07828b))
+
+
+### Bug Fixes
+
+* **api:** honour maxAgeMs=0 on brand retrieve, styleguide and fonts endpoints ([#998](https://github.com/context-dot-dev/context-typescript-sdk/issues/998)) ([503a20e](https://github.com/context-dot-dev/context-typescript-sdk/commit/503a20ed84b09182432bc164c2d4bfe6ca386505))
+* **security:** consolidate dependency updates and harden public fetches ([#1040](https://github.com/context-dot-dev/context-typescript-sdk/issues/1040)) ([db2c906](https://github.com/context-dot-dev/context-typescript-sdk/commit/db2c9065d92e20c8db5dac07c65e5b1fd289e798))
+* **webhooks:** format Slack webhook notifications ([#1045](https://github.com/context-dot-dev/context-typescript-sdk/issues/1045)) ([9615345](https://github.com/context-dot-dev/context-typescript-sdk/commit/961534544b1fd85fdc351be36d7f8a4ba54b5da7))
+
 ## [2.17.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.16.0...v2.17.0) (2026-09-11)
 
 
