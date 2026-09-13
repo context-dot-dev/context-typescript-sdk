@@ -1334,9 +1334,9 @@ export declare namespace BrandRetrieveParams {
 
     /**
      * Maximum age in milliseconds for cached brand data before the API performs a hard
-     * refresh. Defaults to 3 months (7776000000 ms). Values below 1 day (86400000 ms)
-     * are clamped to 1 day; values above 1 year (31536000000 ms) are clamped to 1
-     * year.
+     * refresh. Defaults to 3 months (7776000000 ms). Set to 0 to always perform a hard
+     * refresh. Negative values are clamped to 0; values above 1 year (31536000000 ms)
+     * are clamped to 1 year.
      */
     maxAgeMs?: number;
 
@@ -1502,9 +1502,9 @@ export declare namespace BrandRetrieveParams {
 
     /**
      * Maximum age in milliseconds for cached brand data before the API performs a hard
-     * refresh. Defaults to 3 months (7776000000 ms). Values below 1 day (86400000 ms)
-     * are clamped to 1 day; values above 1 year (31536000000 ms) are clamped to 1
-     * year.
+     * refresh. Defaults to 3 months (7776000000 ms). Set to 0 to always perform a hard
+     * refresh. Negative values are clamped to 0; values above 1 year (31536000000 ms)
+     * are clamped to 1 year.
      */
     maxAgeMs?: number;
 
@@ -1664,9 +1664,9 @@ export declare namespace BrandRetrieveParams {
 
     /**
      * Maximum age in milliseconds for cached brand data before the API performs a hard
-     * refresh. Defaults to 3 months (7776000000 ms). Values below 1 day (86400000 ms)
-     * are clamped to 1 day; values above 1 year (31536000000 ms) are clamped to 1
-     * year.
+     * refresh. Defaults to 3 months (7776000000 ms). Set to 0 to always perform a hard
+     * refresh. Negative values are clamped to 0; values above 1 year (31536000000 ms)
+     * are clamped to 1 year.
      */
     maxAgeMs?: number;
 
@@ -1826,9 +1826,9 @@ export declare namespace BrandRetrieveParams {
 
     /**
      * Maximum age in milliseconds for cached brand data before the API performs a hard
-     * refresh. Defaults to 3 months (7776000000 ms). Values below 1 day (86400000 ms)
-     * are clamped to 1 day; values above 1 year (31536000000 ms) are clamped to 1
-     * year.
+     * refresh. Defaults to 3 months (7776000000 ms). Set to 0 to always perform a hard
+     * refresh. Negative values are clamped to 0; values above 1 year (31536000000 ms)
+     * are clamped to 1 year.
      */
     maxAgeMs?: number;
 
@@ -2074,9 +2074,9 @@ export interface BrandRetrieveSimplifiedParams {
 
   /**
    * Maximum age in milliseconds for cached brand data before the API performs a hard
-   * refresh. Defaults to 3 months (7776000000 ms). Values below 1 day (86400000 ms)
-   * are clamped to 1 day; values above 1 year (31536000000 ms) are clamped to 1
-   * year.
+   * refresh. Defaults to 3 months (7776000000 ms). Set to 0 to always perform a hard
+   * refresh. Negative values are clamped to 0; values above 1 year (31536000000 ms)
+   * are clamped to 1 year.
    */
   maxAgeMs?: number | null;
 
