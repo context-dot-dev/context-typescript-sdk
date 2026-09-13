@@ -591,7 +591,8 @@ export namespace MonitorCreateResponse {
 
   export interface Webhook {
     /**
-     * Webhook URL events are delivered to.
+     * Webhook URL events are delivered to. Slack incoming webhook URLs are
+     * automatically formatted as Slack messages.
      */
     url: string;
 
@@ -963,7 +964,8 @@ export namespace MonitorRetrieveResponse {
 
   export interface Webhook {
     /**
-     * Webhook URL events are delivered to.
+     * Webhook URL events are delivered to. Slack incoming webhook URLs are
+     * automatically formatted as Slack messages.
      */
     url: string;
 
@@ -1335,7 +1337,8 @@ export namespace MonitorUpdateResponse {
 
   export interface Webhook {
     /**
-     * Webhook URL events are delivered to.
+     * Webhook URL events are delivered to. Slack incoming webhook URLs are
+     * automatically formatted as Slack messages.
      */
     url: string;
 
@@ -1707,7 +1710,8 @@ export namespace MonitorListResponse {
 
     export interface Webhook {
       /**
-       * Webhook URL events are delivered to.
+       * Webhook URL events are delivered to. Slack incoming webhook URLs are
+       * automatically formatted as Slack messages.
        */
       url: string;
 
@@ -2404,7 +2408,8 @@ export namespace MonitorCreateParams {
 
   export interface Webhook {
     /**
-     * Webhook URL events are delivered to.
+     * Webhook URL events are delivered to. Slack incoming webhook URLs are
+     * automatically formatted as Slack messages.
      */
     url: string;
 
@@ -2621,7 +2626,8 @@ export namespace MonitorUpdateParams {
    */
   export interface Webhook {
     /**
-     * Webhook URL events are delivered to.
+     * Webhook URL events are delivered to. Slack incoming webhook URLs are
+     * automatically formatted as Slack messages.
      */
     url: string;
 
