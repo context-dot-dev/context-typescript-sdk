@@ -1439,7 +1439,8 @@ export namespace WebSearchResponse {
 
   export interface Result {
     /**
-     * Snippet excerpt from the page.
+     * Snippet excerpt from the page. Empty string when the search provider does not
+     * supply a snippet.
      */
     description: string;
 
