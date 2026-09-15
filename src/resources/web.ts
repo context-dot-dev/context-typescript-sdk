@@ -9,7 +9,8 @@ export class Web extends APIResource {
    * Researches the live web and returns a sourced answer in your requested JSON
    * shape. Select fast for a smaller research budget at 10 credits or ultra for
    * deeper reasoning at 100 credits. Defaults to ultra. Fast research is limited to
-   * 30 seconds and ultra to 50 seconds; timeoutMS can shorten either deadline.
+   * 30 seconds and ultra to 50 seconds; timeoutOpts.milliseconds can shorten either
+   * deadline.
    *
    * @example
    * ```ts
@@ -168,7 +169,11 @@ export class Web extends APIResource {
 
   /**
    * Scrapes the given URL and returns the raw HTML content of the page. The base
-   * request costs 1 credit; requests with browser actions cost 2 credits.
+   * request costs 1 credit; requests with browser actions cost 2 credits. A request
+   * that hits its timeoutOpts.milliseconds deadline fails with 408 and is not
+   * billed, unless timeoutOpts.behavior=return-partial is set — then the page as
+   * rendered so far is returned with `finalDOMState: "still-loading"` and billed at
+   * the base cost of 1 credit.
    *
    * @example
    * ```ts
@@ -226,11 +231,11 @@ export class Web extends APIResource {
    *
    * | HTTP status | Billed?                                   | Meaning                                                                                                                                                                                                                                                                                                       |
    * | ----------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   * | 200         | Yes — 1 credit, or 2 credits with actions | Successful scrape, including a zero-length result when includeSelectors matched nothing                                                                                                                                                                                                                       |
+   * | 200         | Yes — 1 credit, or 2 credits with actions | Successful scrape, including a zero-length result when includeSelectors matched nothing. A partial result (`finalDOMState: "still-loading"`, only with timeoutOpts.behavior=return-partial) is billed at the base 1 credit with no OCR or actions surcharge                                                   |
    * | 400         | No                                        | Invalid input, skipped PDF, or the page could not be scraped. error_code WEBSITE_BLOCKED specifically means the site answered with an anti-bot challenge, CAPTCHA wall, or login shell instead of the page (even when the site returned HTTP 200) — retrying later or from another country sometimes succeeds |
    * | 401 / 403   | No                                        | Invalid/disabled key, insufficient permissions, or credits exhausted; inspect error_code                                                                                                                                                                                                                      |
    * | 404         | No                                        | Target page returned or fingerprinted as not found                                                                                                                                                                                                                                                            |
-   * | 408         | No                                        | Request timed out                                                                                                                                                                                                                                                                                             |
+   * | 408         | No                                        | Request timed out. With timeoutOpts.behavior=return-partial this only happens when nothing usable had rendered by the deadline                                                                                                                                                                                |
    * | 413         | No                                        | Target content exceeds the maximum supported size (20 MB)                                                                                                                                                                                                                                                     |
    * | 415         | No                                        | Unsupported content type                                                                                                                                                                                                                                                                                      |
    * | 429         | No                                        | Per-minute rate limit exceeded; honor Retry-After                                                                                                                                                                                                                                                             |
@@ -286,6 +291,12 @@ export interface WebAnswersResponse {
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebAnswersResponse.KeyMetadata;
+
+  /**
+   * True when the request deadline ended research and the answer uses the evidence
+   * collected so far.
+   */
+  partial?: boolean;
 }
 
 export namespace WebAnswersResponse {
@@ -345,6 +356,12 @@ export interface WebExtractResponse {
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebExtractResponse.KeyMetadata;
+
+  /**
+   * True when the timeout ended processing and this response contains only usable
+   * results completed so far. Unfinished results are omitted.
+   */
+  partial?: boolean;
 }
 
 export namespace WebExtractResponse {
@@ -461,6 +478,12 @@ export interface WebExtractCompetitorsResponse {
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebExtractCompetitorsResponse.KeyMetadata;
+
+  /**
+   * True when the timeout ended processing and this response contains only usable
+   * results completed so far. Unfinished results are omitted.
+   */
+  partial?: boolean;
 }
 
 export namespace WebExtractCompetitorsResponse {
@@ -570,6 +593,15 @@ export interface WebExtractFontsResponse {
    * Status of the response, e.g., 'ok'
    */
   status: string;
+
+  /**
+   * How complete the returned content is. `loaded` means the page finished the waits
+   * the request asked for. `still-loading` only occurs with
+   * timeoutOpts.behavior=return-partial: the timeoutOpts.milliseconds deadline was
+   * reached first, so the content reflects the DOM at that moment and late-rendering
+   * parts may be missing. Partial results are billed at the base request cost.
+   */
+  finalDOMState?: 'loaded' | 'still-loading';
 
   /**
    * Font assets keyed by family name as it appears in the fonts array (non-generic
@@ -702,6 +734,15 @@ export interface WebExtractStyleguideResponse {
    * The normalized domain that was processed
    */
   domain?: string;
+
+  /**
+   * How complete the returned content is. `loaded` means the page finished the waits
+   * the request asked for. `still-loading` only occurs with
+   * timeoutOpts.behavior=return-partial: the timeoutOpts.milliseconds deadline was
+   * reached first, so the content reflects the DOM at that moment and late-rendering
+   * parts may be missing. Partial results are billed at the base request cost.
+   */
+  finalDOMState?: 'loaded' | 'still-loading';
 
   /**
    * Credit usage, included whenever a valid API key is provided.
@@ -1268,6 +1309,15 @@ export interface WebScreenshotResponse {
   domain?: string;
 
   /**
+   * How complete the returned content is. `loaded` means the page finished the waits
+   * the request asked for. `still-loading` only occurs with
+   * timeoutOpts.behavior=return-partial: the timeoutOpts.milliseconds deadline was
+   * reached first, so the content reflects the DOM at that moment and late-rendering
+   * parts may be missing. Partial results are billed at the base request cost.
+   */
+  finalDOMState?: 'loaded' | 'still-loading';
+
+  /**
    * Height in pixels of the returned screenshot image
    */
   height?: number;
@@ -1359,6 +1409,13 @@ export interface WebSearchResponse {
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebSearchResponse.KeyMetadata;
+
+  /**
+   * True when timeoutOpts.behavior=return-partial returned the usable results
+   * collected before the deadline. Partial collections are not cached as complete
+   * results.
+   */
+  partial?: boolean;
 }
 
 export namespace WebSearchResponse {
@@ -1422,6 +1479,15 @@ export namespace WebSearchResponse {
        * scraping succeeded.
        */
       markdown: string | null;
+
+      /**
+       * How complete the returned content is. `loaded` means the page finished the waits
+       * the request asked for. `still-loading` only occurs with
+       * timeoutOpts.behavior=return-partial: the timeoutOpts.milliseconds deadline was
+       * reached first, so the content reflects the DOM at that moment and late-rendering
+       * parts may be missing. Partial results are billed at the base request cost.
+       */
+      finalDOMState?: 'loaded' | 'still-loading';
     }
   }
 
@@ -1463,6 +1529,13 @@ export interface WebWebCrawlMdResponse {
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebWebCrawlMdResponse.KeyMetadata;
+
+  /**
+   * True when timeoutOpts.behavior=return-partial returned the usable results
+   * collected before the deadline. Partial collections are not cached as complete
+   * results.
+   */
+  partial?: boolean;
 }
 
 export namespace WebWebCrawlMdResponse {
@@ -1774,6 +1847,15 @@ export interface WebWebScrapeHTMLResponse {
   cache_metadata: WebWebScrapeHTMLResponse.CacheMetadata;
 
   /**
+   * How complete the returned content is. `loaded` means the page finished the waits
+   * the request asked for. `still-loading` only occurs with
+   * timeoutOpts.behavior=return-partial: the timeoutOpts.milliseconds deadline was
+   * reached first, so the content reflects the DOM at that moment and late-rendering
+   * parts may be missing. Partial results are billed at the base request cost.
+   */
+  finalDOMState: 'loaded' | 'still-loading';
+
+  /**
    * The scraped content of the page. For normal pages this is the raw HTML. When the
    * page is a sitemap or feed served behind an XSL stylesheet (which browsers render
    * into HTML), this is the underlying XML instead — see the `type` field.
@@ -2076,9 +2158,25 @@ export interface WebWebScrapeImagesResponse {
   actionsApplied?: Array<WebWebScrapeImagesResponse.ActionsApplied>;
 
   /**
+   * How complete the returned content is. `loaded` means the page finished the waits
+   * the request asked for. `still-loading` only occurs with
+   * timeoutOpts.behavior=return-partial: the timeoutOpts.milliseconds deadline was
+   * reached first, so the content reflects the DOM at that moment and late-rendering
+   * parts may be missing. Partial results are billed at the base request cost.
+   */
+  finalDOMState?: 'loaded' | 'still-loading';
+
+  /**
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebWebScrapeImagesResponse.KeyMetadata;
+
+  /**
+   * True when the deadline interrupted rendering or image enrichment. Partial
+   * results are billed at the base request cost, without enrichment or actions
+   * surcharges.
+   */
+  partial?: boolean;
 }
 
 export namespace WebWebScrapeImagesResponse {
@@ -2212,6 +2310,15 @@ export interface WebWebScrapeMdResponse {
    * threshold.
    */
   contentLength: number;
+
+  /**
+   * How complete the returned content is. `loaded` means the page finished the waits
+   * the request asked for. `still-loading` only occurs with
+   * timeoutOpts.behavior=return-partial: the timeoutOpts.milliseconds deadline was
+   * reached first, so the content reflects the DOM at that moment and late-rendering
+   * parts may be missing. Partial results are billed at the base request cost.
+   */
+  finalDOMState: 'loaded' | 'still-loading';
 
   /**
    * Page content converted to GitHub Flavored Markdown
@@ -2496,6 +2603,13 @@ export interface WebWebScrapeSitemapResponse {
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: WebWebScrapeSitemapResponse.KeyMetadata;
+
+  /**
+   * True when timeoutOpts.behavior=return-partial returned the usable results
+   * collected before the deadline. Partial collections are not cached as complete
+   * results.
+   */
+  partial?: boolean;
 }
 
 export namespace WebWebScrapeSitemapResponse {
@@ -2569,11 +2683,33 @@ export interface WebAnswersParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebAnswersParams.TimeoutOpts;
+}
+
+export namespace WebAnswersParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export interface WebExtractParams {
@@ -2669,11 +2805,11 @@ export interface WebExtractParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebExtractParams.TimeoutOpts;
 
   /**
    * Optional browser wait time in milliseconds after initial page load for each
@@ -2748,6 +2884,26 @@ export namespace WebExtractParams {
      */
     start?: number;
   }
+
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export interface WebExtractCompetitorsParams {
@@ -2769,11 +2925,33 @@ export interface WebExtractCompetitorsParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebExtractCompetitorsParams.TimeoutOpts;
+}
+
+export namespace WebExtractCompetitorsParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export interface WebExtractFontsParams {
@@ -2806,11 +2984,34 @@ export interface WebExtractFontsParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebExtractFontsParams.TimeoutOpts;
+}
+
+export namespace WebExtractFontsParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results. "return-partial" requires milliseconds of at
+     * least 15000.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export interface WebExtractStyleguideParams {
@@ -2850,11 +3051,34 @@ export interface WebExtractStyleguideParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebExtractStyleguideParams.TimeoutOpts;
+}
+
+export namespace WebExtractStyleguideParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results. "return-partial" requires milliseconds of at
+     * least 15000.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export interface WebScreenshotParams {
@@ -3144,11 +3368,11 @@ export interface WebScreenshotParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebScreenshotParams.TimeoutOpts;
 
   /**
    * Optional browser viewport dimensions for the screenshot. Defaults to 1920x1080.
@@ -3158,8 +3382,9 @@ export interface WebScreenshotParams {
   /**
    * Optional browser wait time in milliseconds after initial page load before taking
    * the screenshot. Min: 0. Max: 30000 (30 seconds). Defaults to 3000 ms when
-   * omitted. When combined with timeoutMS, timeoutMS must be at least waitForMs +
-   * 10000 ms; a shorter deadline is rejected with 400 TIMEOUT_TOO_SHORT_FOR_WAIT.
+   * omitted. When combined with timeoutOpts, timeoutOpts.milliseconds must be at
+   * least waitForMs + 10000 ms; a shorter deadline is rejected with 400
+   * TIMEOUT_TOO_SHORT_FOR_WAIT.
    */
   waitForMs?: number | null;
 
@@ -3173,6 +3398,27 @@ export interface WebScreenshotParams {
 }
 
 export namespace WebScreenshotParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results. "return-partial" requires milliseconds of at
+     * least 15000.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
+
   /**
    * Optional browser viewport dimensions for the screenshot. Defaults to 1920x1080.
    */
@@ -3479,11 +3725,11 @@ export interface WebSearchParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebSearchParams.TimeoutOpts;
 }
 
 export namespace WebSearchParams {
@@ -3528,11 +3774,11 @@ export namespace WebSearchParams {
     shortenBase64Images?: boolean;
 
     /**
-     * Optional timeout in milliseconds for the request. If the request takes longer
-     * than this value, it will be aborted with a 408 status code. Maximum allowed
-     * value is 300000ms (5 minutes).
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
      */
-    timeoutMS?: number;
+    timeoutOpts?: MarkdownOptions.TimeoutOpts;
 
     /**
      * Strip nav, header, footer, and sidebar — keep only the primary article content.
@@ -3567,6 +3813,47 @@ export namespace WebSearchParams {
        */
       start?: number;
     }
+
+    /**
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
+     */
+    export interface TimeoutOpts {
+      /**
+       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       */
+      milliseconds: number;
+
+      /**
+       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+       * credits. "return-partial" returns usable results collected so far; if none are
+       * available, the request still fails without charging credits. Partial results are
+       * not cached as complete results. "return-partial" requires milliseconds of at
+       * least 15000.
+       */
+      behavior?: 'fail' | 'return-partial';
+    }
+  }
+
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results.
+     */
+    behavior?: 'fail' | 'return-partial';
   }
 }
 
@@ -3873,11 +4160,11 @@ export interface WebWebCrawlMdParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebWebCrawlMdParams.TimeoutOpts;
 
   /**
    * Regex pattern. Only URLs matching this pattern will be followed and scraped. An
@@ -3937,6 +4224,26 @@ export namespace WebWebCrawlMdParams {
      * First 1-based PDF page to parse. When omitted, parsing starts at the first page.
      */
     start?: number;
+  }
+
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results.
+     */
+    behavior?: 'fail' | 'return-partial';
   }
 }
 
@@ -4172,11 +4479,11 @@ export interface WebWebScrapeBytesParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebWebScrapeBytesParams.TimeoutOpts;
 
   /**
    * Set to enabled to bypass shared caches and omit request and response content
@@ -4185,6 +4492,26 @@ export interface WebWebScrapeBytesParams {
    * ZDR_NOT_ENABLED. Successful ZDR responses include X-Context-ZDR: true.
    */
   zdr?: 'enabled' | 'disabled';
+}
+
+export namespace WebWebScrapeBytesParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. This endpoint supports "fail": return 408
+     * REQUEST_TIMEOUT without charging credits.
+     */
+    behavior?: 'fail';
+  }
 }
 
 export interface WebWebScrapeHTMLParams {
@@ -4467,11 +4794,11 @@ export interface WebWebScrapeHTMLParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebWebScrapeHTMLParams.TimeoutOpts;
 
   /**
    * When true, return only the page's main content in the HTML response, excluding
@@ -4481,8 +4808,8 @@ export interface WebWebScrapeHTMLParams {
 
   /**
    * Optional browser wait time in milliseconds after initial page load. Min: 0. Max:
-   * 30000 (30 seconds). When combined with timeoutMS, timeoutMS must be at least
-   * waitForMs + 10000 ms; a shorter deadline is rejected with 400
+   * 30000 (30 seconds). When combined with timeoutOpts, timeoutOpts.milliseconds
+   * must be at least waitForMs + 10000 ms; a shorter deadline is rejected with 400
    * TIMEOUT_TOO_SHORT_FOR_WAIT.
    */
   waitForMs?: number | null;
@@ -4575,6 +4902,27 @@ export namespace WebWebScrapeHTMLParams {
      */
     start?: number;
   }
+
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results. "return-partial" requires milliseconds of at
+     * least 15000.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export interface WebWebScrapeImagesParams {
@@ -4628,17 +4976,17 @@ export interface WebWebScrapeImagesParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebWebScrapeImagesParams.TimeoutOpts;
 
   /**
    * Optional browser wait time in milliseconds after initial page load before
    * collecting images. Min: 0. Max: 30000 (30 seconds). When combined with
-   * timeoutMS, timeoutMS must be at least waitForMs + 10000 ms; a shorter deadline
-   * is rejected with 400 TIMEOUT_TOO_SHORT_FOR_WAIT.
+   * timeoutOpts, timeoutOpts.milliseconds must be at least waitForMs + 10000 ms; a
+   * shorter deadline is rejected with 400 TIMEOUT_TOO_SHORT_FOR_WAIT.
    */
   waitForMs?: number | null;
 }
@@ -4717,6 +5065,27 @@ export namespace WebWebScrapeImagesParams {
      * Measure image width and height when possible.
      */
     resolution?: boolean;
+  }
+
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results. "return-partial" requires milliseconds of at
+     * least 15000.
+     */
+    behavior?: 'fail' | 'return-partial';
   }
 }
 
@@ -5023,11 +5392,11 @@ export interface WebWebScrapeMdParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebWebScrapeMdParams.TimeoutOpts;
 
   /**
    * Extract only the main content of the page, excluding headers, footers, sidebars,
@@ -5038,8 +5407,8 @@ export interface WebWebScrapeMdParams {
   /**
    * Optional browser wait time in milliseconds after initial page load before
    * converting the page to Markdown. Min: 0. Max: 30000 (30 seconds). When combined
-   * with timeoutMS, timeoutMS must be at least waitForMs + 10000 ms; a shorter
-   * deadline is rejected with 400 TIMEOUT_TOO_SHORT_FOR_WAIT.
+   * with timeoutOpts, timeoutOpts.milliseconds must be at least waitForMs + 10000
+   * ms; a shorter deadline is rejected with 400 TIMEOUT_TOO_SHORT_FOR_WAIT.
    */
   waitForMs?: number | null;
 
@@ -5131,6 +5500,27 @@ export namespace WebWebScrapeMdParams {
      */
     start?: number;
   }
+
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results. "return-partial" requires milliseconds of at
+     * least 15000.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export interface WebWebScrapeSitemapParams {
@@ -5178,11 +5568,11 @@ export interface WebWebScrapeSitemapParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: WebWebScrapeSitemapParams.TimeoutOpts;
 
   /**
    * Optional RE2-compatible regex pattern. Only URLs matching this pattern are
@@ -5197,6 +5587,28 @@ export interface WebWebScrapeSitemapParams {
    * ZDR_NOT_ENABLED. Successful ZDR responses include X-Context-ZDR: true.
    */
   zdr?: 'enabled' | 'disabled';
+}
+
+export namespace WebWebScrapeSitemapParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export declare namespace Web {

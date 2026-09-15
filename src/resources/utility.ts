@@ -95,11 +95,11 @@ export interface UtilityPrefetchParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: UtilityPrefetchParams.TimeoutOpts;
 }
 
 export namespace UtilityPrefetchParams {
@@ -123,6 +123,24 @@ export namespace UtilityPrefetchParams {
      * are not allowed.
      */
     email: string;
+  }
+
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. This endpoint supports "fail": return 408
+     * REQUEST_TIMEOUT without charging credits.
+     */
+    behavior?: 'fail';
   }
 }
 

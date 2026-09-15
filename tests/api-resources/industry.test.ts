@@ -27,7 +27,7 @@ describe('resource industry', () => {
       maxResults: 1,
       minResults: 1,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
     });
   });
 
@@ -50,7 +50,7 @@ describe('resource industry', () => {
       maxResults: 1,
       minResults: 1,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
       type: 'original_sic',
     });
   });

@@ -29,7 +29,7 @@ describe('resource utility', () => {
       identifier: { domain: 'xxx' },
       type: 'brand',
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
     });
   });
 });

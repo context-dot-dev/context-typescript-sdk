@@ -29,7 +29,7 @@ describe('resource web', () => {
       json_format: { pricing_page_url: 'bar', plans: 'bar' },
       mode: 'fast',
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
     });
   });
 
@@ -79,7 +79,7 @@ describe('resource web', () => {
       settleAnimations: true,
       stopAfterMs: 10000,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
       waitForMs: 0,
     });
   });
@@ -102,7 +102,7 @@ describe('resource web', () => {
       domain: 'xxx',
       numCompetitors: 1,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
     });
   });
 
@@ -128,7 +128,7 @@ describe('resource web', () => {
           domain: 'xxx',
           maxAgeMs: 0,
           tags: ['production', 'team-alpha'],
-          timeoutMS: 1000,
+          timeoutOpts: { milliseconds: 1, behavior: 'fail' },
         },
         { path: '/_stainless_unknown_path' },
       ),
@@ -158,7 +158,7 @@ describe('resource web', () => {
           domain: 'xxx',
           maxAgeMs: 0,
           tags: ['production', 'team-alpha'],
-          timeoutMS: 1000,
+          timeoutOpts: { milliseconds: 1, behavior: 'fail' },
         },
         { path: '/_stainless_unknown_path' },
       ),
@@ -194,7 +194,7 @@ describe('resource web', () => {
           page: 'login',
           scrollOffset: 0,
           tags: ['production', 'team-alpha'],
-          timeoutMS: 1,
+          timeoutOpts: { milliseconds: 1, behavior: 'fail' },
           viewport: { height: 240, width: 240 },
           waitForMs: 0,
           zdr: 'enabled',
@@ -236,14 +236,14 @@ describe('resource web', () => {
           start: 1,
         },
         shortenBase64Images: true,
-        timeoutMS: 1000,
+        timeoutOpts: { milliseconds: 1, behavior: 'fail' },
         useMainContentOnly: true,
         waitForMs: 0,
       },
       numResults: 10,
       queryFanout: true,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
     });
   });
 
@@ -283,7 +283,7 @@ describe('resource web', () => {
       shortenBase64Images: true,
       stopAfterMs: 10000,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
       urlRegex: '^https?://[^/]+/blog/',
       useMainContentOnly: true,
       waitForMs: 0,
@@ -310,7 +310,7 @@ describe('resource web', () => {
       country: 'de',
       headers: { foo: 'J!' },
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1,
+      timeoutOpts: { milliseconds: 1, behavior: 'fail' },
       zdr: 'enabled',
     });
   });
@@ -346,7 +346,7 @@ describe('resource web', () => {
       },
       settleAnimations: true,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1,
+      timeoutOpts: { milliseconds: 1, behavior: 'fail' },
       useMainContentOnly: true,
       waitForMs: 0,
       zdr: 'enabled',
@@ -380,7 +380,7 @@ describe('resource web', () => {
       headers: { foo: 'J!' },
       maxAgeMs: 0,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1,
+      timeoutOpts: { milliseconds: 1, behavior: 'fail' },
       waitForMs: 0,
     });
   });
@@ -420,7 +420,7 @@ describe('resource web', () => {
       settleAnimations: true,
       shortenBase64Images: true,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1,
+      timeoutOpts: { milliseconds: 1, behavior: 'fail' },
       useMainContentOnly: true,
       waitForMs: 0,
       zdr: 'enabled',
@@ -449,7 +449,7 @@ describe('resource web', () => {
       search: 'help center and troubleshooting articles',
       sitemapUrl: 'https://example.com',
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1,
+      timeoutOpts: { milliseconds: 1, behavior: 'fail' },
       urlRegex: '^https?://[^/]+/blog/',
       zdr: 'enabled',
     });

@@ -48,6 +48,12 @@ export interface PersonEnrichResponse {
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: PersonEnrichResponse.KeyMetadata;
+
+  /**
+   * True when the timeout ended processing and this response contains the usable
+   * data completed so far. Unfinished fields are omitted.
+   */
+  partial?: boolean;
 }
 
 export namespace PersonEnrichResponse {
@@ -293,11 +299,11 @@ export interface PersonEnrichParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: PersonEnrichParams.TimeoutOpts;
 }
 
 export namespace PersonEnrichParams {
@@ -337,6 +343,26 @@ export namespace PersonEnrichParams {
     first?: string;
 
     last?: string;
+  }
+
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results.
+     */
+    behavior?: 'fail' | 'return-partial';
   }
 }
 

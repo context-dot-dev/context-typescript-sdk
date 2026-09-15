@@ -51,6 +51,12 @@ export interface IndustryRetrieveNaicsResponse {
   key_metadata?: IndustryRetrieveNaicsResponse.KeyMetadata;
 
   /**
+   * True when the timeout ended processing and this response contains only usable
+   * results completed so far. Unfinished results are omitted.
+   */
+  partial?: boolean;
+
+  /**
    * Status of the response, e.g., 'ok'
    */
   status?: string;
@@ -123,6 +129,12 @@ export interface IndustryRetrieveSicResponse {
    * Credit usage, included whenever a valid API key is provided.
    */
   key_metadata?: IndustryRetrieveSicResponse.KeyMetadata;
+
+  /**
+   * True when the timeout ended processing and this response contains only usable
+   * results completed so far. Unfinished results are omitted.
+   */
+  partial?: boolean;
 
   /**
    * Status of the response, e.g., 'ok'
@@ -213,11 +225,33 @@ export interface IndustryRetrieveNaicsParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: IndustryRetrieveNaicsParams.TimeoutOpts;
+}
+
+export namespace IndustryRetrieveNaicsParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export interface IndustryRetrieveSicParams {
@@ -245,11 +279,11 @@ export interface IndustryRetrieveSicParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: IndustryRetrieveSicParams.TimeoutOpts;
 
   /**
    * Which SIC dataset to classify against. `original_sic` uses the 1987 Standard
@@ -257,6 +291,28 @@ export interface IndustryRetrieveSicParams {
    * published by the SEC. Defaults to `original_sic`.
    */
   type?: 'original_sic' | 'latest_sec';
+}
+
+export namespace IndustryRetrieveSicParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export declare namespace Industry {

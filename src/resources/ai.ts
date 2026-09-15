@@ -68,6 +68,12 @@ export interface AIExtractProductResponse {
   key_metadata?: AIExtractProductResponse.KeyMetadata;
 
   /**
+   * True when the timeout ended processing and this response contains only usable
+   * results completed so far. Unfinished results are omitted.
+   */
+  partial?: boolean;
+
+  /**
    * The detected ecommerce platform, or null if not a product page
    */
   platform?: 'amazon' | 'tiktok_shop' | 'etsy' | 'generic' | null;
@@ -231,6 +237,13 @@ export interface AIExtractProductsResponse {
   key_metadata?: AIExtractProductsResponse.KeyMetadata;
 
   /**
+   * True when timeoutOpts.behavior=return-partial returned the usable results
+   * collected before the deadline. Partial collections are not cached as complete
+   * results.
+   */
+  partial?: boolean;
+
+  /**
    * Array of products extracted from the website
    */
   products?: Array<AIExtractProductsResponse.Product>;
@@ -385,11 +398,33 @@ export interface AIExtractProductParams {
   tags?: Array<string>;
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: AIExtractProductParams.TimeoutOpts;
+}
+
+export namespace AIExtractProductParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export type AIExtractProductsParams = AIExtractProductsParams.ByDomain | AIExtractProductsParams.ByDirectURL;
@@ -419,11 +454,33 @@ export declare namespace AIExtractProductsParams {
     tags?: Array<string>;
 
     /**
-     * Optional timeout in milliseconds for the request. If the request takes longer
-     * than this value, it will be aborted with a 408 status code. Maximum allowed
-     * value is 300000ms (5 minutes).
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
      */
-    timeoutMS?: number;
+    timeoutOpts?: ByDomain.TimeoutOpts;
+  }
+
+  export namespace ByDomain {
+    /**
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
+     */
+    export interface TimeoutOpts {
+      /**
+       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       */
+      milliseconds: number;
+
+      /**
+       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+       * credits. "return-partial" returns usable results collected so far; if none are
+       * available, the request still fails without charging credits. Partial results are
+       * not cached as complete results.
+       */
+      behavior?: 'fail' | 'return-partial';
+    }
   }
 
   export interface ByDirectURL {
@@ -451,11 +508,33 @@ export declare namespace AIExtractProductsParams {
     tags?: Array<string>;
 
     /**
-     * Optional timeout in milliseconds for the request. If the request takes longer
-     * than this value, it will be aborted with a 408 status code. Maximum allowed
-     * value is 300000ms (5 minutes).
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
      */
-    timeoutMS?: number;
+    timeoutOpts?: ByDirectURL.TimeoutOpts;
+  }
+
+  export namespace ByDirectURL {
+    /**
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
+     */
+    export interface TimeoutOpts {
+      /**
+       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       */
+      milliseconds: number;
+
+      /**
+       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+       * credits. "return-partial" returns usable results collected so far; if none are
+       * available, the request still fails without charging credits. Partial results are
+       * not cached as complete results.
+       */
+      behavior?: 'fail' | 'return-partial';
+    }
   }
 }
 
