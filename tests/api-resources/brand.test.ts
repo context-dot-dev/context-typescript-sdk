@@ -29,7 +29,7 @@ describe('resource brand', () => {
       maxAgeMs: 0,
       maxSpeed: true,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
     });
   });
 
@@ -52,7 +52,7 @@ describe('resource brand', () => {
       maxAgeMs: 0,
       tags: ['production', 'team-alpha'],
       theme: 'light',
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
     });
   });
 

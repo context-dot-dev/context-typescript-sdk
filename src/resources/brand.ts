@@ -86,6 +86,12 @@ export interface BrandRetrieveResponse {
   key_metadata?: BrandRetrieveResponse.KeyMetadata;
 
   /**
+   * True when the timeout ended processing and this response contains the usable
+   * data completed so far. Unfinished fields are omitted.
+   */
+  partial?: boolean;
+
+  /**
    * Status of the response, e.g., 'ok'
    */
   status?: string;
@@ -930,6 +936,12 @@ export interface BrandRetrieveSimplifiedResponse {
   key_metadata?: BrandRetrieveSimplifiedResponse.KeyMetadata;
 
   /**
+   * True when the timeout ended processing and only completed brand data is
+   * returned.
+   */
+  partial?: boolean;
+
+  /**
    * Status of the response, e.g., 'ok'
    */
   status?: string;
@@ -1353,11 +1365,33 @@ export declare namespace BrandRetrieveParams {
     tags?: Array<string>;
 
     /**
-     * Optional timeout in milliseconds for the request. If the request takes longer
-     * than this value, it will be aborted with a 408 status code. Maximum allowed
-     * value is 300000ms (5 minutes).
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
      */
-    timeoutMS?: number;
+    timeoutOpts?: BrandRetrieveByDomainRequest.TimeoutOpts;
+  }
+
+  export namespace BrandRetrieveByDomainRequest {
+    /**
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
+     */
+    export interface TimeoutOpts {
+      /**
+       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       */
+      milliseconds: number;
+
+      /**
+       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+       * credits. "return-partial" returns usable results collected so far; if none are
+       * available, the request still fails without charging credits. Partial results are
+       * not cached as complete results.
+       */
+      behavior?: 'fail' | 'return-partial';
+    }
   }
 
   export interface BrandRetrieveByNameRequest {
@@ -1521,11 +1555,33 @@ export declare namespace BrandRetrieveParams {
     tags?: Array<string>;
 
     /**
-     * Optional timeout in milliseconds for the request. If the request takes longer
-     * than this value, it will be aborted with a 408 status code. Maximum allowed
-     * value is 300000ms (5 minutes).
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
      */
-    timeoutMS?: number;
+    timeoutOpts?: BrandRetrieveByNameRequest.TimeoutOpts;
+  }
+
+  export namespace BrandRetrieveByNameRequest {
+    /**
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
+     */
+    export interface TimeoutOpts {
+      /**
+       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       */
+      milliseconds: number;
+
+      /**
+       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+       * credits. "return-partial" returns usable results collected so far; if none are
+       * available, the request still fails without charging credits. Partial results are
+       * not cached as complete results.
+       */
+      behavior?: 'fail' | 'return-partial';
+    }
   }
 
   export interface BrandRetrieveByEmailRequest {
@@ -1683,11 +1739,33 @@ export declare namespace BrandRetrieveParams {
     tags?: Array<string>;
 
     /**
-     * Optional timeout in milliseconds for the request. If the request takes longer
-     * than this value, it will be aborted with a 408 status code. Maximum allowed
-     * value is 300000ms (5 minutes).
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
      */
-    timeoutMS?: number;
+    timeoutOpts?: BrandRetrieveByEmailRequest.TimeoutOpts;
+  }
+
+  export namespace BrandRetrieveByEmailRequest {
+    /**
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
+     */
+    export interface TimeoutOpts {
+      /**
+       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       */
+      milliseconds: number;
+
+      /**
+       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+       * credits. "return-partial" returns usable results collected so far; if none are
+       * available, the request still fails without charging credits. Partial results are
+       * not cached as complete results.
+       */
+      behavior?: 'fail' | 'return-partial';
+    }
   }
 
   export interface BrandRetrieveByTickerRequest {
@@ -1850,11 +1928,33 @@ export declare namespace BrandRetrieveParams {
     ticker_exchange?: string;
 
     /**
-     * Optional timeout in milliseconds for the request. If the request takes longer
-     * than this value, it will be aborted with a 408 status code. Maximum allowed
-     * value is 300000ms (5 minutes).
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
      */
-    timeoutMS?: number;
+    timeoutOpts?: BrandRetrieveByTickerRequest.TimeoutOpts;
+  }
+
+  export namespace BrandRetrieveByTickerRequest {
+    /**
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
+     */
+    export interface TimeoutOpts {
+      /**
+       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       */
+      milliseconds: number;
+
+      /**
+       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+       * credits. "return-partial" returns usable results collected so far; if none are
+       * available, the request still fails without charging credits. Partial results are
+       * not cached as complete results.
+       */
+      behavior?: 'fail' | 'return-partial';
+    }
   }
 
   export interface BrandRetrieveByDirectURLRequest {
@@ -1876,11 +1976,33 @@ export declare namespace BrandRetrieveParams {
     tags?: Array<string>;
 
     /**
-     * Optional timeout in milliseconds for the request. If the request takes longer
-     * than this value, it will be aborted with a 408 status code. Maximum allowed
-     * value is 300000ms (5 minutes).
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
      */
-    timeoutMS?: number;
+    timeoutOpts?: BrandRetrieveByDirectURLRequest.TimeoutOpts;
+  }
+
+  export namespace BrandRetrieveByDirectURLRequest {
+    /**
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
+     */
+    export interface TimeoutOpts {
+      /**
+       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       */
+      milliseconds: number;
+
+      /**
+       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+       * credits. "return-partial" returns usable results collected so far; if none are
+       * available, the request still fails without charging credits. Partial results are
+       * not cached as complete results.
+       */
+      behavior?: 'fail' | 'return-partial';
+    }
   }
 
   export interface BrandRetrieveFromTransactionRequest {
@@ -2058,11 +2180,33 @@ export declare namespace BrandRetrieveParams {
     tags?: Array<string>;
 
     /**
-     * Optional timeout in milliseconds for the request. If the request takes longer
-     * than this value, it will be aborted with a 408 status code. Maximum allowed
-     * value is 300000ms (5 minutes).
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
      */
-    timeoutMS?: number;
+    timeoutOpts?: BrandRetrieveFromTransactionRequest.TimeoutOpts;
+  }
+
+  export namespace BrandRetrieveFromTransactionRequest {
+    /**
+     * Optional request deadline and behavior on timeout. For GET requests, use
+     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+     * timeoutOpts object.
+     */
+    export interface TimeoutOpts {
+      /**
+       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       */
+      milliseconds: number;
+
+      /**
+       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+       * credits. "return-partial" returns usable results collected so far; if none are
+       * available, the request still fails without charging credits. Partial results are
+       * not cached as complete results.
+       */
+      behavior?: 'fail' | 'return-partial';
+    }
   }
 }
 
@@ -2092,11 +2236,33 @@ export interface BrandRetrieveSimplifiedParams {
   theme?: 'light' | 'dark';
 
   /**
-   * Optional timeout in milliseconds for the request. If the request takes longer
-   * than this value, it will be aborted with a 408 status code. Maximum allowed
-   * value is 300000ms (5 minutes).
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
    */
-  timeoutMS?: number;
+  timeoutOpts?: BrandRetrieveSimplifiedParams.TimeoutOpts;
+}
+
+export namespace BrandRetrieveSimplifiedParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
 }
 
 export interface BrandSearchParams {

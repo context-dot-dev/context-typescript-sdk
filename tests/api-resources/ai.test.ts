@@ -26,7 +26,7 @@ describe('resource ai', () => {
       url: 'https://example.com',
       maxAgeMs: 0,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
     });
   });
 
@@ -49,7 +49,7 @@ describe('resource ai', () => {
       maxAgeMs: 0,
       maxProducts: 1,
       tags: ['production', 'team-alpha'],
-      timeoutMS: 1000,
+      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
     });
   });
 });
