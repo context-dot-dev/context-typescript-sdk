@@ -5,9 +5,10 @@ name: Publish NPM
 on:
   workflow_dispatch:
     inputs:
-      path:
-        description: "The package path to publish ('.' for the SDK)"
+      tag:
+        description: 'Release tag to publish, e.g. v2.18.0'
         required: true
+        type: string
 
   release:
     types: [published]
@@ -15,33 +16,37 @@ on:
 jobs:
   publish:
     name: publish
+    if: github.repository == 'context-dot-dev/context-typescript-sdk'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       id-token: write
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: refs/tags/${{ inputs.tag || github.event.release.tag_name }}
+          persist-credentials: false
 
       - name: Set up Node
         uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
         with:
           node-version: '24'
 
+      - name: Verify release version
+        run: test "$RELEASE_TAG" = "v$(node -p 'require("./package.json").version')"
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+
+      - name: Set up npm trusted publishing
+        run: npm install --global npm@11
+
       - name: Install dependencies
-        run: |
-          yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Build package
-        run: |
-          if [ -n "$INPUT_PATH" ] && [ "$INPUT_PATH" != "." ]; then
-            echo "Only the root SDK package (.) is supported."
-            exit 1
-          fi
-          yarn build
-        env:
-          INPUT_PATH: ${{ github.event.inputs.path }}
+        run: yarn build
 
       - name: Publish to NPM
         working-directory: dist
-        run: npm publish --access public
+        run: npm publish --access public --provenance
