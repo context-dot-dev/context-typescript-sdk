@@ -58,11 +58,21 @@ export class Brand extends APIResource {
 
 export interface BrandRetrieveResponse {
   /**
+   * Detailed brand information
+   */
+  brand: BrandRetrieveResponse.Brand;
+
+  /**
    * Cache outcome for this response. Composite responses are hits only when every
    * cache-controlled fetch contributing to the output was a hit; age_ms is the
    * oldest contributing hit.
    */
   cache_metadata: BrandRetrieveResponse.CacheMetadata;
+
+  /**
+   * HTTP status code
+   */
+  code: number;
 
   /**
    * Unique id of this API call, also sent in the X-Request-Id response header. Quote
@@ -71,14 +81,9 @@ export interface BrandRetrieveResponse {
   request_id: string;
 
   /**
-   * Detailed brand information
+   * Status of the response, e.g., 'ok'
    */
-  brand?: BrandRetrieveResponse.Brand;
-
-  /**
-   * HTTP status code
-   */
-  code?: number;
+  status: string;
 
   /**
    * Credit usage, included whenever a valid API key is provided.
@@ -90,32 +95,9 @@ export interface BrandRetrieveResponse {
    * data completed so far. Unfinished fields are omitted.
    */
   partial?: boolean;
-
-  /**
-   * Status of the response, e.g., 'ok'
-   */
-  status?: string;
 }
 
 export namespace BrandRetrieveResponse {
-  /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
-   */
-  export interface CacheMetadata {
-    /**
-     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
-     */
-    age_ms: number;
-
-    /**
-     * Whether the response was served from cache, required fresh work, or honored
-     * zero-data-retention cache bypass.
-     */
-    status: 'hit' | 'miss' | 'zdr';
-  }
-
   /**
    * Detailed brand information
    */
@@ -891,64 +873,6 @@ export namespace BrandRetrieveResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
-   */
-  export interface KeyMetadata {
-    /**
-     * Credits used by this request.
-     */
-    credits_consumed: number;
-
-    /**
-     * Credits remaining for your organization.
-     */
-    credits_remaining: number;
-  }
-}
-
-export interface BrandRetrieveSimplifiedResponse {
-  /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
-   */
-  cache_metadata: BrandRetrieveSimplifiedResponse.CacheMetadata;
-
-  /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
-   */
-  request_id: string;
-
-  /**
-   * Simplified brand information
-   */
-  brand?: BrandRetrieveSimplifiedResponse.Brand;
-
-  /**
-   * HTTP status code of the response
-   */
-  code?: number;
-
-  /**
-   * Credit usage, included whenever a valid API key is provided.
-   */
-  key_metadata?: BrandRetrieveSimplifiedResponse.KeyMetadata;
-
-  /**
-   * True when the timeout ended processing and only completed brand data is
-   * returned.
-   */
-  partial?: boolean;
-
-  /**
-   * Status of the response, e.g., 'ok'
-   */
-  status?: string;
-}
-
-export namespace BrandRetrieveSimplifiedResponse {
-  /**
    * Cache outcome for this response. Composite responses are hits only when every
    * cache-controlled fetch contributing to the output was a hit; age_ms is the
    * oldest contributing hit.
@@ -966,6 +890,64 @@ export namespace BrandRetrieveSimplifiedResponse {
     status: 'hit' | 'miss' | 'zdr';
   }
 
+  /**
+   * Credit usage, included whenever a valid API key is provided.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits used by this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
+}
+
+export interface BrandRetrieveSimplifiedResponse {
+  /**
+   * Simplified brand information
+   */
+  brand: BrandRetrieveSimplifiedResponse.Brand;
+
+  /**
+   * Cache outcome for this response. Composite responses are hits only when every
+   * cache-controlled fetch contributing to the output was a hit; age_ms is the
+   * oldest contributing hit.
+   */
+  cache_metadata: BrandRetrieveSimplifiedResponse.CacheMetadata;
+
+  /**
+   * HTTP status code of the response
+   */
+  code: number;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
+   * Status of the response, e.g., 'ok'
+   */
+  status: string;
+
+  /**
+   * Credit usage, included whenever a valid API key is provided.
+   */
+  key_metadata?: BrandRetrieveSimplifiedResponse.KeyMetadata;
+
+  /**
+   * True when the timeout ended processing and only completed brand data is
+   * returned.
+   */
+  partial?: boolean;
+}
+
+export namespace BrandRetrieveSimplifiedResponse {
   /**
    * Simplified brand information
    */
@@ -1129,6 +1111,24 @@ export namespace BrandRetrieveSimplifiedResponse {
         width?: number;
       }
     }
+  }
+
+  /**
+   * Cache outcome for this response. Composite responses are hits only when every
+   * cache-controlled fetch contributing to the output was a hit; age_ms is the
+   * oldest contributing hit.
+   */
+  export interface CacheMetadata {
+    /**
+     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+     */
+    age_ms: number;
+
+    /**
+     * Whether the response was served from cache, required fresh work, or honored
+     * zero-data-retention cache bypass.
+     */
+    status: 'hit' | 'miss' | 'zdr';
   }
 
   /**

@@ -5,9 +5,10 @@ name: Publish NPM
 on:
   workflow_dispatch:
     inputs:
-      path:
-        description: The path to run the release in, e.g. '.' or 'packages/mcp-server'
+      tag:
+        description: 'Release tag to publish, e.g. v2.18.0'
         required: true
+        type: string
 
   release:
     types: [published]
@@ -15,37 +16,37 @@ on:
 jobs:
   publish:
     name: publish
+    if: github.repository == 'context-dot-dev/context-typescript-sdk'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       id-token: write
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: refs/tags/${{ inputs.tag || github.event.release.tag_name }}
+          persist-credentials: false
 
       - name: Set up Node
         uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
         with:
           node-version: '24'
 
+      - name: Verify release version
+        run: test "$RELEASE_TAG" = "v$(node -p 'require("./package.json").version')"
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+
+      - name: Set up npm trusted publishing
+        run: npm install --global npm@11
+
       - name: Install dependencies
-        run: |
-          yarn install
+        run: yarn install --frozen-lockfile
+
+      - name: Build package
+        run: yarn build
 
       - name: Publish to NPM
-        run: |
-          if [ -n "$INPUT_PATH" ]; then
-            PATHS_RELEASED="[\"$INPUT_PATH\"]"
-          else
-            PATHS_RELEASED='[\".\", \"packages/mcp-server\"]'
-          fi
-          yarn tsn scripts/publish-packages.ts "{ \"paths_released\": \"$PATHS_RELEASED\" }"
-        env:
-          INPUT_PATH: ${{ github.event.inputs.path }}
-
-      - name: Upload MCP Server DXT GitHub release asset
-        run: |
-          gh release upload ${{ github.event.release.tag_name }} \
-            packages/mcp-server/context_dev_api.mcpb
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: dist
+        run: npm publish --access public --provenance
