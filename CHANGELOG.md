@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.18.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.18.0...v2.18.1) (2026-09-15)
+
+
+### Bug Fixes
+
+* **api:** guarantee search descriptions and align response types ([#1089](https://github.com/context-dot-dev/context-typescript-sdk/issues/1089)) ([9f55749](https://github.com/context-dot-dev/context-typescript-sdk/commit/9f55749869ff8149d1458357b11e55976519e590))
+
 ## [2.18.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.17.0...v2.18.0) (2026-09-15)
 
 
