@@ -141,6 +141,32 @@ export class Web extends APIResource {
   }
 
   /**
+   * Downloads a resource and returns its bytes as base64. Supports images, PDFs,
+   * HTML pages, and any other content type without image conversion, text
+   * extraction, or character-encoding changes. HTTP compression is decoded before
+   * base64 encoding. HTML is the original HTTP response; JavaScript is not rendered.
+   * Follows public redirects and retries failed downloads through ISP and
+   * residential proxies, with a direct fallback. When country is specified, only a
+   * residential proxy in that country is used. Supply headers such as Referer for
+   * images that require a referring page. Downloads are not cached. Maximum decoded
+   * resource size: 20 MiB (20971520 bytes), before base64 encoding. Successful
+   * requests cost 1 credit; errors are not billed.
+   *
+   * @example
+   * ```ts
+   * const response = await client.web.webScrapeBytes({
+   *   url: 'https://example.com',
+   * });
+   * ```
+   */
+  webScrapeBytes(
+    query: WebWebScrapeBytesParams,
+    options?: RequestOptions,
+  ): APIPromise<WebWebScrapeBytesResponse> {
+    return this._client.get('/web/scrape/bytes', { query, ...options });
+  }
+
+  /**
    * Scrapes the given URL and returns the raw HTML content of the page. The base
    * request costs 1 credit; requests with browser actions cost 2 credits.
    *
@@ -1657,6 +1683,72 @@ export namespace WebWebCrawlMdResponse {
     }
   }
 
+  /**
+   * Credit usage, included whenever a valid API key is provided.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits used by this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
+}
+
+export interface WebWebScrapeBytesResponse {
+  /**
+   * Base64-encoded resource bytes, without a data URI prefix. Decode this field to
+   * recover the downloaded file.
+   */
+  bytes: string;
+
+  /**
+   * Number of decoded resource bytes, before base64 encoding.
+   */
+  contentLength: number;
+
+  /**
+   * The Content-Type returned by the origin, including any charset. Defaults to
+   * application/octet-stream when absent.
+   */
+  contentType: string;
+
+  encoding: 'base64';
+
+  /**
+   * The resource URL after redirects.
+   */
+  finalUrl: string;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
+   * HTTP status returned by the origin.
+   */
+  statusCode: number;
+
+  success: true;
+
+  /**
+   * The requested resource URL.
+   */
+  url: string;
+
+  /**
+   * Credit usage, included whenever a valid API key is provided.
+   */
+  key_metadata?: WebWebScrapeBytesResponse.KeyMetadata;
+}
+
+export namespace WebWebScrapeBytesResponse {
   /**
    * Credit usage, included whenever a valid API key is provided.
    */
@@ -3848,6 +3940,253 @@ export namespace WebWebCrawlMdParams {
   }
 }
 
+export interface WebWebScrapeBytesParams {
+  /**
+   * Full HTTP(S) URL of the resource to download, such as an image, PDF, or page.
+   */
+  url: string;
+
+  /**
+   * Fetch the target page through a residential proxy in this country (ISO 3166-1
+   * alpha-2).
+   */
+  country?:
+    | 'ad'
+    | 'ae'
+    | 'af'
+    | 'ag'
+    | 'ai'
+    | 'al'
+    | 'am'
+    | 'ao'
+    | 'ar'
+    | 'at'
+    | 'au'
+    | 'aw'
+    | 'az'
+    | 'ba'
+    | 'bb'
+    | 'bd'
+    | 'be'
+    | 'bf'
+    | 'bg'
+    | 'bh'
+    | 'bi'
+    | 'bj'
+    | 'bm'
+    | 'bn'
+    | 'bo'
+    | 'bq'
+    | 'br'
+    | 'bs'
+    | 'bw'
+    | 'by'
+    | 'bz'
+    | 'ca'
+    | 'cd'
+    | 'cf'
+    | 'cg'
+    | 'ch'
+    | 'ci'
+    | 'cl'
+    | 'cm'
+    | 'cn'
+    | 'co'
+    | 'cr'
+    | 'cv'
+    | 'cw'
+    | 'cy'
+    | 'cz'
+    | 'de'
+    | 'dj'
+    | 'dk'
+    | 'dm'
+    | 'do'
+    | 'dz'
+    | 'ec'
+    | 'ee'
+    | 'eg'
+    | 'es'
+    | 'et'
+    | 'fi'
+    | 'fj'
+    | 'fr'
+    | 'ga'
+    | 'gb'
+    | 'gd'
+    | 'ge'
+    | 'gf'
+    | 'gg'
+    | 'gh'
+    | 'gm'
+    | 'gn'
+    | 'gp'
+    | 'gq'
+    | 'gr'
+    | 'gt'
+    | 'gu'
+    | 'gw'
+    | 'gy'
+    | 'hk'
+    | 'hn'
+    | 'hr'
+    | 'ht'
+    | 'hu'
+    | 'id'
+    | 'ie'
+    | 'il'
+    | 'im'
+    | 'in'
+    | 'iq'
+    | 'ir'
+    | 'is'
+    | 'it'
+    | 'je'
+    | 'jm'
+    | 'jo'
+    | 'jp'
+    | 'ke'
+    | 'kg'
+    | 'kh'
+    | 'kn'
+    | 'kr'
+    | 'kw'
+    | 'ky'
+    | 'kz'
+    | 'la'
+    | 'lb'
+    | 'lc'
+    | 'lk'
+    | 'lr'
+    | 'ls'
+    | 'lt'
+    | 'lu'
+    | 'lv'
+    | 'ly'
+    | 'ma'
+    | 'mc'
+    | 'md'
+    | 'me'
+    | 'mf'
+    | 'mg'
+    | 'mk'
+    | 'ml'
+    | 'mm'
+    | 'mn'
+    | 'mo'
+    | 'mq'
+    | 'mr'
+    | 'mt'
+    | 'mu'
+    | 'mv'
+    | 'mw'
+    | 'mx'
+    | 'my'
+    | 'mz'
+    | 'na'
+    | 'nc'
+    | 'ne'
+    | 'ng'
+    | 'ni'
+    | 'nl'
+    | 'no'
+    | 'np'
+    | 'nz'
+    | 'om'
+    | 'pa'
+    | 'pe'
+    | 'pf'
+    | 'pg'
+    | 'ph'
+    | 'pk'
+    | 'pl'
+    | 'pr'
+    | 'ps'
+    | 'pt'
+    | 'py'
+    | 'qa'
+    | 're'
+    | 'ro'
+    | 'rs'
+    | 'ru'
+    | 'rw'
+    | 'sa'
+    | 'sc'
+    | 'sd'
+    | 'se'
+    | 'sg'
+    | 'si'
+    | 'sk'
+    | 'sl'
+    | 'sm'
+    | 'sn'
+    | 'so'
+    | 'sr'
+    | 'ss'
+    | 'st'
+    | 'sv'
+    | 'sx'
+    | 'sy'
+    | 'sz'
+    | 'tc'
+    | 'td'
+    | 'tg'
+    | 'th'
+    | 'tj'
+    | 'tl'
+    | 'tm'
+    | 'tn'
+    | 'tr'
+    | 'tt'
+    | 'tw'
+    | 'tz'
+    | 'ua'
+    | 'ug'
+    | 'us'
+    | 'uy'
+    | 'uz'
+    | 'vc'
+    | 've'
+    | 'vg'
+    | 'vi'
+    | 'vn'
+    | 'ye'
+    | 'yt'
+    | 'za'
+    | 'zm'
+    | 'zw';
+
+  /**
+   * Optional outbound HTTP headers, such as Referer, Cookie, or Authorization. Send
+   * as a JSON object or deep-object query params such as
+   * headers[Referer]=https://example.com/. Host, Content-Length, and hop-by-hop
+   * transport headers are rejected. Authorization and cookies are removed when a
+   * redirect changes origin.
+   */
+  headers?: { [key: string]: string };
+
+  /**
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
+   */
+  tags?: Array<string>;
+
+  /**
+   * Optional timeout in milliseconds for the request. If the request takes longer
+   * than this value, it will be aborted with a 408 status code. Maximum allowed
+   * value is 300000ms (5 minutes).
+   */
+  timeoutMS?: number;
+
+  /**
+   * Set to enabled to bypass shared caches and omit request and response content
+   * from retained usage logs. Requires zero data retention to be enabled for your
+   * organization (contact support@context.dev), otherwise the request fails with
+   * ZDR_NOT_ENABLED. Successful ZDR responses include X-Context-ZDR: true.
+   */
+  zdr?: 'enabled' | 'disabled';
+}
+
 export interface WebWebScrapeHTMLParams {
   /**
    * Full URL to scrape (must include http:// or https:// protocol)
@@ -4870,6 +5209,7 @@ export declare namespace Web {
     type WebScreenshotResponse as WebScreenshotResponse,
     type WebSearchResponse as WebSearchResponse,
     type WebWebCrawlMdResponse as WebWebCrawlMdResponse,
+    type WebWebScrapeBytesResponse as WebWebScrapeBytesResponse,
     type WebWebScrapeHTMLResponse as WebWebScrapeHTMLResponse,
     type WebWebScrapeImagesResponse as WebWebScrapeImagesResponse,
     type WebWebScrapeMdResponse as WebWebScrapeMdResponse,
@@ -4882,6 +5222,7 @@ export declare namespace Web {
     type WebScreenshotParams as WebScreenshotParams,
     type WebSearchParams as WebSearchParams,
     type WebWebCrawlMdParams as WebWebCrawlMdParams,
+    type WebWebScrapeBytesParams as WebWebScrapeBytesParams,
     type WebWebScrapeHTMLParams as WebWebScrapeHTMLParams,
     type WebWebScrapeImagesParams as WebWebScrapeImagesParams,
     type WebWebScrapeMdParams as WebWebScrapeMdParams,

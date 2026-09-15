@@ -20,6 +20,7 @@ Types:
 - <code><a href="./src/resources/web.ts">WebScreenshotResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebSearchResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebWebCrawlMdResponse</a></code>
+- <code><a href="./src/resources/web.ts">WebWebScrapeBytesResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebWebScrapeHTMLResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebWebScrapeImagesResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebWebScrapeMdResponse</a></code>
@@ -35,6 +36,7 @@ Methods:
 - <code title="get /web/screenshot">client.web.<a href="./src/resources/web.ts">screenshot</a>({ ...params }) -> WebScreenshotResponse</code>
 - <code title="post /web/search">client.web.<a href="./src/resources/web.ts">search</a>({ ...params }) -> WebSearchResponse</code>
 - <code title="post /web/crawl">client.web.<a href="./src/resources/web.ts">webCrawlMd</a>({ ...params }) -> WebWebCrawlMdResponse</code>
+- <code title="get /web/scrape/bytes">client.web.<a href="./src/resources/web.ts">webScrapeBytes</a>({ ...params }) -> WebWebScrapeBytesResponse</code>
 - <code title="get /web/scrape/html">client.web.<a href="./src/resources/web.ts">webScrapeHTML</a>({ ...params }) -> WebWebScrapeHTMLResponse</code>
 - <code title="get /web/scrape/images">client.web.<a href="./src/resources/web.ts">webScrapeImages</a>({ ...params }) -> WebWebScrapeImagesResponse</code>
 - <code title="get /web/scrape/markdown">client.web.<a href="./src/resources/web.ts">webScrapeMd</a>({ ...params }) -> WebWebScrapeMdResponse</code>

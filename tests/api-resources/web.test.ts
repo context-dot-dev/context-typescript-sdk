@@ -292,6 +292,30 @@ describe('resource web', () => {
   });
 
   // Mock server tests are disabled
+  test.skip('webScrapeBytes: only required params', async () => {
+    const responsePromise = client.web.webScrapeBytes({ url: 'https://example.com' });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Mock server tests are disabled
+  test.skip('webScrapeBytes: required and optional params', async () => {
+    const response = await client.web.webScrapeBytes({
+      url: 'https://example.com',
+      country: 'de',
+      headers: { foo: 'J!' },
+      tags: ['production', 'team-alpha'],
+      timeoutMS: 1,
+      zdr: 'enabled',
+    });
+  });
+
+  // Mock server tests are disabled
   test.skip('webScrapeHTML: only required params', async () => {
     const responsePromise = client.web.webScrapeHTML({ url: 'https://example.com' });
     const rawResponse = await responsePromise.asResponse();
