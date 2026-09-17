@@ -3009,7 +3009,7 @@ export namespace WebExtractFontsParams {
      * credits. "return-partial" returns usable results collected so far; if none are
      * available, the request still fails without charging credits. Partial results are
      * not cached as complete results. "return-partial" requires milliseconds of at
-     * least 15000.
+     * least 5000.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -3076,7 +3076,7 @@ export namespace WebExtractStyleguideParams {
      * credits. "return-partial" returns usable results collected so far; if none are
      * available, the request still fails without charging credits. Partial results are
      * not cached as complete results. "return-partial" requires milliseconds of at
-     * least 15000.
+     * least 5000.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -3415,7 +3415,7 @@ export namespace WebScreenshotParams {
      * credits. "return-partial" returns usable results collected so far; if none are
      * available, the request still fails without charging credits. Partial results are
      * not cached as complete results. "return-partial" requires milliseconds of at
-     * least 15000.
+     * least 5000.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -3831,7 +3831,7 @@ export namespace WebSearchParams {
        * credits. "return-partial" returns usable results collected so far; if none are
        * available, the request still fails without charging credits. Partial results are
        * not cached as complete results. "return-partial" requires milliseconds of at
-       * least 15000.
+       * least 5000.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -4920,7 +4920,7 @@ export namespace WebWebScrapeHTMLParams {
      * credits. "return-partial" returns usable results collected so far; if none are
      * available, the request still fails without charging credits. Partial results are
      * not cached as complete results. "return-partial" requires milliseconds of at
-     * least 15000.
+     * least 5000.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -5084,7 +5084,7 @@ export namespace WebWebScrapeImagesParams {
      * credits. "return-partial" returns usable results collected so far; if none are
      * available, the request still fails without charging credits. Partial results are
      * not cached as complete results. "return-partial" requires milliseconds of at
-     * least 15000.
+     * least 5000.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -5518,7 +5518,7 @@ export namespace WebWebScrapeMdParams {
      * credits. "return-partial" returns usable results collected so far; if none are
      * available, the request still fails without charging credits. Partial results are
      * not cached as complete results. "return-partial" requires milliseconds of at
-     * least 15000.
+     * least 5000.
      */
     behavior?: 'fail' | 'return-partial';
   }
