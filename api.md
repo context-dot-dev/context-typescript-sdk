@@ -24,6 +24,7 @@ Types:
 - <code><a href="./src/resources/web.ts">WebWebScrapeHTMLResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebWebScrapeImagesResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebWebScrapeMdResponse</a></code>
+- <code><a href="./src/resources/web.ts">WebWebScrapeScreenshotResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebWebScrapeSitemapResponse</a></code>
 
 Methods:
@@ -40,6 +41,7 @@ Methods:
 - <code title="get /web/scrape/html">client.web.<a href="./src/resources/web.ts">webScrapeHTML</a>({ ...params }) -> WebWebScrapeHTMLResponse</code>
 - <code title="get /web/scrape/images">client.web.<a href="./src/resources/web.ts">webScrapeImages</a>({ ...params }) -> WebWebScrapeImagesResponse</code>
 - <code title="get /web/scrape/markdown">client.web.<a href="./src/resources/web.ts">webScrapeMd</a>({ ...params }) -> WebWebScrapeMdResponse</code>
+- <code title="get /web/scrape/screenshot">client.web.<a href="./src/resources/web.ts">webScrapeScreenshot</a>({ ...params }) -> WebWebScrapeScreenshotResponse</code>
 - <code title="get /web/scrape/sitemap">client.web.<a href="./src/resources/web.ts">webScrapeSitemap</a>({ ...params }) -> WebWebScrapeSitemapResponse</code>
 
 # AI

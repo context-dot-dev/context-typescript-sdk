@@ -435,6 +435,37 @@ describe('resource web', () => {
   });
 
   // Mock server tests are disabled
+  test.skip('webScrapeScreenshot: only required params', async () => {
+    const responsePromise = client.web.webScrapeScreenshot({ url: 'https://example.com' });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Mock server tests are disabled
+  test.skip('webScrapeScreenshot: required and optional params', async () => {
+    const response = await client.web.webScrapeScreenshot({
+      url: 'https://example.com',
+      clearPopups: true,
+      colorScheme: 'light',
+      country: 'de',
+      fullScreenshot: 'true',
+      handleCookiePopup: true,
+      maxAgeMs: 0,
+      scrollOffset: 0,
+      tags: ['production', 'team-alpha'],
+      timeoutOpts: { milliseconds: 1, behavior: 'fail' },
+      viewport: { height: 240, width: 240 },
+      waitForMs: 0,
+      zdr: 'enabled',
+    });
+  });
+
+  // Mock server tests are disabled
   test.skip('webScrapeSitemap: only required params', async () => {
     const responsePromise = client.web.webScrapeSitemap({ domain: 'xxx' });
     const rawResponse = await responsePromise.asResponse();
