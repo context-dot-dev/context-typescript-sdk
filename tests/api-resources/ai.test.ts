@@ -27,6 +27,7 @@ describe('resource ai', () => {
       maxAgeMs: 0,
       tags: ['production', 'team-alpha'],
       timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
+      zdr: 'enabled',
     });
   });
 

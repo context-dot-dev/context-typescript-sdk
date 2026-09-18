@@ -214,6 +214,35 @@ export namespace AIExtractProductResponse {
      * URL to the product page
      */
     url?: string | null;
+
+    /**
+     * Product variations, such as different colors or sizes, with their attributes and
+     * images. Empty if none are found. May not include every variation offered by the
+     * store.
+     */
+    variants?: Array<Product.Variant>;
+  }
+
+  export namespace Product {
+    export interface Variant {
+      /**
+       * Explicit variant attributes such as color, size, material, pattern and
+       * properties declared by page.
+       */
+      attributes: { [key: string]: string };
+
+      /**
+       * Original source image URLs explicitly attached to this variant.
+       */
+      images: Array<string>;
+
+      sku: string | null;
+
+      /**
+       * Variant or offer URL when provided by the source. May be shared by variants.
+       */
+      url: string | null;
+    }
   }
 }
 
@@ -376,6 +405,35 @@ export namespace AIExtractProductsResponse {
      * URL to the product page
      */
     url?: string | null;
+
+    /**
+     * Product variations, such as different colors or sizes, with their attributes and
+     * images. Empty if none are found. May not include every variation offered by the
+     * store.
+     */
+    variants?: Array<Product.Variant>;
+  }
+
+  export namespace Product {
+    export interface Variant {
+      /**
+       * Explicit variant attributes such as color, size, material, pattern and
+       * properties declared by page.
+       */
+      attributes: { [key: string]: string };
+
+      /**
+       * Original source image URLs explicitly attached to this variant.
+       */
+      images: Array<string>;
+
+      sku: string | null;
+
+      /**
+       * Variant or offer URL when provided by the source. May be shared by variants.
+       */
+      url: string | null;
+    }
   }
 }
 
@@ -403,6 +461,15 @@ export interface AIExtractProductParams {
    * timeoutOpts object.
    */
   timeoutOpts?: AIExtractProductParams.TimeoutOpts;
+
+  /**
+   * Set to enabled to bypass shared caches and omit request and response content
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
+   */
+  zdr?: 'enabled' | 'disabled';
 }
 
 export namespace AIExtractProductParams {

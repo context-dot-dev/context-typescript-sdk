@@ -28,6 +28,7 @@ describe('resource industry', () => {
       minResults: 1,
       tags: ['production', 'team-alpha'],
       timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
+      zdr: 'enabled',
     });
   });
 
@@ -52,6 +53,7 @@ describe('resource industry', () => {
       tags: ['production', 'team-alpha'],
       timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
       type: 'original_sic',
+      zdr: 'enabled',
     });
   });
 });
