@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.19.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.18.1...v2.19.0) (2026-09-18)
+
+
+### Features
+
+* **api:** enable ZDR on remaining AI endpoints via OpenAI ([#1099](https://github.com/context-dot-dev/context-typescript-sdk/issues/1099)) ([9147c49](https://github.com/context-dot-dev/context-typescript-sdk/commit/9147c496af2bc72c4be185abe6dc01c91ca4fdf3))
+* **products:** extract ProductGroup variants with images ([#1124](https://github.com/context-dot-dev/context-typescript-sdk/issues/1124)) ([9a80da2](https://github.com/context-dot-dev/context-typescript-sdk/commit/9a80da2aed02602d5ef7ab2bff03eff440753680))
+* **scrape:** add CSS extraction rules to HTML scraping ([#1146](https://github.com/context-dot-dev/context-typescript-sdk/issues/1146)) ([c5235fc](https://github.com/context-dot-dev/context-typescript-sdk/commit/c5235fc82b2d2abff938d25175aa6d1152d0f867))
+* **web:** add URL-based scrape screenshot endpoint ([#1150](https://github.com/context-dot-dev/context-typescript-sdk/issues/1150)) ([6c7cd79](https://github.com/context-dot-dev/context-typescript-sdk/commit/6c7cd7998646feca5d8bdecee63e35c9383de7d8))
+
+
+### Bug Fixes
+
+* **api:** lower partial scrape timeout minimum to five seconds ([#1118](https://github.com/context-dot-dev/context-typescript-sdk/issues/1118)) ([2baeba3](https://github.com/context-dot-dev/context-typescript-sdk/commit/2baeba3bf88170a1e6c6c877d2a4758392202f01))
+
 ## [2.18.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.18.0...v2.18.1) (2026-09-15)
 
 
