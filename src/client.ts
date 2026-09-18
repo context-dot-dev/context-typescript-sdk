@@ -112,6 +112,8 @@ import {
   WebWebScrapeImagesResponse,
   WebWebScrapeMdParams,
   WebWebScrapeMdResponse,
+  WebWebScrapeScreenshotParams,
+  WebWebScrapeScreenshotResponse,
   WebWebScrapeSitemapParams,
   WebWebScrapeSitemapResponse,
 } from './resources/web';
@@ -895,6 +897,7 @@ export declare namespace ContextDev {
     type WebWebScrapeHTMLResponse as WebWebScrapeHTMLResponse,
     type WebWebScrapeImagesResponse as WebWebScrapeImagesResponse,
     type WebWebScrapeMdResponse as WebWebScrapeMdResponse,
+    type WebWebScrapeScreenshotResponse as WebWebScrapeScreenshotResponse,
     type WebWebScrapeSitemapResponse as WebWebScrapeSitemapResponse,
     type WebAnswersParams as WebAnswersParams,
     type WebExtractParams as WebExtractParams,
@@ -908,6 +911,7 @@ export declare namespace ContextDev {
     type WebWebScrapeHTMLParams as WebWebScrapeHTMLParams,
     type WebWebScrapeImagesParams as WebWebScrapeImagesParams,
     type WebWebScrapeMdParams as WebWebScrapeMdParams,
+    type WebWebScrapeScreenshotParams as WebWebScrapeScreenshotParams,
     type WebWebScrapeSitemapParams as WebWebScrapeSitemapParams,
   };
 

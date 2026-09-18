@@ -257,6 +257,28 @@ export class Web extends APIResource {
   }
 
   /**
+   * Capture the given HTTP or HTTPS URL with configurable viewport, full-page
+   * capture, wait time, popup handling, theme, scroll offset, cache age, country,
+   * and request timeout. Defaults to a 1920x1080 viewport, a 3-second wait, and a
+   * cache age of 1 day. With timeoutOpts.behavior=return-partial, a screenshot of
+   * the page rendered so far may be returned; inspect finalDOMState to identify an
+   * incomplete render. Successful requests cost 1 credit; errors are not billed.
+   *
+   * @example
+   * ```ts
+   * const response = await client.web.webScrapeScreenshot({
+   *   url: 'https://example.com',
+   * });
+   * ```
+   */
+  webScrapeScreenshot(
+    query: WebWebScrapeScreenshotParams,
+    options?: RequestOptions,
+  ): APIPromise<WebWebScrapeScreenshotResponse> {
+    return this._client.get('/web/scrape/screenshot', { query, ...options });
+  }
+
+  /**
    * Crawl an entire website's sitemap and return all discovered page URLs. Set
    * `includeSubdomains=true` to also discover public pages and sitemaps on child
    * hosts such as `docs.example.com` or `brand.example.com`. Pass `search` to have
@@ -2566,6 +2588,91 @@ export namespace WebWebScrapeMdResponse {
     method?: string;
 
     targetDescription?: string;
+  }
+
+  /**
+   * Credit usage, included whenever a valid API key is provided.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits used by this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
+}
+
+export interface WebWebScrapeScreenshotResponse {
+  /**
+   * Cache outcome for this response. Composite responses are hits only when every
+   * cache-controlled fetch contributing to the output was a hit; age_ms is the
+   * oldest contributing hit.
+   */
+  cache_metadata: WebWebScrapeScreenshotResponse.CacheMetadata;
+
+  /**
+   * Height of the returned image in pixels.
+   */
+  height: number;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
+   * Public image URL for standard requests, or an in-memory data URL when ZDR is
+   * enabled.
+   */
+  screenshot: string;
+
+  /**
+   * The requested page URL.
+   */
+  url: string;
+
+  /**
+   * Width of the returned image in pixels.
+   */
+  width: number;
+
+  /**
+   * How complete the returned content is. `loaded` means the page finished the waits
+   * the request asked for. `still-loading` only occurs with
+   * timeoutOpts.behavior=return-partial: the timeoutOpts.milliseconds deadline was
+   * reached first, so the content reflects the DOM at that moment and late-rendering
+   * parts may be missing. Partial results are billed at the base request cost.
+   */
+  finalDOMState?: 'loaded' | 'still-loading';
+
+  /**
+   * Credit usage, included whenever a valid API key is provided.
+   */
+  key_metadata?: WebWebScrapeScreenshotResponse.KeyMetadata;
+}
+
+export namespace WebWebScrapeScreenshotResponse {
+  /**
+   * Cache outcome for this response. Composite responses are hits only when every
+   * cache-controlled fetch contributing to the output was a hit; age_ms is the
+   * oldest contributing hit.
+   */
+  export interface CacheMetadata {
+    /**
+     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+     */
+    age_ms: number;
+
+    /**
+     * Whether the response was served from cache, required fresh work, or honored
+     * zero-data-retention cache bypass.
+     */
+    status: 'hit' | 'miss' | 'zdr';
   }
 
   /**
@@ -5623,6 +5730,340 @@ export namespace WebWebScrapeMdParams {
   }
 }
 
+export interface WebWebScrapeScreenshotParams {
+  url: string;
+
+  /**
+   * Optional parameter for comprehensive popup cleanup. If 'true', the browser
+   * dismisses detected cookie/consent UI and clears other detected obstructive
+   * popups and overlays before capture. If 'false' or not provided, this parameter
+   * requests no cleanup; handleCookiePopup can still request cookie/consent handling
+   * independently.
+   */
+  clearPopups?: boolean;
+
+  /**
+   * Optional parameter to choose the site's visual theme in the screenshot. Use
+   * 'light' or 'dark' when the site offers both appearances.
+   */
+  colorScheme?: 'light' | 'dark';
+
+  /**
+   * Fetch the target page through a residential proxy in this country (ISO 3166-1
+   * alpha-2).
+   */
+  country?:
+    | 'ad'
+    | 'ae'
+    | 'af'
+    | 'ag'
+    | 'ai'
+    | 'al'
+    | 'am'
+    | 'ao'
+    | 'ar'
+    | 'at'
+    | 'au'
+    | 'aw'
+    | 'az'
+    | 'ba'
+    | 'bb'
+    | 'bd'
+    | 'be'
+    | 'bf'
+    | 'bg'
+    | 'bh'
+    | 'bi'
+    | 'bj'
+    | 'bm'
+    | 'bn'
+    | 'bo'
+    | 'bq'
+    | 'br'
+    | 'bs'
+    | 'bw'
+    | 'by'
+    | 'bz'
+    | 'ca'
+    | 'cd'
+    | 'cf'
+    | 'cg'
+    | 'ch'
+    | 'ci'
+    | 'cl'
+    | 'cm'
+    | 'cn'
+    | 'co'
+    | 'cr'
+    | 'cv'
+    | 'cw'
+    | 'cy'
+    | 'cz'
+    | 'de'
+    | 'dj'
+    | 'dk'
+    | 'dm'
+    | 'do'
+    | 'dz'
+    | 'ec'
+    | 'ee'
+    | 'eg'
+    | 'es'
+    | 'et'
+    | 'fi'
+    | 'fj'
+    | 'fr'
+    | 'ga'
+    | 'gb'
+    | 'gd'
+    | 'ge'
+    | 'gf'
+    | 'gg'
+    | 'gh'
+    | 'gm'
+    | 'gn'
+    | 'gp'
+    | 'gq'
+    | 'gr'
+    | 'gt'
+    | 'gu'
+    | 'gw'
+    | 'gy'
+    | 'hk'
+    | 'hn'
+    | 'hr'
+    | 'ht'
+    | 'hu'
+    | 'id'
+    | 'ie'
+    | 'il'
+    | 'im'
+    | 'in'
+    | 'iq'
+    | 'ir'
+    | 'is'
+    | 'it'
+    | 'je'
+    | 'jm'
+    | 'jo'
+    | 'jp'
+    | 'ke'
+    | 'kg'
+    | 'kh'
+    | 'kn'
+    | 'kr'
+    | 'kw'
+    | 'ky'
+    | 'kz'
+    | 'la'
+    | 'lb'
+    | 'lc'
+    | 'lk'
+    | 'lr'
+    | 'ls'
+    | 'lt'
+    | 'lu'
+    | 'lv'
+    | 'ly'
+    | 'ma'
+    | 'mc'
+    | 'md'
+    | 'me'
+    | 'mf'
+    | 'mg'
+    | 'mk'
+    | 'ml'
+    | 'mm'
+    | 'mn'
+    | 'mo'
+    | 'mq'
+    | 'mr'
+    | 'mt'
+    | 'mu'
+    | 'mv'
+    | 'mw'
+    | 'mx'
+    | 'my'
+    | 'mz'
+    | 'na'
+    | 'nc'
+    | 'ne'
+    | 'ng'
+    | 'ni'
+    | 'nl'
+    | 'no'
+    | 'np'
+    | 'nz'
+    | 'om'
+    | 'pa'
+    | 'pe'
+    | 'pf'
+    | 'pg'
+    | 'ph'
+    | 'pk'
+    | 'pl'
+    | 'pr'
+    | 'ps'
+    | 'pt'
+    | 'py'
+    | 'qa'
+    | 're'
+    | 'ro'
+    | 'rs'
+    | 'ru'
+    | 'rw'
+    | 'sa'
+    | 'sc'
+    | 'sd'
+    | 'se'
+    | 'sg'
+    | 'si'
+    | 'sk'
+    | 'sl'
+    | 'sm'
+    | 'sn'
+    | 'so'
+    | 'sr'
+    | 'ss'
+    | 'st'
+    | 'sv'
+    | 'sx'
+    | 'sy'
+    | 'sz'
+    | 'tc'
+    | 'td'
+    | 'tg'
+    | 'th'
+    | 'tj'
+    | 'tl'
+    | 'tm'
+    | 'tn'
+    | 'tr'
+    | 'tt'
+    | 'tw'
+    | 'tz'
+    | 'ua'
+    | 'ug'
+    | 'us'
+    | 'uy'
+    | 'uz'
+    | 'vc'
+    | 've'
+    | 'vg'
+    | 'vi'
+    | 'vn'
+    | 'ye'
+    | 'yt'
+    | 'za'
+    | 'zm'
+    | 'zw';
+
+  /**
+   * Optional parameter to determine screenshot type. If 'true', takes a full page
+   * screenshot capturing all content. If 'false' or not provided, takes a viewport
+   * screenshot (standard browser view).
+   */
+  fullScreenshot?: 'true' | 'false';
+
+  /**
+   * Optional parameter to control cookie/consent popup handling. If 'true', we
+   * dismiss cookie banner before capture. If 'false' or not provided, captures the
+   * page without that step.
+   */
+  handleCookiePopup?: boolean;
+
+  /**
+   * Return a cached screenshot if a prior screenshot for the same parameters exists
+   * and is younger than this many milliseconds. Defaults to 1 day (86400000 ms) when
+   * omitted. Max is 30 days (2592000000 ms). Set to 0 to always capture fresh.
+   */
+  maxAgeMs?: number | null;
+
+  /**
+   * Optional vertical scroll offset in pixels for capturing a long page in
+   * viewport-sized chunks. When provided, the full page is captured once and the
+   * returned image is the viewport-sized slice that begins at this Y offset (e.g.
+   * request scrollOffset=0, then 1080, then 2160 to walk a 1920x1080 landing page
+   * top to bottom). The final slice may be shorter than the viewport height. Takes
+   * precedence over fullScreenshot. Max: 100000.
+   */
+  scrollOffset?: number | null;
+
+  /**
+   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
+   * characters.
+   */
+  tags?: Array<string>;
+
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  timeoutOpts?: WebWebScrapeScreenshotParams.TimeoutOpts;
+
+  /**
+   * Optional browser viewport dimensions for the screenshot. Defaults to 1920x1080.
+   */
+  viewport?: WebWebScrapeScreenshotParams.Viewport;
+
+  /**
+   * Optional browser wait time in milliseconds after initial page load before taking
+   * the screenshot. Min: 0. Max: 30000 (30 seconds). Defaults to 3000 ms when
+   * omitted. When combined with timeoutOpts, timeoutOpts.milliseconds must be at
+   * least waitForMs + 10000 ms; a shorter deadline is rejected with 400
+   * TIMEOUT_TOO_SHORT_FOR_WAIT.
+   */
+  waitForMs?: number | null;
+
+  /**
+   * Set to enabled to bypass shared caches and omit request and response content
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
+   */
+  zdr?: 'enabled' | 'disabled';
+}
+
+export namespace WebWebScrapeScreenshotParams {
+  /**
+   * Optional request deadline and behavior on timeout. For GET requests, use
+   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
+   * timeoutOpts object.
+   */
+  export interface TimeoutOpts {
+    /**
+     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     */
+    milliseconds: number;
+
+    /**
+     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
+     * credits. "return-partial" returns usable results collected so far; if none are
+     * available, the request still fails without charging credits. Partial results are
+     * not cached as complete results. "return-partial" requires milliseconds of at
+     * least 5000.
+     */
+    behavior?: 'fail' | 'return-partial';
+  }
+
+  /**
+   * Optional browser viewport dimensions for the screenshot. Defaults to 1920x1080.
+   */
+  export interface Viewport {
+    /**
+     * Viewport height in pixels.
+     */
+    height?: number;
+
+    /**
+     * Viewport width in pixels.
+     */
+    width?: number;
+  }
+}
+
 export interface WebWebScrapeSitemapParams {
   /**
    * Domain to build a sitemap for
@@ -5726,6 +6167,7 @@ export declare namespace Web {
     type WebWebScrapeHTMLResponse as WebWebScrapeHTMLResponse,
     type WebWebScrapeImagesResponse as WebWebScrapeImagesResponse,
     type WebWebScrapeMdResponse as WebWebScrapeMdResponse,
+    type WebWebScrapeScreenshotResponse as WebWebScrapeScreenshotResponse,
     type WebWebScrapeSitemapResponse as WebWebScrapeSitemapResponse,
     type WebAnswersParams as WebAnswersParams,
     type WebExtractParams as WebExtractParams,
@@ -5739,6 +6181,7 @@ export declare namespace Web {
     type WebWebScrapeHTMLParams as WebWebScrapeHTMLParams,
     type WebWebScrapeImagesParams as WebWebScrapeImagesParams,
     type WebWebScrapeMdParams as WebWebScrapeMdParams,
+    type WebWebScrapeScreenshotParams as WebWebScrapeScreenshotParams,
     type WebWebScrapeSitemapParams as WebWebScrapeSitemapParams,
   };
 }

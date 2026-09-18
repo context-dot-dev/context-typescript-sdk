@@ -83,6 +83,7 @@ export {
   type WebWebScrapeHTMLResponse,
   type WebWebScrapeImagesResponse,
   type WebWebScrapeMdResponse,
+  type WebWebScrapeScreenshotResponse,
   type WebWebScrapeSitemapResponse,
   type WebAnswersParams,
   type WebExtractParams,
@@ -96,6 +97,7 @@ export {
   type WebWebScrapeHTMLParams,
   type WebWebScrapeImagesParams,
   type WebWebScrapeMdParams,
+  type WebWebScrapeScreenshotParams,
   type WebWebScrapeSitemapParams,
 } from './web';
 export { Webhooks, type RetryConfig } from './webhooks/webhooks';
