@@ -168,12 +168,16 @@ export class Web extends APIResource {
   }
 
   /**
-   * Scrapes the given URL and returns the raw HTML content of the page. The base
-   * request costs 1 credit; requests with browser actions cost 2 credits. A request
-   * that hits its timeoutOpts.milliseconds deadline fails with 408 and is not
-   * billed, unless timeoutOpts.behavior=return-partial is set — then the page as
-   * rendered so far is returned with `finalDOMState: "still-loading"` and billed at
-   * the base cost of 1 credit.
+   * Scrapes the given URL and returns the HTML content of the page. Optional
+   * extractRules return deterministic structured data in extracted using CSS
+   * selectors, attributes, lists, and nested rules, without an LLM or additional
+   * credits. Rules run on the returned HTML after selector and main-content
+   * filtering. Send extractRules as a JSON-encoded query parameter. The base request
+   * costs 1 credit; requests with browser actions cost 2 credits. A request that
+   * hits its timeoutOpts.milliseconds deadline fails with 408 and is not billed,
+   * unless timeoutOpts.behavior=return-partial is set — then the page as rendered so
+   * far is returned with `finalDOMState: "still-loading"` and billed at the base
+   * cost of 1 credit.
    *
    * @example
    * ```ts
@@ -1916,6 +1920,14 @@ export interface WebWebScrapeHTMLResponse {
    * afterward.
    */
   actionsHtmlStale?: boolean;
+
+  /**
+   * Present only when extractRules is supplied. Keys match the requested fields.
+   * Values are normalized text, raw attribute strings, outer HTML, nested objects,
+   * or lists. Missing items are null; lists with no matches are empty. Rules run on
+   * the returned HTML after filtering.
+   */
+  extracted?: { [key: string]: string | unknown | Array<string | unknown | null> | null };
 
   /**
    * Credit usage, included whenever a valid API key is provided.
@@ -4750,6 +4762,17 @@ export interface WebWebScrapeHTMLParams {
   excludeSelectors?: Array<string> | null;
 
   /**
+   * Optional CSS extraction rules applied to the returned HTML after selector and
+   * main-content filtering. Use selector strings ("h1", "a@href") or objects with
+   * selector, type (item or list), and output (text, html, @attribute, or nested
+   * rules). Text whitespace is normalized; html includes the matched element;
+   * attributes are returned as written. Missing items are null and missing lists are
+   * empty. CSS only; XPath is not supported. Maximum: 100 fields across 5 levels.
+   * Send a JSON-encoded string in the extractRules query parameter.
+   */
+  extractRules?: { [key: string]: string | WebWebScrapeHTMLParams.UnionMember1 };
+
+  /**
    * Optional outbound HTTP headers forwarded only to the target URL, sent as
    * deep-object query params such as headers[X-Custom]=value. When provided, caching
    * is bypassed: the result is neither read from nor written to cache.
@@ -4871,6 +4894,24 @@ export namespace WebWebScrapeHTMLParams {
      * changing. Defaults to 1.
      */
     maxScrolls?: number;
+  }
+
+  export interface UnionMember1 {
+    selector: string;
+
+    output?: 'text' | 'html' | string | { [key: string]: string | UnionMember1.UnionMember1 };
+
+    type?: 'item' | 'list';
+  }
+
+  export namespace UnionMember1 {
+    export interface UnionMember1 {
+      selector: string;
+
+      output?: 'text' | 'html' | string | unknown;
+
+      type?: 'item' | 'list';
+    }
   }
 
   /**
