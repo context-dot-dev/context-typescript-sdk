@@ -30,6 +30,7 @@ describe('resource web', () => {
       mode: 'fast',
       tags: ['production', 'team-alpha'],
       timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
+      zdr: 'enabled',
     });
   });
 
@@ -81,6 +82,7 @@ describe('resource web', () => {
       tags: ['production', 'team-alpha'],
       timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
       waitForMs: 0,
+      zdr: 'enabled',
     });
   });
 
@@ -103,6 +105,7 @@ describe('resource web', () => {
       numCompetitors: 1,
       tags: ['production', 'team-alpha'],
       timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
+      zdr: 'enabled',
     });
   });
 
@@ -159,6 +162,7 @@ describe('resource web', () => {
           maxAgeMs: 0,
           tags: ['production', 'team-alpha'],
           timeoutOpts: { milliseconds: 1, behavior: 'fail' },
+          zdr: 'enabled',
         },
         { path: '/_stainless_unknown_path' },
       ),
@@ -244,6 +248,7 @@ describe('resource web', () => {
       queryFanout: true,
       tags: ['production', 'team-alpha'],
       timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
+      zdr: 'enabled',
     });
   });
 
@@ -383,6 +388,7 @@ describe('resource web', () => {
       tags: ['production', 'team-alpha'],
       timeoutOpts: { milliseconds: 1, behavior: 'fail' },
       waitForMs: 0,
+      zdr: 'enabled',
     });
   });
 

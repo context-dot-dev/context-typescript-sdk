@@ -2701,6 +2701,15 @@ export interface WebAnswersParams {
    * timeoutOpts object.
    */
   timeoutOpts?: WebAnswersParams.TimeoutOpts;
+
+  /**
+   * Set to enabled to bypass shared caches and omit request and response content
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
+   */
+  zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebAnswersParams {
@@ -2829,6 +2838,15 @@ export interface WebExtractParams {
    * crawled page.
    */
   waitForMs?: number;
+
+  /**
+   * Set to enabled to bypass shared caches and omit request and response content
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
+   */
+  zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebExtractParams {
@@ -2943,6 +2961,15 @@ export interface WebExtractCompetitorsParams {
    * timeoutOpts object.
    */
   timeoutOpts?: WebExtractCompetitorsParams.TimeoutOpts;
+
+  /**
+   * Set to enabled to bypass shared caches and omit request and response content
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
+   */
+  zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebExtractCompetitorsParams {
@@ -3069,6 +3096,15 @@ export interface WebExtractStyleguideParams {
    * timeoutOpts object.
    */
   timeoutOpts?: WebExtractStyleguideParams.TimeoutOpts;
+
+  /**
+   * Set to enabled to bypass shared caches and omit request and response content
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
+   */
+  zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebExtractStyleguideParams {
@@ -3403,9 +3439,10 @@ export interface WebScreenshotParams {
 
   /**
    * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Requires zero data retention to be enabled for your
-   * organization (contact support@context.dev), otherwise the request fails with
-   * ZDR_NOT_ENABLED. Successful ZDR responses include X-Context-ZDR: true.
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
    */
   zdr?: 'enabled' | 'disabled';
 }
@@ -3743,6 +3780,15 @@ export interface WebSearchParams {
    * timeoutOpts object.
    */
   timeoutOpts?: WebSearchParams.TimeoutOpts;
+
+  /**
+   * Set to enabled to bypass shared caches and omit request and response content
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
+   */
+  zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebSearchParams {
@@ -4500,9 +4546,10 @@ export interface WebWebScrapeBytesParams {
 
   /**
    * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Requires zero data retention to be enabled for your
-   * organization (contact support@context.dev), otherwise the request fails with
-   * ZDR_NOT_ENABLED. Successful ZDR responses include X-Context-ZDR: true.
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
    */
   zdr?: 'enabled' | 'disabled';
 }
@@ -4840,9 +4887,10 @@ export interface WebWebScrapeHTMLParams {
 
   /**
    * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Requires zero data retention to be enabled for your
-   * organization (contact support@context.dev), otherwise the request fails with
-   * ZDR_NOT_ENABLED. Successful ZDR responses include X-Context-ZDR: true.
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
    */
   zdr?: 'enabled' | 'disabled';
 }
@@ -5031,6 +5079,15 @@ export interface WebWebScrapeImagesParams {
    * shorter deadline is rejected with 400 TIMEOUT_TOO_SHORT_FOR_WAIT.
    */
   waitForMs?: number | null;
+
+  /**
+   * Set to enabled to bypass shared caches and omit request and response content
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
+   */
+  zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebWebScrapeImagesParams {
@@ -5094,7 +5151,7 @@ export namespace WebWebScrapeImagesParams {
 
     /**
      * Host materializable images on the Brand.dev CDN and return their URL and MIME
-     * type.
+     * type. Ignored when zero data retention is enabled.
      */
     hostedUrl?: boolean;
 
@@ -5456,9 +5513,10 @@ export interface WebWebScrapeMdParams {
 
   /**
    * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Requires zero data retention to be enabled for your
-   * organization (contact support@context.dev), otherwise the request fails with
-   * ZDR_NOT_ENABLED. Successful ZDR responses include X-Context-ZDR: true.
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
    */
   zdr?: 'enabled' | 'disabled';
 }
@@ -5624,9 +5682,10 @@ export interface WebWebScrapeSitemapParams {
 
   /**
    * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Requires zero data retention to be enabled for your
-   * organization (contact support@context.dev), otherwise the request fails with
-   * ZDR_NOT_ENABLED. Successful ZDR responses include X-Context-ZDR: true.
+   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
+   * omitted. Requires zero data retention to be enabled for your organization
+   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
+   * Successful ZDR responses include X-Context-ZDR: true.
    */
   zdr?: 'enabled' | 'disabled';
 }
