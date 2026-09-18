@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.20.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.19.0...v2.20.0) (2026-09-18)
+
+
+### Features
+
+* **billing:** charge for 404s and skip fraud accounting ([#1152](https://github.com/context-dot-dev/context-typescript-sdk/issues/1152)) ([b0a4aa5](https://github.com/context-dot-dev/context-typescript-sdk/commit/b0a4aa52533b83f905218d84976494c1dd931d1e))
+
 ## [2.19.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.18.1...v2.19.0) (2026-09-18)
 
 
