@@ -316,6 +316,7 @@ describe('resource web', () => {
       headers: { foo: 'J!' },
       tags: ['production', 'team-alpha'],
       timeoutOpts: { milliseconds: 1, behavior: 'fail' },
+      waitForMs: 0,
       zdr: 'enabled',
     });
   });
