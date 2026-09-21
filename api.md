@@ -17,6 +17,7 @@ Types:
 - <code><a href="./src/resources/web.ts">WebExtractCompetitorsResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebExtractFontsResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebExtractStyleguideResponse</a></code>
+- <code><a href="./src/resources/web.ts">WebScrapeResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebScreenshotResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebSearchResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebWebCrawlMdResponse</a></code>
@@ -34,6 +35,7 @@ Methods:
 - <code title="get /web/competitors">client.web.<a href="./src/resources/web.ts">extractCompetitors</a>({ ...params }) -> WebExtractCompetitorsResponse</code>
 - <code title="get /web/fonts">client.web.<a href="./src/resources/web.ts">extractFonts</a>({ ...params }) -> WebExtractFontsResponse</code>
 - <code title="get /web/styleguide">client.web.<a href="./src/resources/web.ts">extractStyleguide</a>({ ...params }) -> WebExtractStyleguideResponse</code>
+- <code title="post /web/scrape">client.web.<a href="./src/resources/web.ts">scrape</a>({ ...params }) -> WebScrapeResponse</code>
 - <code title="get /web/screenshot">client.web.<a href="./src/resources/web.ts">screenshot</a>({ ...params }) -> WebScreenshotResponse</code>
 - <code title="post /web/search">client.web.<a href="./src/resources/web.ts">search</a>({ ...params }) -> WebSearchResponse</code>
 - <code title="post /web/crawl">client.web.<a href="./src/resources/web.ts">webCrawlMd</a>({ ...params }) -> WebWebCrawlMdResponse</code>

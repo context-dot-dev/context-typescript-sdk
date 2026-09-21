@@ -170,6 +170,79 @@ describe('resource web', () => {
   });
 
   // Mock server tests are disabled
+  test.skip('scrape: only required params', async () => {
+    const responsePromise = client.web.scrape({
+      formats: {},
+      url: 'https://example.com',
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Mock server tests are disabled
+  test.skip('scrape: required and optional params', async () => {
+    const response = await client.web.scrape({
+      formats: {
+        bytes: true,
+        html: true,
+        images: true,
+        markdown: true,
+        parse: true,
+        screenshot: true,
+      },
+      url: 'https://example.com',
+      imageParams: { dedupe: 'none', enrich: ['dimensions'] },
+      markdownParams: {
+        includeImages: true,
+        includeLinks: true,
+        inlineImages: 'placeholder',
+      },
+      maxAgeMs: 0,
+      parseParams: {
+        rules: {
+          title: 'h1',
+          links: {
+            selector: 'a',
+            output: '@href',
+            type: 'list',
+          },
+        },
+      },
+      screenshotParams: { area: 'viewport', format: 'png' },
+      sharedParams: {
+        actions: [{ action: 'Click the product details tab', type: 'perform' }],
+        country: 'US',
+        dismissCookies: true,
+        dismissPopups: true,
+        excludeSelectors: ['P'],
+        headers: { 'Accept-Language': 'en-US' },
+        includeFrames: true,
+        includeSelectors: ['P'],
+        mainContentOnly: true,
+        parsers: {
+          pdf: {
+            endPage: 1,
+            ocr: 'off',
+            startPage: 1,
+          },
+        },
+        settleAnimations: true,
+        theme: 'light',
+        viewport: { height: 240, width: 240 },
+        waitFor: 500,
+      },
+      tags: ['production', 'team-alpha'],
+      timeoutMs: 1,
+      zdr: 'enabled',
+    });
+  });
+
+  // Mock server tests are disabled
   test.skip('screenshot', async () => {
     const responsePromise = client.web.screenshot();
     const rawResponse = await responsePromise.asResponse();
