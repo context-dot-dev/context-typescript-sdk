@@ -151,9 +151,14 @@ export class Web extends APIResource {
    * Follows public redirects and retries failed downloads through ISP and
    * residential proxies, with a direct fallback. When country is specified, only a
    * residential proxy in that country is used. Supply headers such as Referer for
-   * images that require a referring page. Downloads are not cached. Maximum decoded
-   * resource size: 20 MiB (20971520 bytes), before base64 encoding. Successful
-   * requests cost 1 credit; errors are not billed.
+   * images that require a referring page. Cached results are reused according to
+   * maxAgeMs (default: 1 day; maximum: 30 days). Set maxAgeMs=0 to fetch fresh and
+   * refresh the cache. Cache identity includes the exact URL, country, waitForMs,
+   * and normalized outbound headers. Credential-bearing headers and zero data
+   * retention bypass cache reads and writes. cache_metadata reports hit, miss, or
+   * zdr and the cached result age in milliseconds. Maximum decoded resource size: 20
+   * MiB (20971520 bytes), before base64 encoding. Successful requests cost 1 credit;
+   * errors are not billed.
    *
    * @example
    * ```ts
@@ -1809,6 +1814,13 @@ export interface WebWebScrapeBytesResponse {
   bytes: string;
 
   /**
+   * Cache outcome for this response. Composite responses are hits only when every
+   * cache-controlled fetch contributing to the output was a hit; age_ms is the
+   * oldest contributing hit.
+   */
+  cache_metadata: WebWebScrapeBytesResponse.CacheMetadata;
+
+  /**
    * Number of decoded resource bytes, before base64 encoding.
    */
   contentLength: number;
@@ -1851,6 +1863,24 @@ export interface WebWebScrapeBytesResponse {
 }
 
 export namespace WebWebScrapeBytesResponse {
+  /**
+   * Cache outcome for this response. Composite responses are hits only when every
+   * cache-controlled fetch contributing to the output was a hit; age_ms is the
+   * oldest contributing hit.
+   */
+  export interface CacheMetadata {
+    /**
+     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+     */
+    age_ms: number;
+
+    /**
+     * Whether the response was served from cache, required fresh work, or honored
+     * zero-data-retention cache bypass.
+     */
+    status: 'hit' | 'miss' | 'zdr';
+  }
+
   /**
    * Credit usage, included whenever a valid API key is provided.
    */
@@ -4647,9 +4677,17 @@ export interface WebWebScrapeBytesParams {
    * as a JSON object or deep-object query params such as
    * headers[Referer]=https://example.com/. Host, Content-Length, and hop-by-hop
    * transport headers are rejected. Authorization and cookies are removed when a
-   * redirect changes origin.
+   * redirect changes origin. Credential-bearing headers bypass cache reads and
+   * writes; other headers are included in the cache key.
    */
   headers?: { [key: string]: string };
+
+  /**
+   * Return a cached result if a prior scrape for the same parameters exists and is
+   * younger than this many milliseconds. Defaults to 1 day (86400000 ms) when
+   * omitted. Max is 30 days (2592000000 ms). Set to 0 to always scrape fresh.
+   */
+  maxAgeMs?: number | null;
 
   /**
    * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
@@ -5161,6 +5199,216 @@ export interface WebWebScrapeImagesParams {
     | WebWebScrapeImagesParams.WebScrapePerformAction
     | WebWebScrapeImagesParams.WebScrapeScrollAction
   > | null;
+
+  /**
+   * Fetch the target page through a residential proxy in this country (ISO 3166-1
+   * alpha-2).
+   */
+  country?:
+    | 'ad'
+    | 'ae'
+    | 'af'
+    | 'ag'
+    | 'ai'
+    | 'al'
+    | 'am'
+    | 'ao'
+    | 'ar'
+    | 'at'
+    | 'au'
+    | 'aw'
+    | 'az'
+    | 'ba'
+    | 'bb'
+    | 'bd'
+    | 'be'
+    | 'bf'
+    | 'bg'
+    | 'bh'
+    | 'bi'
+    | 'bj'
+    | 'bm'
+    | 'bn'
+    | 'bo'
+    | 'bq'
+    | 'br'
+    | 'bs'
+    | 'bw'
+    | 'by'
+    | 'bz'
+    | 'ca'
+    | 'cd'
+    | 'cf'
+    | 'cg'
+    | 'ch'
+    | 'ci'
+    | 'cl'
+    | 'cm'
+    | 'cn'
+    | 'co'
+    | 'cr'
+    | 'cv'
+    | 'cw'
+    | 'cy'
+    | 'cz'
+    | 'de'
+    | 'dj'
+    | 'dk'
+    | 'dm'
+    | 'do'
+    | 'dz'
+    | 'ec'
+    | 'ee'
+    | 'eg'
+    | 'es'
+    | 'et'
+    | 'fi'
+    | 'fj'
+    | 'fr'
+    | 'ga'
+    | 'gb'
+    | 'gd'
+    | 'ge'
+    | 'gf'
+    | 'gg'
+    | 'gh'
+    | 'gm'
+    | 'gn'
+    | 'gp'
+    | 'gq'
+    | 'gr'
+    | 'gt'
+    | 'gu'
+    | 'gw'
+    | 'gy'
+    | 'hk'
+    | 'hn'
+    | 'hr'
+    | 'ht'
+    | 'hu'
+    | 'id'
+    | 'ie'
+    | 'il'
+    | 'im'
+    | 'in'
+    | 'iq'
+    | 'ir'
+    | 'is'
+    | 'it'
+    | 'je'
+    | 'jm'
+    | 'jo'
+    | 'jp'
+    | 'ke'
+    | 'kg'
+    | 'kh'
+    | 'kn'
+    | 'kr'
+    | 'kw'
+    | 'ky'
+    | 'kz'
+    | 'la'
+    | 'lb'
+    | 'lc'
+    | 'lk'
+    | 'lr'
+    | 'ls'
+    | 'lt'
+    | 'lu'
+    | 'lv'
+    | 'ly'
+    | 'ma'
+    | 'mc'
+    | 'md'
+    | 'me'
+    | 'mf'
+    | 'mg'
+    | 'mk'
+    | 'ml'
+    | 'mm'
+    | 'mn'
+    | 'mo'
+    | 'mq'
+    | 'mr'
+    | 'mt'
+    | 'mu'
+    | 'mv'
+    | 'mw'
+    | 'mx'
+    | 'my'
+    | 'mz'
+    | 'na'
+    | 'nc'
+    | 'ne'
+    | 'ng'
+    | 'ni'
+    | 'nl'
+    | 'no'
+    | 'np'
+    | 'nz'
+    | 'om'
+    | 'pa'
+    | 'pe'
+    | 'pf'
+    | 'pg'
+    | 'ph'
+    | 'pk'
+    | 'pl'
+    | 'pr'
+    | 'ps'
+    | 'pt'
+    | 'py'
+    | 'qa'
+    | 're'
+    | 'ro'
+    | 'rs'
+    | 'ru'
+    | 'rw'
+    | 'sa'
+    | 'sc'
+    | 'sd'
+    | 'se'
+    | 'sg'
+    | 'si'
+    | 'sk'
+    | 'sl'
+    | 'sm'
+    | 'sn'
+    | 'so'
+    | 'sr'
+    | 'ss'
+    | 'st'
+    | 'sv'
+    | 'sx'
+    | 'sy'
+    | 'sz'
+    | 'tc'
+    | 'td'
+    | 'tg'
+    | 'th'
+    | 'tj'
+    | 'tl'
+    | 'tm'
+    | 'tn'
+    | 'tr'
+    | 'tt'
+    | 'tw'
+    | 'tz'
+    | 'ua'
+    | 'ug'
+    | 'us'
+    | 'uy'
+    | 'uz'
+    | 'vc'
+    | 've'
+    | 'vg'
+    | 'vi'
+    | 'vn'
+    | 'ye'
+    | 'yt'
+    | 'za'
+    | 'zm'
+    | 'zw';
 
   /**
    * When true, visually duplicate images are removed: every image is loaded and
