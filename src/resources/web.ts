@@ -100,11 +100,14 @@ export class Web extends APIResource {
   }
 
   /**
-   * Capture the requested formats from one page visit. Shared settings apply once.
-   * HTML-only requests use the existing fast acquisition path. One credit per
-   * capture, or two with browser actions; PDF OCR adds one credit per recovered
-   * page. Original response bytes and screenshots are limited to 20 MiB each,
-   * screenshots to 40 megapixels, and the combined browser capture to 60 MiB.
+   * Reuse cached outputs independently and capture missing formats in one page
+   * visit. Each cache key includes only the settings that affect that output. HTML
+   * is shared with Markdown and parsed fields. Cached outputs can come from
+   * different visits within maxAgeMs; use 0 for a fresh capture. HTML-only requests
+   * use the existing fast acquisition path. One credit per request, including cache
+   * hits, or two with browser actions; PDF OCR adds one credit per recovered page on
+   * fresh extraction. Original response bytes and screenshots are limited to 20 MiB
+   * each, screenshots to 40 megapixels, and the combined browser capture to 60 MiB.
    *
    * @example
    * ```ts
@@ -3639,8 +3642,10 @@ export interface WebScrapeParams {
   markdownParams?: WebScrapeParams.MarkdownParams;
 
   /**
-   * Maximum age for the entire capture, including bytes. Defaults to 1 day; 0
-   * fetches fresh. Captures with hosted image files refresh after 23 hours.
+   * Maximum age of each cached output. Defaults to 1 day; 0 fetches fresh and
+   * updates the requested outputs. Compatible outputs are shared with the individual
+   * scrape endpoints. Image results with hosted files refresh after 23 hours; other
+   * outputs retain their own freshness.
    */
   maxAgeMs?: number;
 
