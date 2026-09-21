@@ -1356,8 +1356,8 @@ export interface WebScreenshotResponse {
   key_metadata?: WebScreenshotResponse.KeyMetadata;
 
   /**
-   * Public image URL for standard requests, or an in-memory data URL when ZDR is
-   * enabled.
+   * Public image URL for standard requests, or an in-memory data URL when ZDR or
+   * non-empty custom headers are supplied.
    */
   screenshot?: string;
 
@@ -2628,8 +2628,8 @@ export interface WebWebScrapeScreenshotResponse {
   request_id: string;
 
   /**
-   * Public image URL for standard requests, or an in-memory data URL when ZDR is
-   * enabled.
+   * Public image URL for standard requests, or an in-memory data URL when ZDR or
+   * non-empty custom headers are supplied.
    */
   screenshot: string;
 
@@ -3492,6 +3492,17 @@ export interface WebScreenshotParams {
    * page without that step.
    */
   handleCookiePopup?: boolean;
+
+  /**
+   * Optional outbound HTTP headers, using the same JSON object or deep-object query
+   * format as other scrape endpoints (for example headers[Authorization]=Bearer
+   * token). Headers are scoped to the target origin during capture. For domain/page
+   * requests, discovery receives no custom headers and only pages on the resolved
+   * origin are eligible. Non-empty headers bypass screenshot caching and return an
+   * in-memory data URL; no screenshot is uploaded. Empty objects behave like omitted
+   * headers.
+   */
+  headers?: { [key: string]: string };
 
   /**
    * Return a cached screenshot if a prior screenshot for the same parameters exists
@@ -5983,6 +5994,17 @@ export interface WebWebScrapeScreenshotParams {
    * page without that step.
    */
   handleCookiePopup?: boolean;
+
+  /**
+   * Optional outbound HTTP headers, using the same JSON object or deep-object query
+   * format as other scrape endpoints (for example headers[Authorization]=Bearer
+   * token). Headers are scoped to the target origin during capture. For domain/page
+   * requests, discovery receives no custom headers and only pages on the resolved
+   * origin are eligible. Non-empty headers bypass screenshot caching and return an
+   * in-memory data URL; no screenshot is uploaded. Empty objects behave like omitted
+   * headers.
+   */
+  headers?: { [key: string]: string };
 
   /**
    * Return a cached screenshot if a prior screenshot for the same parameters exists
