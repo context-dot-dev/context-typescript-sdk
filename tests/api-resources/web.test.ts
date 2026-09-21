@@ -194,6 +194,7 @@ describe('resource web', () => {
           domain: 'xxx',
           fullScreenshot: 'true',
           handleCookiePopup: true,
+          headers: { foo: 'J!' },
           maxAgeMs: 0,
           page: 'login',
           scrollOffset: 0,
@@ -314,8 +315,10 @@ describe('resource web', () => {
       url: 'https://example.com',
       country: 'de',
       headers: { foo: 'J!' },
+      maxAgeMs: 0,
       tags: ['production', 'team-alpha'],
       timeoutOpts: { milliseconds: 1, behavior: 'fail' },
+      waitForMs: 0,
       zdr: 'enabled',
     });
   });
@@ -376,6 +379,7 @@ describe('resource web', () => {
     const response = await client.web.webScrapeImages({
       url: 'https://example.com',
       actions: [{ do: 'wait', timeMs: 0 }],
+      country: 'de',
       dedupe: true,
       enrichment: {
         classification: true,
@@ -455,6 +459,7 @@ describe('resource web', () => {
       country: 'de',
       fullScreenshot: 'true',
       handleCookiePopup: true,
+      headers: { foo: 'J!' },
       maxAgeMs: 0,
       scrollOffset: 0,
       tags: ['production', 'team-alpha'],

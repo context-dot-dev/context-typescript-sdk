@@ -142,16 +142,23 @@ export class Web extends APIResource {
   }
 
   /**
-   * Downloads a resource and returns its bytes as base64. Supports images, PDFs,
-   * HTML pages, and any other content type without image conversion, text
-   * extraction, or character-encoding changes. HTTP compression is decoded before
-   * base64 encoding. HTML is the original HTTP response; JavaScript is not rendered.
+   * Downloads a resource and returns its bytes as base64. Without waitForMs, returns
+   * the original HTTP response without image conversion, text extraction, or
+   * character-encoding changes. HTTP compression is decoded before base64 encoding.
+   * Supply waitForMs to render HTML with JavaScript in the browser and return the
+   * resulting HTML as UTF-8 bytes after the wait. Non-HTML resources, including
+   * images and PDFs, keep their original bytes and do not incur a browser wait.
    * Follows public redirects and retries failed downloads through ISP and
    * residential proxies, with a direct fallback. When country is specified, only a
    * residential proxy in that country is used. Supply headers such as Referer for
-   * images that require a referring page. Downloads are not cached. Maximum decoded
-   * resource size: 20 MiB (20971520 bytes), before base64 encoding. Successful
-   * requests cost 1 credit; errors are not billed.
+   * images that require a referring page. Cached results are reused according to
+   * maxAgeMs (default: 1 day; maximum: 30 days). Set maxAgeMs=0 to fetch fresh and
+   * refresh the cache. Cache identity includes the exact URL, country, waitForMs,
+   * and normalized outbound headers. Credential-bearing headers and zero data
+   * retention bypass cache reads and writes. cache_metadata reports hit, miss, or
+   * zdr and the cached result age in milliseconds. Maximum decoded resource size: 20
+   * MiB (20971520 bytes), before base64 encoding. Successful requests cost 1 credit;
+   * errors are not billed.
    *
    * @example
    * ```ts
@@ -1354,8 +1361,8 @@ export interface WebScreenshotResponse {
   key_metadata?: WebScreenshotResponse.KeyMetadata;
 
   /**
-   * Public image URL for standard requests, or an in-memory data URL when ZDR is
-   * enabled.
+   * Public image URL for standard requests, or an in-memory data URL when ZDR or
+   * non-empty custom headers are supplied.
    */
   screenshot?: string;
 
@@ -1807,6 +1814,13 @@ export interface WebWebScrapeBytesResponse {
   bytes: string;
 
   /**
+   * Cache outcome for this response. Composite responses are hits only when every
+   * cache-controlled fetch contributing to the output was a hit; age_ms is the
+   * oldest contributing hit.
+   */
+  cache_metadata: WebWebScrapeBytesResponse.CacheMetadata;
+
+  /**
    * Number of decoded resource bytes, before base64 encoding.
    */
   contentLength: number;
@@ -1849,6 +1863,24 @@ export interface WebWebScrapeBytesResponse {
 }
 
 export namespace WebWebScrapeBytesResponse {
+  /**
+   * Cache outcome for this response. Composite responses are hits only when every
+   * cache-controlled fetch contributing to the output was a hit; age_ms is the
+   * oldest contributing hit.
+   */
+  export interface CacheMetadata {
+    /**
+     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+     */
+    age_ms: number;
+
+    /**
+     * Whether the response was served from cache, required fresh work, or honored
+     * zero-data-retention cache bypass.
+     */
+    status: 'hit' | 'miss' | 'zdr';
+  }
+
   /**
    * Credit usage, included whenever a valid API key is provided.
    */
@@ -2626,8 +2658,8 @@ export interface WebWebScrapeScreenshotResponse {
   request_id: string;
 
   /**
-   * Public image URL for standard requests, or an in-memory data URL when ZDR is
-   * enabled.
+   * Public image URL for standard requests, or an in-memory data URL when ZDR or
+   * non-empty custom headers are supplied.
    */
   screenshot: string;
 
@@ -3490,6 +3522,17 @@ export interface WebScreenshotParams {
    * page without that step.
    */
   handleCookiePopup?: boolean;
+
+  /**
+   * Optional outbound HTTP headers, using the same JSON object or deep-object query
+   * format as other scrape endpoints (for example headers[Authorization]=Bearer
+   * token). Headers are scoped to the target origin during capture. For domain/page
+   * requests, discovery receives no custom headers and only pages on the resolved
+   * origin are eligible. Non-empty headers bypass screenshot caching and return an
+   * in-memory data URL; no screenshot is uploaded. Empty objects behave like omitted
+   * headers.
+   */
+  headers?: { [key: string]: string };
 
   /**
    * Return a cached screenshot if a prior screenshot for the same parameters exists
@@ -4634,9 +4677,17 @@ export interface WebWebScrapeBytesParams {
    * as a JSON object or deep-object query params such as
    * headers[Referer]=https://example.com/. Host, Content-Length, and hop-by-hop
    * transport headers are rejected. Authorization and cookies are removed when a
-   * redirect changes origin.
+   * redirect changes origin. Credential-bearing headers bypass cache reads and
+   * writes; other headers are included in the cache key.
    */
   headers?: { [key: string]: string };
+
+  /**
+   * Return a cached result if a prior scrape for the same parameters exists and is
+   * younger than this many milliseconds. Defaults to 1 day (86400000 ms) when
+   * omitted. Max is 30 days (2592000000 ms). Set to 0 to always scrape fresh.
+   */
+  maxAgeMs?: number | null;
 
   /**
    * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
@@ -4650,6 +4701,16 @@ export interface WebWebScrapeBytesParams {
    * timeoutOpts object.
    */
   timeoutOpts?: WebWebScrapeBytesParams.TimeoutOpts;
+
+  /**
+   * Optional browser wait time after initial page load, in milliseconds (0–30000; 0
+   * uses 500). When supplied, HTML is rendered with JavaScript and returned as UTF-8
+   * bytes. Other resources keep their original bytes without a browser wait. Omit to
+   * download the original HTTP response. When combined with timeoutOpts,
+   * timeoutOpts.milliseconds must be at least waitForMs + 10000 ms; a shorter
+   * deadline is rejected with 400 TIMEOUT_TOO_SHORT_FOR_WAIT.
+   */
+  waitForMs?: number | null;
 
   /**
    * Set to enabled to bypass shared caches and omit request and response content
@@ -5138,6 +5199,216 @@ export interface WebWebScrapeImagesParams {
     | WebWebScrapeImagesParams.WebScrapePerformAction
     | WebWebScrapeImagesParams.WebScrapeScrollAction
   > | null;
+
+  /**
+   * Fetch the target page through a residential proxy in this country (ISO 3166-1
+   * alpha-2).
+   */
+  country?:
+    | 'ad'
+    | 'ae'
+    | 'af'
+    | 'ag'
+    | 'ai'
+    | 'al'
+    | 'am'
+    | 'ao'
+    | 'ar'
+    | 'at'
+    | 'au'
+    | 'aw'
+    | 'az'
+    | 'ba'
+    | 'bb'
+    | 'bd'
+    | 'be'
+    | 'bf'
+    | 'bg'
+    | 'bh'
+    | 'bi'
+    | 'bj'
+    | 'bm'
+    | 'bn'
+    | 'bo'
+    | 'bq'
+    | 'br'
+    | 'bs'
+    | 'bw'
+    | 'by'
+    | 'bz'
+    | 'ca'
+    | 'cd'
+    | 'cf'
+    | 'cg'
+    | 'ch'
+    | 'ci'
+    | 'cl'
+    | 'cm'
+    | 'cn'
+    | 'co'
+    | 'cr'
+    | 'cv'
+    | 'cw'
+    | 'cy'
+    | 'cz'
+    | 'de'
+    | 'dj'
+    | 'dk'
+    | 'dm'
+    | 'do'
+    | 'dz'
+    | 'ec'
+    | 'ee'
+    | 'eg'
+    | 'es'
+    | 'et'
+    | 'fi'
+    | 'fj'
+    | 'fr'
+    | 'ga'
+    | 'gb'
+    | 'gd'
+    | 'ge'
+    | 'gf'
+    | 'gg'
+    | 'gh'
+    | 'gm'
+    | 'gn'
+    | 'gp'
+    | 'gq'
+    | 'gr'
+    | 'gt'
+    | 'gu'
+    | 'gw'
+    | 'gy'
+    | 'hk'
+    | 'hn'
+    | 'hr'
+    | 'ht'
+    | 'hu'
+    | 'id'
+    | 'ie'
+    | 'il'
+    | 'im'
+    | 'in'
+    | 'iq'
+    | 'ir'
+    | 'is'
+    | 'it'
+    | 'je'
+    | 'jm'
+    | 'jo'
+    | 'jp'
+    | 'ke'
+    | 'kg'
+    | 'kh'
+    | 'kn'
+    | 'kr'
+    | 'kw'
+    | 'ky'
+    | 'kz'
+    | 'la'
+    | 'lb'
+    | 'lc'
+    | 'lk'
+    | 'lr'
+    | 'ls'
+    | 'lt'
+    | 'lu'
+    | 'lv'
+    | 'ly'
+    | 'ma'
+    | 'mc'
+    | 'md'
+    | 'me'
+    | 'mf'
+    | 'mg'
+    | 'mk'
+    | 'ml'
+    | 'mm'
+    | 'mn'
+    | 'mo'
+    | 'mq'
+    | 'mr'
+    | 'mt'
+    | 'mu'
+    | 'mv'
+    | 'mw'
+    | 'mx'
+    | 'my'
+    | 'mz'
+    | 'na'
+    | 'nc'
+    | 'ne'
+    | 'ng'
+    | 'ni'
+    | 'nl'
+    | 'no'
+    | 'np'
+    | 'nz'
+    | 'om'
+    | 'pa'
+    | 'pe'
+    | 'pf'
+    | 'pg'
+    | 'ph'
+    | 'pk'
+    | 'pl'
+    | 'pr'
+    | 'ps'
+    | 'pt'
+    | 'py'
+    | 'qa'
+    | 're'
+    | 'ro'
+    | 'rs'
+    | 'ru'
+    | 'rw'
+    | 'sa'
+    | 'sc'
+    | 'sd'
+    | 'se'
+    | 'sg'
+    | 'si'
+    | 'sk'
+    | 'sl'
+    | 'sm'
+    | 'sn'
+    | 'so'
+    | 'sr'
+    | 'ss'
+    | 'st'
+    | 'sv'
+    | 'sx'
+    | 'sy'
+    | 'sz'
+    | 'tc'
+    | 'td'
+    | 'tg'
+    | 'th'
+    | 'tj'
+    | 'tl'
+    | 'tm'
+    | 'tn'
+    | 'tr'
+    | 'tt'
+    | 'tw'
+    | 'tz'
+    | 'ua'
+    | 'ug'
+    | 'us'
+    | 'uy'
+    | 'uz'
+    | 'vc'
+    | 've'
+    | 'vg'
+    | 'vi'
+    | 'vn'
+    | 'ye'
+    | 'yt'
+    | 'za'
+    | 'zm'
+    | 'zw';
 
   /**
    * When true, visually duplicate images are removed: every image is loaded and
@@ -5971,6 +6242,17 @@ export interface WebWebScrapeScreenshotParams {
    * page without that step.
    */
   handleCookiePopup?: boolean;
+
+  /**
+   * Optional outbound HTTP headers, using the same JSON object or deep-object query
+   * format as other scrape endpoints (for example headers[Authorization]=Bearer
+   * token). Headers are scoped to the target origin during capture. For domain/page
+   * requests, discovery receives no custom headers and only pages on the resolved
+   * origin are eligible. Non-empty headers bypass screenshot caching and return an
+   * in-memory data URL; no screenshot is uploaded. Empty objects behave like omitted
+   * headers.
+   */
+  headers?: { [key: string]: string };
 
   /**
    * Return a cached screenshot if a prior screenshot for the same parameters exists
