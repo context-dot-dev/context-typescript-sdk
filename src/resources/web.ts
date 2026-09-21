@@ -100,6 +100,25 @@ export class Web extends APIResource {
   }
 
   /**
+   * Capture the requested formats from one page visit. Shared settings apply once.
+   * HTML-only requests use the existing fast acquisition path. One credit per
+   * capture, or two with browser actions; PDF OCR adds one credit per recovered
+   * page. Original response bytes and screenshots are limited to 20 MiB each,
+   * screenshots to 40 megapixels, and the combined browser capture to 60 MiB.
+   *
+   * @example
+   * ```ts
+   * const response = await client.web.scrape({
+   *   formats: { html: true },
+   *   url: 'https://example.com',
+   * });
+   * ```
+   */
+  scrape(body: WebScrapeParams, options?: RequestOptions): APIPromise<WebScrapeResponse> {
+    return this._client.post('/web/scrape', { body, ...options });
+  }
+
+  /**
    * Capture a screenshot of a website.
    *
    * @example
@@ -1314,6 +1333,335 @@ export namespace WebExtractStyleguideResponse {
         lineHeight: string;
       }
     }
+  }
+}
+
+export interface WebScrapeResponse {
+  /**
+   * Original HTTP response body. Waiting, actions, and content filters never change
+   * it.
+   */
+  bytes: WebScrapeResponse.Bytes;
+
+  /**
+   * Cache outcome for this response. Composite responses are hits only when every
+   * cache-controlled fetch contributing to the output was a hit; age_ms is the
+   * oldest contributing hit.
+   */
+  cache_metadata: WebScrapeResponse.CacheMetadata;
+
+  /**
+   * Rendered HTML after content filters.
+   */
+  html: WebScrapeResponse.HTML;
+
+  /**
+   * Images after content filters. Empty when none are found.
+   */
+  images: WebScrapeResponse.Images;
+
+  /**
+   * Markdown after content filters.
+   */
+  markdown: WebScrapeResponse.Markdown;
+
+  /**
+   * Page details, when available.
+   */
+  metadata: WebScrapeResponse.Metadata;
+
+  /**
+   * Fields produced by parseParams.rules, after shared content filters.
+   */
+  parsed: WebScrapeResponse.Parsed;
+
+  /**
+   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
+   * it when contacting support about a failed request.
+   */
+  request_id: string;
+
+  /**
+   * An image data URL. Use directly as an image src.
+   */
+  screenshot: WebScrapeResponse.Screenshot;
+
+  /**
+   * Final URL after redirects and browser actions.
+   */
+  url: string;
+
+  /**
+   * Credit usage, included whenever a valid API key is provided.
+   */
+  key_metadata?: WebScrapeResponse.KeyMetadata;
+}
+
+export namespace WebScrapeResponse {
+  /**
+   * Original HTTP response body. Waiting, actions, and content filters never change
+   * it.
+   */
+  export interface Bytes {
+    data: Bytes.Data | null;
+
+    requested: boolean;
+  }
+
+  export namespace Bytes {
+    export interface Data {
+      /**
+       * Original response body as base64, after HTTP decompression. Maximum decoded
+       * size: 20 MiB.
+       */
+      base64: string;
+
+      contentType: string;
+    }
+  }
+
+  /**
+   * Cache outcome for this response. Composite responses are hits only when every
+   * cache-controlled fetch contributing to the output was a hit; age_ms is the
+   * oldest contributing hit.
+   */
+  export interface CacheMetadata {
+    /**
+     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+     */
+    age_ms: number;
+
+    /**
+     * Whether the response was served from cache, required fresh work, or honored
+     * zero-data-retention cache bypass.
+     */
+    status: 'hit' | 'miss' | 'zdr';
+  }
+
+  /**
+   * Rendered HTML after content filters.
+   */
+  export interface HTML {
+    data: string | null;
+
+    requested: boolean;
+  }
+
+  /**
+   * Images after content filters. Empty when none are found.
+   */
+  export interface Images {
+    data: Array<Images.Data> | null;
+
+    requested: boolean;
+  }
+
+  export namespace Images {
+    export interface Data {
+      /**
+       * Alt text, if present.
+       */
+      alt: string | null;
+
+      /**
+       * Image URL, or a data URI for inline images.
+       */
+      url: string;
+
+      classification?:
+        | 'photography'
+        | 'illustration'
+        | 'logo'
+        | 'wordmark'
+        | 'icon'
+        | 'pattern'
+        | 'graphic'
+        | 'other';
+
+      /**
+       * Hosted copy when file enrichment is requested and zdr is disabled. Valid for 24
+       * hours from the original capture.
+       */
+      fileUrl?: string;
+
+      height?: number;
+
+      width?: number;
+    }
+  }
+
+  /**
+   * Markdown after content filters.
+   */
+  export interface Markdown {
+    data: string | null;
+
+    requested: boolean;
+  }
+
+  /**
+   * Page details, when available.
+   */
+  export interface Metadata {
+    /**
+     * Additional non-social meta tags not promoted to top-level metadata fields.
+     */
+    additionalMeta?: { [key: string]: string | Array<string> };
+
+    /**
+     * Resolved alternate links from link rel=alternate tags.
+     */
+    alternates?: Array<Metadata.Alternate>;
+
+    /**
+     * Author metadata, when present.
+     */
+    author?: string;
+
+    /**
+     * Resolved canonical URL, when present.
+     */
+    canonicalUrl?: string;
+
+    /**
+     * Best description extracted from standard, Open Graph, or Twitter metadata.
+     */
+    description?: string;
+
+    /**
+     * Resolved favicon URL, when present.
+     */
+    favicon?: string;
+
+    /**
+     * Page headings (h1–h6) in document order, extracted from the unfiltered document.
+     * Capped at the first 500 headings. Omitted when the page has none.
+     */
+    headings?: Array<Metadata.Heading>;
+
+    /**
+     * Primary resolved preview image from Open Graph, Twitter, or image metadata.
+     */
+    image?: string;
+
+    /**
+     * JSON-LD structured data blocks parsed from the page.
+     */
+    jsonLd?: Array<{ [key: string]: unknown }>;
+
+    /**
+     * Keywords extracted from the page's keywords meta tag.
+     */
+    keywords?: Array<string>;
+
+    /**
+     * Language extracted from html lang or language meta tags.
+     */
+    language?: string;
+
+    /**
+     * Modified timestamp/date from page metadata, when present.
+     */
+    modifiedTime?: string;
+
+    /**
+     * Open Graph metadata with the og: prefix removed and keys camel-cased.
+     */
+    openGraph?: { [key: string]: string | Array<string> };
+
+    /**
+     * Published timestamp/date from page metadata, when present.
+     */
+    publishedTime?: string;
+
+    /**
+     * Robots meta directive, when present.
+     */
+    robots?: string;
+
+    /**
+     * Site or application name from page metadata.
+     */
+    siteName?: string;
+
+    /**
+     * Best title extracted from the page.
+     */
+    title?: string;
+
+    /**
+     * Twitter card metadata with the twitter: prefix removed and keys camel-cased.
+     */
+    twitter?: { [key: string]: string | Array<string> };
+  }
+
+  export namespace Metadata {
+    export interface Alternate {
+      /**
+       * Resolved alternate URL.
+       */
+      href: string;
+
+      /**
+       * Language or locale for the alternate URL, when present.
+       */
+      hreflang?: string;
+
+      /**
+       * Alternate resource title, when present.
+       */
+      title?: string;
+
+      /**
+       * Alternate resource MIME type, when present.
+       */
+      type?: string;
+    }
+
+    export interface Heading {
+      /**
+       * Heading level, 1–6 (from h1–h6).
+       */
+      level: number;
+
+      /**
+       * Heading text with whitespace collapsed, truncated to 1000 characters.
+       */
+      text: string;
+    }
+  }
+
+  /**
+   * Fields produced by parseParams.rules, after shared content filters.
+   */
+  export interface Parsed {
+    data: { [key: string]: unknown } | null;
+
+    requested: boolean;
+  }
+
+  /**
+   * An image data URL. Use directly as an image src.
+   */
+  export interface Screenshot {
+    data: string | null;
+
+    requested: boolean;
+  }
+
+  /**
+   * Credit usage, included whenever a valid API key is provided.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits used by this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
   }
 }
 
@@ -3266,6 +3614,344 @@ export namespace WebExtractStyleguideParams {
      * least 5000.
      */
     behavior?: 'fail' | 'return-partial';
+  }
+}
+
+export interface WebScrapeParams {
+  /**
+   * Outputs to return. Enable at least one; omitted formats are false.
+   */
+  formats: WebScrapeParams.Formats;
+
+  /**
+   * The URL to scrape.
+   */
+  url: string;
+
+  /**
+   * Image options. Requires formats.images: true.
+   */
+  imageParams?: WebScrapeParams.ImageParams;
+
+  /**
+   * Markdown options. Requires formats.markdown: true.
+   */
+  markdownParams?: WebScrapeParams.MarkdownParams;
+
+  /**
+   * Maximum age for the entire capture, including bytes. Defaults to 1 day; 0
+   * fetches fresh. Captures with hosted image files refresh after 23 hours.
+   */
+  maxAgeMs?: number;
+
+  /**
+   * Required when formats.parse is true.
+   */
+  parseParams?: WebScrapeParams.ParseParams;
+
+  /**
+   * Screenshot options. Requires formats.screenshot: true.
+   */
+  screenshotParams?: WebScrapeParams.ScreenshotParams;
+
+  /**
+   * Shared browser and content settings. Content filters leave screenshots and
+   * original bytes unchanged.
+   */
+  sharedParams?: WebScrapeParams.SharedParams;
+
+  /**
+   * Labels for tracking request usage. Not retained when zdr is enabled.
+   */
+  tags?: Array<string>;
+
+  /**
+   * Total deadline, including navigation, actions, waiting, and all outputs.
+   */
+  timeoutMs?: number;
+
+  /**
+   * Zero data retention. Bypasses caches and uploads; excludes request/response
+   * content and tags from logs. Must be enabled for your organization.
+   */
+  zdr?: 'enabled' | 'disabled';
+}
+
+export namespace WebScrapeParams {
+  /**
+   * Outputs to return. Enable at least one; omitted formats are false.
+   */
+  export interface Formats {
+    /**
+     * The original HTTP response body.
+     */
+    bytes?: boolean;
+
+    /**
+     * Rendered HTML.
+     */
+    html?: boolean;
+
+    /**
+     * Images found on the page.
+     */
+    images?: boolean;
+
+    /**
+     * Page content as Markdown.
+     */
+    markdown?: boolean;
+
+    /**
+     * Fields selected by parseParams.rules.
+     */
+    parse?: boolean;
+
+    /**
+     * An inline image of the page.
+     */
+    screenshot?: boolean;
+  }
+
+  /**
+   * Image options. Requires formats.images: true.
+   */
+  export interface ImageParams {
+    /**
+     * For visual duplicates, keep the largest image.
+     */
+    dedupe?: 'none' | 'visual';
+
+    /**
+     * Add dimensions, a visual category, or a hosted file URL.
+     */
+    enrich?: Array<'dimensions' | 'classification' | 'file'>;
+  }
+
+  /**
+   * Markdown options. Requires formats.markdown: true.
+   */
+  export interface MarkdownParams {
+    includeImages?: boolean;
+
+    includeLinks?: boolean;
+
+    /**
+     * Base64 images use placeholders by default. Requires includeImages: true.
+     */
+    inlineImages?: 'placeholder' | 'preserve';
+  }
+
+  /**
+   * Required when formats.parse is true.
+   */
+  export interface ParseParams {
+    /**
+     * Map field names to CSS selectors or rules. Missing items return null; missing
+     * lists return [].
+     */
+    rules: { [key: string]: string | ParseParams.UnionMember1 };
+  }
+
+  export namespace ParseParams {
+    export interface UnionMember1 {
+      selector: string;
+
+      output?: 'text' | 'html' | string | unknown;
+
+      type?: 'item' | 'list';
+    }
+  }
+
+  /**
+   * Screenshot options. Requires formats.screenshot: true.
+   */
+  export interface ScreenshotParams {
+    /**
+     * Viewport, full page, one visible element, or a rectangle. Maximum 40 megapixels.
+     */
+    area?: 'viewport' | 'fullPage' | ScreenshotParams.Element | ScreenshotParams.Rectangle;
+
+    format?: 'png' | 'jpeg' | 'webp';
+  }
+
+  export namespace ScreenshotParams {
+    export interface Element {
+      /**
+       * Must match one visible element.
+       */
+      selector: string;
+    }
+
+    /**
+     * Pixels from the document origin.
+     */
+    export interface Rectangle {
+      height: number;
+
+      width: number;
+
+      x: number;
+
+      y: number;
+    }
+  }
+
+  /**
+   * Shared browser and content settings. Content filters leave screenshots and
+   * original bytes unchanged.
+   */
+  export interface SharedParams {
+    /**
+     * Run in order before capture. A failed action fails the request. Bypasses
+     * caching.
+     */
+    actions?: Array<SharedParams.Perform | SharedParams.Scroll | SharedParams.Wait | SharedParams.WaitFor>;
+
+    /**
+     * Supported two-letter country code, case-insensitive. Applies to every output,
+     * including image downloads.
+     */
+    country?: string;
+
+    /**
+     * Dismiss cookie banners by accepting cookies before actions.
+     */
+    dismissCookies?: boolean;
+
+    /**
+     * Dismiss other popups before actions.
+     */
+    dismissPopups?: boolean;
+
+    /**
+     * Remove matching content. Exclusions win.
+     */
+    excludeSelectors?: Array<string>;
+
+    /**
+     * Headers for the target origin. Requests with custom headers bypass caching.
+     */
+    headers?: { [key: string]: string };
+
+    /**
+     * Include iframe content in extraction. Screenshots show visible frames
+     * regardless.
+     */
+    includeFrames?: boolean;
+
+    /**
+     * Keep matching content after mainContentOnly.
+     */
+    includeSelectors?: Array<string>;
+
+    /**
+     * Keep only main content in HTML, Markdown, images, and parsed fields.
+     */
+    mainContentOnly?: boolean;
+
+    /**
+     * Document parsing options.
+     */
+    parsers?: SharedParams.Parsers;
+
+    /**
+     * Settle animations before capture. Defaults to true with screenshots, otherwise
+     * false.
+     */
+    settleAnimations?: boolean;
+
+    /**
+     * Override the browser color scheme.
+     */
+    theme?: 'light' | 'dark';
+
+    /**
+     * Browser dimensions in pixels.
+     */
+    viewport?: SharedParams.Viewport;
+
+    /**
+     * After actions, wait this many milliseconds or until a CSS selector is visible.
+     * Defaults to 500 ms, or 2000 ms with frames or an XML URL. Set 0 to skip.
+     */
+    waitFor?: number | string;
+  }
+
+  export namespace SharedParams {
+    export interface Perform {
+      action: string;
+
+      type: 'perform';
+    }
+
+    export interface Scroll {
+      type: 'scroll';
+
+      amount?: number | 'viewport' | 'max';
+
+      direction?: 'down' | 'up' | 'left' | 'right';
+
+      maxScrolls?: number;
+
+      /**
+       * Scroll this container. Omit to scroll the page.
+       */
+      selector?: string;
+    }
+
+    export interface Wait {
+      milliseconds: number;
+
+      type: 'wait';
+    }
+
+    export interface WaitFor {
+      selector: string;
+
+      type: 'waitFor';
+    }
+
+    /**
+     * Document parsing options.
+     */
+    export interface Parsers {
+      /**
+       * PDF text options for HTML, Markdown, and parsed fields.
+       */
+      pdf?: Parsers.Pdf;
+    }
+
+    export namespace Parsers {
+      /**
+       * PDF text options for HTML, Markdown, and parsed fields.
+       */
+      export interface Pdf {
+        /**
+         * Last page to parse. Must be at least startPage.
+         */
+        endPage?: number;
+
+        /**
+         * Read text from scanned pages.
+         */
+        ocr?: 'off' | 'auto';
+
+        /**
+         * First page to parse, starting at 1.
+         */
+        startPage?: number;
+      }
+    }
+
+    /**
+     * Browser dimensions in pixels.
+     */
+    export interface Viewport {
+      height?: number;
+
+      width?: number;
+    }
   }
 }
 
@@ -6442,6 +7128,7 @@ export declare namespace Web {
     type WebExtractCompetitorsResponse as WebExtractCompetitorsResponse,
     type WebExtractFontsResponse as WebExtractFontsResponse,
     type WebExtractStyleguideResponse as WebExtractStyleguideResponse,
+    type WebScrapeResponse as WebScrapeResponse,
     type WebScreenshotResponse as WebScreenshotResponse,
     type WebSearchResponse as WebSearchResponse,
     type WebWebCrawlMdResponse as WebWebCrawlMdResponse,
@@ -6456,6 +7143,7 @@ export declare namespace Web {
     type WebExtractCompetitorsParams as WebExtractCompetitorsParams,
     type WebExtractFontsParams as WebExtractFontsParams,
     type WebExtractStyleguideParams as WebExtractStyleguideParams,
+    type WebScrapeParams as WebScrapeParams,
     type WebScreenshotParams as WebScreenshotParams,
     type WebSearchParams as WebSearchParams,
     type WebWebCrawlMdParams as WebWebCrawlMdParams,
