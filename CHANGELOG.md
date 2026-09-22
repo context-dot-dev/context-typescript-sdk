@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.20.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.19.0...v2.20.0) (2026-09-22)
+## [3.0.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.19.0...v3.0.0) (2026-09-22)
 
 
 ### Features
