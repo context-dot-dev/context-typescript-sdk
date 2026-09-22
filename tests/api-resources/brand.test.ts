@@ -34,29 +34,6 @@ describe('resource brand', () => {
   });
 
   // Mock server tests are disabled
-  test.skip('retrieveSimplified: only required params', async () => {
-    const responsePromise = client.brand.retrieveSimplified({ domain: 'xxx' });
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  // Mock server tests are disabled
-  test.skip('retrieveSimplified: required and optional params', async () => {
-    const response = await client.brand.retrieveSimplified({
-      domain: 'xxx',
-      maxAgeMs: 0,
-      tags: ['production', 'team-alpha'],
-      theme: 'light',
-      timeoutOpts: { milliseconds: 1000, behavior: 'fail' },
-    });
-  });
-
-  // Mock server tests are disabled
   test.skip('search: only required params', async () => {
     const responsePromise = client.brand.search({ query: 'x' });
     const rawResponse = await responsePromise.asResponse();

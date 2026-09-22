@@ -287,6 +287,35 @@ describe('resource monitors', () => {
   });
 
   // Mock server tests are disabled
+  test.skip('retrieveRun: only required params', async () => {
+    const responsePromise = client.monitors.retrieveRun('run_123', { monitor_id: 'mon_123' });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Mock server tests are disabled
+  test.skip('retrieveRun: required and optional params', async () => {
+    const response = await client.monitors.retrieveRun('run_123', { monitor_id: 'mon_123' });
+  });
+
+  // Mock server tests are disabled
+  test.skip('rotateWebhookSecret', async () => {
+    const responsePromise = client.monitors.rotateWebhookSecret('mon_123');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Mock server tests are disabled
   test.skip('run', async () => {
     const responsePromise = client.monitors.run('mon_123');
     const rawResponse = await responsePromise.asResponse();

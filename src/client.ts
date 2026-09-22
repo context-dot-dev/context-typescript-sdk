@@ -18,13 +18,6 @@ import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
 import {
-  AI,
-  AIExtractProductParams,
-  AIExtractProductResponse,
-  AIExtractProductsParams,
-  AIExtractProductsResponse,
-} from './resources/ai';
-import {
   Batch,
   BatchCancelResponse,
   BatchDeleteResponse,
@@ -44,8 +37,6 @@ import {
   Brand,
   BrandRetrieveParams,
   BrandRetrieveResponse,
-  BrandRetrieveSimplifiedParams,
-  BrandRetrieveSimplifiedResponse,
   BrandSearchParams,
   BrandSearchResponse,
 } from './resources/brand';
@@ -76,6 +67,9 @@ import {
   MonitorListRunsResponse,
   MonitorRetrieveChangeResponse,
   MonitorRetrieveResponse,
+  MonitorRetrieveRunParams,
+  MonitorRetrieveRunResponse,
+  MonitorRotateWebhookSecretResponse,
   MonitorRunResponse,
   MonitorUpdateParams,
   MonitorUpdateResponse,
@@ -92,12 +86,10 @@ import {
   WebAnswersResponse,
   WebExtractCompetitorsParams,
   WebExtractCompetitorsResponse,
-  WebExtractFontsParams,
-  WebExtractFontsResponse,
-  WebExtractParams,
-  WebExtractResponse,
   WebExtractStyleguideParams,
   WebExtractStyleguideResponse,
+  WebMapURLsParams,
+  WebMapURLsResponse,
   WebScrapeParams,
   WebScrapeResponse,
   WebScreenshotParams,
@@ -106,18 +98,6 @@ import {
   WebSearchResponse,
   WebWebCrawlMdParams,
   WebWebCrawlMdResponse,
-  WebWebScrapeBytesParams,
-  WebWebScrapeBytesResponse,
-  WebWebScrapeHTMLParams,
-  WebWebScrapeHTMLResponse,
-  WebWebScrapeImagesParams,
-  WebWebScrapeImagesResponse,
-  WebWebScrapeMdParams,
-  WebWebScrapeMdResponse,
-  WebWebScrapeScreenshotParams,
-  WebWebScrapeScreenshotResponse,
-  WebWebScrapeSitemapParams,
-  WebWebScrapeSitemapResponse,
 } from './resources/web';
 import { RetryConfig, Webhooks } from './resources/webhooks/webhooks';
 import { type Fetch } from './internal/builtin-types';
@@ -839,7 +819,6 @@ export class ContextDev {
 
   parse: API.Parse = new API.Parse(this);
   web: API.Web = new API.Web(this);
-  ai: API.AI = new API.AI(this);
   brand: API.Brand = new API.Brand(this);
   industry: API.Industry = new API.Industry(this);
   utility: API.Utility = new API.Utility(this);
@@ -865,7 +844,6 @@ export class ContextDev {
 
 ContextDev.Parse = Parse;
 ContextDev.Web = Web;
-ContextDev.AI = AI;
 ContextDev.Brand = Brand;
 ContextDev.Industry = Industry;
 ContextDev.Utility = Utility;
@@ -888,52 +866,28 @@ export declare namespace ContextDev {
   export {
     Web as Web,
     type WebAnswersResponse as WebAnswersResponse,
-    type WebExtractResponse as WebExtractResponse,
     type WebExtractCompetitorsResponse as WebExtractCompetitorsResponse,
-    type WebExtractFontsResponse as WebExtractFontsResponse,
     type WebExtractStyleguideResponse as WebExtractStyleguideResponse,
+    type WebMapURLsResponse as WebMapURLsResponse,
     type WebScrapeResponse as WebScrapeResponse,
     type WebScreenshotResponse as WebScreenshotResponse,
     type WebSearchResponse as WebSearchResponse,
     type WebWebCrawlMdResponse as WebWebCrawlMdResponse,
-    type WebWebScrapeBytesResponse as WebWebScrapeBytesResponse,
-    type WebWebScrapeHTMLResponse as WebWebScrapeHTMLResponse,
-    type WebWebScrapeImagesResponse as WebWebScrapeImagesResponse,
-    type WebWebScrapeMdResponse as WebWebScrapeMdResponse,
-    type WebWebScrapeScreenshotResponse as WebWebScrapeScreenshotResponse,
-    type WebWebScrapeSitemapResponse as WebWebScrapeSitemapResponse,
     type WebAnswersParams as WebAnswersParams,
-    type WebExtractParams as WebExtractParams,
     type WebExtractCompetitorsParams as WebExtractCompetitorsParams,
-    type WebExtractFontsParams as WebExtractFontsParams,
     type WebExtractStyleguideParams as WebExtractStyleguideParams,
+    type WebMapURLsParams as WebMapURLsParams,
     type WebScrapeParams as WebScrapeParams,
     type WebScreenshotParams as WebScreenshotParams,
     type WebSearchParams as WebSearchParams,
     type WebWebCrawlMdParams as WebWebCrawlMdParams,
-    type WebWebScrapeBytesParams as WebWebScrapeBytesParams,
-    type WebWebScrapeHTMLParams as WebWebScrapeHTMLParams,
-    type WebWebScrapeImagesParams as WebWebScrapeImagesParams,
-    type WebWebScrapeMdParams as WebWebScrapeMdParams,
-    type WebWebScrapeScreenshotParams as WebWebScrapeScreenshotParams,
-    type WebWebScrapeSitemapParams as WebWebScrapeSitemapParams,
-  };
-
-  export {
-    AI as AI,
-    type AIExtractProductResponse as AIExtractProductResponse,
-    type AIExtractProductsResponse as AIExtractProductsResponse,
-    type AIExtractProductParams as AIExtractProductParams,
-    type AIExtractProductsParams as AIExtractProductsParams,
   };
 
   export {
     Brand as Brand,
     type BrandRetrieveResponse as BrandRetrieveResponse,
-    type BrandRetrieveSimplifiedResponse as BrandRetrieveSimplifiedResponse,
     type BrandSearchResponse as BrandSearchResponse,
     type BrandRetrieveParams as BrandRetrieveParams,
-    type BrandRetrieveSimplifiedParams as BrandRetrieveSimplifiedParams,
     type BrandSearchParams as BrandSearchParams,
   };
 
@@ -966,6 +920,8 @@ export declare namespace ContextDev {
     type MonitorListChangesResponse as MonitorListChangesResponse,
     type MonitorListRunsResponse as MonitorListRunsResponse,
     type MonitorRetrieveChangeResponse as MonitorRetrieveChangeResponse,
+    type MonitorRetrieveRunResponse as MonitorRetrieveRunResponse,
+    type MonitorRotateWebhookSecretResponse as MonitorRotateWebhookSecretResponse,
     type MonitorRunResponse as MonitorRunResponse,
     type MonitorCreateParams as MonitorCreateParams,
     type MonitorUpdateParams as MonitorUpdateParams,
@@ -975,6 +931,7 @@ export declare namespace ContextDev {
     type MonitorListAccountRunsParams as MonitorListAccountRunsParams,
     type MonitorListChangesParams as MonitorListChangesParams,
     type MonitorListRunsParams as MonitorListRunsParams,
+    type MonitorRetrieveRunParams as MonitorRetrieveRunParams,
   };
 
   export {
