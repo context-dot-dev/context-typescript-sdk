@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.20.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.19.0...v2.20.0) (2026-09-22)
+
+
+### Features
+
+* **billing:** charge for 404s and skip fraud accounting ([#1152](https://github.com/context-dot-dev/context-typescript-sdk/issues/1152)) ([b0a4aa5](https://github.com/context-dot-dev/context-typescript-sdk/commit/b0a4aa52533b83f905218d84976494c1dd931d1e))
+* **scrape:** add cache age support to byte downloads ([#1171](https://github.com/context-dot-dev/context-typescript-sdk/issues/1171)) ([477940d](https://github.com/context-dot-dev/context-typescript-sdk/commit/477940dccfff3cf4b2265d56dc7b15c95d232c1a))
+* **scrape:** add unified scrape API ([#1182](https://github.com/context-dot-dev/context-typescript-sdk/issues/1182)) ([3c92f39](https://github.com/context-dot-dev/context-typescript-sdk/commit/3c92f39ccd9d60820af5874e866fcc8058a9f2d5))
+* **scrape:** align timeout options and public SDK methods ([#1207](https://github.com/context-dot-dev/context-typescript-sdk/issues/1207)) ([bb950e7](https://github.com/context-dot-dev/context-typescript-sdk/commit/bb950e714a482b50d540a8abceea92fddf3e6678))
+* **scrape:** support country for image scraping ([#1172](https://github.com/context-dot-dev/context-typescript-sdk/issues/1172)) ([477940d](https://github.com/context-dot-dev/context-typescript-sdk/commit/477940dccfff3cf4b2265d56dc7b15c95d232c1a))
+* **scrape:** support custom screenshot headers ([#1169](https://github.com/context-dot-dev/context-typescript-sdk/issues/1169)) ([bacbc64](https://github.com/context-dot-dev/context-typescript-sdk/commit/bacbc64bb21b56f6c87926729af62731e1cd3e84))
+* **scrape:** support waitForMs for byte downloads ([#1170](https://github.com/context-dot-dev/context-typescript-sdk/issues/1170)) ([47c18a0](https://github.com/context-dot-dev/context-typescript-sdk/commit/47c18a0b11c00a6f697abb99a2e79795736d3143))
+
+
+### Bug Fixes
+
+* **scrape:** reuse legacy caches across all output formats ([#1197](https://github.com/context-dot-dev/context-typescript-sdk/issues/1197)) ([57dd03d](https://github.com/context-dot-dev/context-typescript-sdk/commit/57dd03dd18f93840faf239efdaeeca8a8f6fbaec))
+
 ## [2.19.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.18.1...v2.19.0) (2026-09-18)
 
 
