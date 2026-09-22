@@ -1,13 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 export {
-  AI,
-  type AIExtractProductResponse,
-  type AIExtractProductsResponse,
-  type AIExtractProductParams,
-  type AIExtractProductsParams,
-} from './ai';
-export {
   Batch,
   type PageErrorCount,
   type Failure,
@@ -26,10 +19,8 @@ export {
 export {
   Brand,
   type BrandRetrieveResponse,
-  type BrandRetrieveSimplifiedResponse,
   type BrandSearchResponse,
   type BrandRetrieveParams,
-  type BrandRetrieveSimplifiedParams,
   type BrandSearchParams,
 } from './brand';
 export {
@@ -55,6 +46,8 @@ export {
   type MonitorListChangesResponse,
   type MonitorListRunsResponse,
   type MonitorRetrieveChangeResponse,
+  type MonitorRetrieveRunResponse,
+  type MonitorRotateWebhookSecretResponse,
   type MonitorRunResponse,
   type MonitorCreateParams,
   type MonitorUpdateParams,
@@ -64,6 +57,7 @@ export {
   type MonitorListAccountRunsParams,
   type MonitorListChangesParams,
   type MonitorListRunsParams,
+  type MonitorRetrieveRunParams,
 } from './monitors';
 export { News, type NewsSearchResponse, type NewsSearchParams } from './news';
 export { Parse, type ParseHandleResponse, type ParseHandleParams } from './parse';
@@ -72,34 +66,20 @@ export { Utility, type UtilityPrefetchResponse, type UtilityPrefetchParams } fro
 export {
   Web,
   type WebAnswersResponse,
-  type WebExtractResponse,
   type WebExtractCompetitorsResponse,
-  type WebExtractFontsResponse,
   type WebExtractStyleguideResponse,
+  type WebMapURLsResponse,
   type WebScrapeResponse,
   type WebScreenshotResponse,
   type WebSearchResponse,
   type WebWebCrawlMdResponse,
-  type WebWebScrapeBytesResponse,
-  type WebWebScrapeHTMLResponse,
-  type WebWebScrapeImagesResponse,
-  type WebWebScrapeMdResponse,
-  type WebWebScrapeScreenshotResponse,
-  type WebWebScrapeSitemapResponse,
   type WebAnswersParams,
-  type WebExtractParams,
   type WebExtractCompetitorsParams,
-  type WebExtractFontsParams,
   type WebExtractStyleguideParams,
+  type WebMapURLsParams,
   type WebScrapeParams,
   type WebScreenshotParams,
   type WebSearchParams,
   type WebWebCrawlMdParams,
-  type WebWebScrapeBytesParams,
-  type WebWebScrapeHTMLParams,
-  type WebWebScrapeImagesParams,
-  type WebWebScrapeMdParams,
-  type WebWebScrapeScreenshotParams,
-  type WebWebScrapeSitemapParams,
 } from './web';
 export { Webhooks, type RetryConfig } from './webhooks/webhooks';

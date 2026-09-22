@@ -13,63 +13,35 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/web.ts">WebAnswersResponse</a></code>
-- <code><a href="./src/resources/web.ts">WebExtractResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebExtractCompetitorsResponse</a></code>
-- <code><a href="./src/resources/web.ts">WebExtractFontsResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebExtractStyleguideResponse</a></code>
+- <code><a href="./src/resources/web.ts">WebMapURLsResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebScrapeResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebScreenshotResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebSearchResponse</a></code>
 - <code><a href="./src/resources/web.ts">WebWebCrawlMdResponse</a></code>
-- <code><a href="./src/resources/web.ts">WebWebScrapeBytesResponse</a></code>
-- <code><a href="./src/resources/web.ts">WebWebScrapeHTMLResponse</a></code>
-- <code><a href="./src/resources/web.ts">WebWebScrapeImagesResponse</a></code>
-- <code><a href="./src/resources/web.ts">WebWebScrapeMdResponse</a></code>
-- <code><a href="./src/resources/web.ts">WebWebScrapeScreenshotResponse</a></code>
-- <code><a href="./src/resources/web.ts">WebWebScrapeSitemapResponse</a></code>
 
 Methods:
 
 - <code title="post /web/answers">client.web.<a href="./src/resources/web.ts">answers</a>({ ...params }) -> WebAnswersResponse</code>
-- <code title="post /web/extract">client.web.<a href="./src/resources/web.ts">extract</a>({ ...params }) -> WebExtractResponse</code>
 - <code title="get /web/competitors">client.web.<a href="./src/resources/web.ts">extractCompetitors</a>({ ...params }) -> WebExtractCompetitorsResponse</code>
-- <code title="get /web/fonts">client.web.<a href="./src/resources/web.ts">extractFonts</a>({ ...params }) -> WebExtractFontsResponse</code>
 - <code title="get /web/styleguide">client.web.<a href="./src/resources/web.ts">extractStyleguide</a>({ ...params }) -> WebExtractStyleguideResponse</code>
+- <code title="get /web/urls">client.web.<a href="./src/resources/web.ts">mapUrls</a>({ ...params }) -> WebMapURLsResponse</code>
 - <code title="post /web/scrape">client.web.<a href="./src/resources/web.ts">scrape</a>({ ...params }) -> WebScrapeResponse</code>
 - <code title="get /web/screenshot">client.web.<a href="./src/resources/web.ts">screenshot</a>({ ...params }) -> WebScreenshotResponse</code>
 - <code title="post /web/search">client.web.<a href="./src/resources/web.ts">search</a>({ ...params }) -> WebSearchResponse</code>
 - <code title="post /web/crawl">client.web.<a href="./src/resources/web.ts">webCrawlMd</a>({ ...params }) -> WebWebCrawlMdResponse</code>
-- <code title="get /web/scrape/bytes">client.web.<a href="./src/resources/web.ts">webScrapeBytes</a>({ ...params }) -> WebWebScrapeBytesResponse</code>
-- <code title="get /web/scrape/html">client.web.<a href="./src/resources/web.ts">webScrapeHTML</a>({ ...params }) -> WebWebScrapeHTMLResponse</code>
-- <code title="get /web/scrape/images">client.web.<a href="./src/resources/web.ts">webScrapeImages</a>({ ...params }) -> WebWebScrapeImagesResponse</code>
-- <code title="get /web/scrape/markdown">client.web.<a href="./src/resources/web.ts">webScrapeMd</a>({ ...params }) -> WebWebScrapeMdResponse</code>
-- <code title="get /web/scrape/screenshot">client.web.<a href="./src/resources/web.ts">webScrapeScreenshot</a>({ ...params }) -> WebWebScrapeScreenshotResponse</code>
-- <code title="get /web/scrape/sitemap">client.web.<a href="./src/resources/web.ts">webScrapeSitemap</a>({ ...params }) -> WebWebScrapeSitemapResponse</code>
-
-# AI
-
-Types:
-
-- <code><a href="./src/resources/ai.ts">AIExtractProductResponse</a></code>
-- <code><a href="./src/resources/ai.ts">AIExtractProductsResponse</a></code>
-
-Methods:
-
-- <code title="post /brand/ai/product">client.ai.<a href="./src/resources/ai.ts">extractProduct</a>({ ...params }) -> AIExtractProductResponse</code>
-- <code title="post /brand/ai/products">client.ai.<a href="./src/resources/ai.ts">extractProducts</a>({ ...params }) -> AIExtractProductsResponse</code>
 
 # Brand
 
 Types:
 
 - <code><a href="./src/resources/brand.ts">BrandRetrieveResponse</a></code>
-- <code><a href="./src/resources/brand.ts">BrandRetrieveSimplifiedResponse</a></code>
 - <code><a href="./src/resources/brand.ts">BrandSearchResponse</a></code>
 
 Methods:
 
 - <code title="post /brand/retrieve">client.brand.<a href="./src/resources/brand.ts">retrieve</a>({ ...params }) -> BrandRetrieveResponse</code>
-- <code title="get /brand/retrieve-simplified">client.brand.<a href="./src/resources/brand.ts">retrieveSimplified</a>({ ...params }) -> BrandRetrieveSimplifiedResponse</code>
 - <code title="get /brand/search">client.brand.<a href="./src/resources/brand.ts">search</a>({ ...params }) -> BrandSearchResponse</code>
 
 # Industry
@@ -111,6 +83,8 @@ Types:
 - <code><a href="./src/resources/monitors.ts">MonitorListChangesResponse</a></code>
 - <code><a href="./src/resources/monitors.ts">MonitorListRunsResponse</a></code>
 - <code><a href="./src/resources/monitors.ts">MonitorRetrieveChangeResponse</a></code>
+- <code><a href="./src/resources/monitors.ts">MonitorRetrieveRunResponse</a></code>
+- <code><a href="./src/resources/monitors.ts">MonitorRotateWebhookSecretResponse</a></code>
 - <code><a href="./src/resources/monitors.ts">MonitorRunResponse</a></code>
 
 Methods:
@@ -127,6 +101,8 @@ Methods:
 - <code title="get /monitors/{monitor_id}/changes">client.monitors.<a href="./src/resources/monitors.ts">listChanges</a>(monitorID, { ...params }) -> MonitorListChangesResponse</code>
 - <code title="get /monitors/{monitor_id}/runs">client.monitors.<a href="./src/resources/monitors.ts">listRuns</a>(monitorID, { ...params }) -> MonitorListRunsResponse</code>
 - <code title="get /monitors/changes/{change_id}">client.monitors.<a href="./src/resources/monitors.ts">retrieveChange</a>(changeID) -> MonitorRetrieveChangeResponse</code>
+- <code title="get /monitors/{monitor_id}/runs/{run_id}">client.monitors.<a href="./src/resources/monitors.ts">retrieveRun</a>(runID, { ...params }) -> MonitorRetrieveRunResponse</code>
+- <code title="post /monitors/{monitor_id}/webhook/rotate-secret">client.monitors.<a href="./src/resources/monitors.ts">rotateWebhookSecret</a>(monitorID) -> MonitorRotateWebhookSecretResponse</code>
 - <code title="post /monitors/{monitor_id}/run">client.monitors.<a href="./src/resources/monitors.ts">run</a>(monitorID) -> MonitorRunResponse</code>
 
 # Batch
