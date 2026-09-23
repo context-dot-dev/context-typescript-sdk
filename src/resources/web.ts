@@ -946,7 +946,9 @@ export interface WebScrapeResponse {
   cache_metadata: WebScrapeResponse.CacheMetadata;
 
   /**
-   * Relevant passages for your question or topic.
+   * Relevant passages for your question or topic, in page order. A heading in square
+   * brackets is included when needed to interpret a passage. Empty when the page has
+   * no text.
    */
   highlights: WebScrapeResponse.Highlights;
 
@@ -1057,7 +1059,9 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Relevant passages for your question or topic.
+   * Relevant passages for your question or topic, in page order. A heading in square
+   * brackets is included when needed to interpret a passage. Empty when the page has
+   * no text.
    */
   export interface Highlights {
     data: Array<string> | null;
@@ -2315,7 +2319,8 @@ export namespace WebScrapeParams {
     bytes?: boolean;
 
     /**
-     * Relevant passages for your question or topic. Adds 3 credits.
+     * Relevant passages for your question or topic, with headings included when needed
+     * for context. Adds 3 credits.
      */
     highlights?: boolean;
 
