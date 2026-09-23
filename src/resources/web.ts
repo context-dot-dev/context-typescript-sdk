@@ -86,16 +86,18 @@ export class Web extends APIResource {
   /**
    * Reuse cached outputs independently and capture missing formats in one page
    * visit. Each cache key includes only the settings that affect that output. HTML
-   * is shared with Markdown, parsed fields, highlights, and JSON extraction. Cached
-   * outputs can come from different visits within maxAgeMs; use 0 for a fresh
-   * capture. HTML-only requests use the existing fast acquisition path. Highlights
-   * return the plain-text passages most relevant to highlightsParams.query. One
-   * credit per request, including cache hits and missing pages, or two with browser
-   * actions; highlights add 3 credits when passages are returned; JSON extraction
-   * adds four credits and runs an LLM over the page Markdown on every request that
-   * has text to extract; PDF OCR adds one credit per recovered page on fresh
-   * extraction. Original response bytes and screenshots are limited to 20 MiB each,
-   * screenshots to 40 megapixels, and the combined browser capture to 60 MiB.
+   * is shared with Markdown, parsed fields, product data, highlights, and JSON
+   * extraction. Cached outputs can come from different visits within maxAgeMs; use 0
+   * for a fresh capture. HTML-only requests use the existing fast acquisition path.
+   * Highlights return the plain-text passages most relevant to
+   * highlightsParams.query. One credit per request, including cache hits and missing
+   * pages, or two with browser actions; highlights add 3 credits when passages are
+   * returned; JSON extraction adds four credits and runs an LLM over the page
+   * Markdown on every request that has text to extract; PDF OCR adds one credit per
+   * recovered page on fresh extraction; the product output adds one credit, plus six
+   * more when the specialized model is used. Original response bytes and screenshots
+   * are limited to 20 MiB each, screenshots to 40 megapixels, and the combined
+   * browser capture to 60 MiB.
    *
    * @example
    * ```ts
@@ -984,6 +986,11 @@ export interface WebScrapeResponse {
   parsed: WebScrapeResponse.Parsed;
 
   /**
+   * Product detail page classification and the extracted product.
+   */
+  product: WebScrapeResponse.Product;
+
+  /**
    * Unique id of this API call, also sent in the X-Request-Id response header. Quote
    * it when contacting support about a failed request.
    */
@@ -1000,8 +1007,10 @@ export interface WebScrapeResponse {
   url: string;
 
   /**
-   * Present when return-partial captures a page that is still loading or returns
-   * images before image processing finishes. Partial responses are not cached.
+   * Present when return-partial captures a page that is still loading, returns
+   * images before image processing finishes, or cuts product AI extraction short.
+   * Also present if the optional product AI fallback fails. Partial responses are
+   * not cached.
    */
   isPartial?: true;
 
@@ -1275,6 +1284,148 @@ export namespace WebScrapeResponse {
     data: { [key: string]: unknown } | null;
 
     requested: boolean;
+  }
+
+  /**
+   * Product detail page classification and the extracted product.
+   */
+  export interface Product {
+    data: Product.Data | null;
+
+    requested: boolean;
+  }
+
+  export namespace Product {
+    export interface Data {
+      /**
+       * Whether the page is a product detail page.
+       */
+      isProductPage: boolean;
+
+      /**
+       * The extracted product, or null when the page is not a product detail page.
+       */
+      product: Data.Product | null;
+    }
+
+    export namespace Data {
+      /**
+       * The extracted product, or null when the page is not a product detail page.
+       */
+      export interface Product {
+        /**
+         * Stock or ordering availability.
+         */
+        availability:
+          | 'in_stock'
+          | 'out_of_stock'
+          | 'limited_availability'
+          | 'preorder'
+          | 'backorder'
+          | 'made_to_order'
+          | 'discontinued'
+          | null;
+
+        /**
+         * Brand or vendor.
+         */
+        brand: string | null;
+
+        /**
+         * Product category.
+         */
+        category: string | null;
+
+        /**
+         * ISO 4217 currency code.
+         */
+        currency: string | null;
+
+        /**
+         * Product description.
+         */
+        description: string | null;
+
+        /**
+         * Product dimensions as shown on the page.
+         */
+        dimensions: Array<string>;
+
+        /**
+         * Key features and specifications.
+         */
+        features: Array<string>;
+
+        /**
+         * Product image URLs, main image first.
+         */
+        images: Array<string>;
+
+        /**
+         * Main product image URL.
+         */
+        imageUrl: string | null;
+
+        /**
+         * Product name.
+         */
+        name: string;
+
+        /**
+         * Current price.
+         */
+        price: number | null;
+
+        /**
+         * List price before any discount.
+         */
+        regularPrice: number | null;
+
+        /**
+         * Product identifier such as a SKU or model number.
+         */
+        sku: string | null;
+
+        /**
+         * Product tags.
+         */
+        tags: Array<string>;
+
+        /**
+         * Intended audience.
+         */
+        targetAudience: Array<string>;
+
+        /**
+         * Product variations, such as different colors or sizes, with their attributes and
+         * images. Empty if none are found. May not include every variation offered by the
+         * store.
+         */
+        variants: Array<Product.Variant>;
+      }
+
+      export namespace Product {
+        export interface Variant {
+          /**
+           * Explicit variant attributes such as color, size, material, pattern and
+           * properties declared by page.
+           */
+          attributes: { [key: string]: string };
+
+          /**
+           * Original source image URLs explicitly attached to this variant.
+           */
+          images: Array<string>;
+
+          sku: string | null;
+
+          /**
+           * Variant or offer URL when provided by the source. May be shared by variants.
+           */
+          url: string | null;
+        }
+      }
+    }
   }
 
   /**
@@ -2125,6 +2276,11 @@ export interface WebScrapeParams {
   parseParams?: WebScrapeParams.ParseParams;
 
   /**
+   * Product options. Requires formats.product: true.
+   */
+  productParams?: WebScrapeParams.ProductParams;
+
+  /**
    * Screenshot options. Requires formats.screenshot: true.
    */
   screenshotParams?: WebScrapeParams.ScreenshotParams;
@@ -2203,6 +2359,11 @@ export namespace WebScrapeParams {
      * Fields selected by parseParams.rules.
      */
     parse?: boolean;
+
+    /**
+     * Structured product data for product detail pages. Adds one credit.
+     */
+    product?: boolean;
 
     /**
      * An inline image of the page.
@@ -2295,6 +2456,19 @@ export namespace WebScrapeParams {
 
       type?: 'item' | 'list';
     }
+  }
+
+  /**
+   * Product options. Requires formats.product: true.
+   */
+  export interface ProductParams {
+    /**
+     * Extract the product with a specialized model when the page has no structured
+     * product data. Adds six credits when the model returns a verdict. If the fallback
+     * fails, returns a partial response with the deterministic result and no fallback
+     * charge. Request deadlines and client disconnects still apply.
+     */
+    useAIFallback?: boolean;
   }
 
   /**
