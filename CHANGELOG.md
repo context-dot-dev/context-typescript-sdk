@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.1.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.0.0...v3.1.0) (2026-09-23)
+
+
+### Features
+
+* **scrape:** add highlights format to POST /web/scrape ([#1210](https://github.com/context-dot-dev/context-typescript-sdk/issues/1210)) ([9a81729](https://github.com/context-dot-dev/context-typescript-sdk/commit/9a81729963bc7af20ab82498143b593f070adaeb))
+* **scrape:** add json output format to POST /web/scrape ([#1213](https://github.com/context-dot-dev/context-typescript-sdk/issues/1213)) ([7f96676](https://github.com/context-dot-dev/context-typescript-sdk/commit/7f966761a10434baa0a66aceb24725d227f71b16))
+* **scrape:** add product extraction format to POST /web/scrape ([#1212](https://github.com/context-dot-dev/context-typescript-sdk/issues/1212)) ([21edbde](https://github.com/context-dot-dev/context-typescript-sdk/commit/21edbde24214379f9a20b11366b3e298ff4df407))
+
 ## [3.0.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v2.19.0...v3.0.0) (2026-09-22)
 
 
