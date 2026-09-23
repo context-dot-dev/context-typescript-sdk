@@ -142,6 +142,7 @@ describe('resource web', () => {
         json: true,
         markdown: true,
         parse: true,
+        product: true,
         screenshot: true,
       },
       url: 'https://example.com',
@@ -172,6 +173,7 @@ describe('resource web', () => {
           },
         },
       },
+      productParams: { useAIFallback: true },
       screenshotParams: { area: 'viewport', format: 'png' },
       sharedParams: {
         actions: [{ action: 'Click the product details tab', type: 'perform' }],
