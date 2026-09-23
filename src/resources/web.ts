@@ -86,10 +86,12 @@ export class Web extends APIResource {
   /**
    * Reuse cached outputs independently and capture missing formats in one page
    * visit. Each cache key includes only the settings that affect that output. HTML
-   * is shared with Markdown and parsed fields. Cached outputs can come from
-   * different visits within maxAgeMs; use 0 for a fresh capture. HTML-only requests
-   * use the existing fast acquisition path. One credit per request, including cache
-   * hits, or two with browser actions; PDF OCR adds one credit per recovered page on
+   * is shared with Markdown, parsed fields, and JSON extraction. Cached outputs can
+   * come from different visits within maxAgeMs; use 0 for a fresh capture. HTML-only
+   * requests use the existing fast acquisition path. One credit per request,
+   * including cache hits and missing pages, or two with browser actions; JSON
+   * extraction adds four credits and runs an LLM over the page Markdown on every
+   * request that has text to extract; PDF OCR adds one credit per recovered page on
    * fresh extraction. Original response bytes and screenshots are limited to 20 MiB
    * each, screenshots to 40 megapixels, and the combined browser capture to 60 MiB.
    *
@@ -950,6 +952,14 @@ export interface WebScrapeResponse {
   images: WebScrapeResponse.Images;
 
   /**
+   * Page data extracted into jsonParams.schema, after shared content filters. Values
+   * are grounded in the page; optional fields the page does not state are omitted,
+   * or null when their type allows null. An empty object when the filters leave no
+   * text.
+   */
+  json: WebScrapeResponse.Json;
+
+  /**
    * Markdown after content filters.
    */
   markdown: WebScrapeResponse.Markdown;
@@ -1083,6 +1093,18 @@ export namespace WebScrapeResponse {
 
       width?: number;
     }
+  }
+
+  /**
+   * Page data extracted into jsonParams.schema, after shared content filters. Values
+   * are grounded in the page; optional fields the page does not state are omitted,
+   * or null when their type allows null. An empty object when the filters leave no
+   * text.
+   */
+  export interface Json {
+    data: { [key: string]: unknown } | null;
+
+    requested: boolean;
   }
 
   /**
@@ -2055,6 +2077,11 @@ export interface WebScrapeParams {
   imageParams?: WebScrapeParams.ImageParams;
 
   /**
+   * Required when formats.json is true.
+   */
+  jsonParams?: WebScrapeParams.JsonParams;
+
+  /**
    * Markdown options. Requires formats.markdown: true.
    */
   markdownParams?: WebScrapeParams.MarkdownParams;
@@ -2127,6 +2154,14 @@ export namespace WebScrapeParams {
     images?: boolean;
 
     /**
+     * Page data extracted by an LLM from the page Markdown into jsonParams.schema;
+     * values carried only in attributes or CSS classes need formats.parse instead.
+     * Adds four credits when the page has text to extract; when shared content filters
+     * leave no text the result is an empty object and only the base price applies.
+     */
+    json?: boolean;
+
+    /**
      * Page content as Markdown.
      */
     markdown?: boolean;
@@ -2157,6 +2192,26 @@ export namespace WebScrapeParams {
      * deadline.
      */
     enrich?: Array<'dimensions' | 'classification' | 'file'>;
+  }
+
+  /**
+   * Required when formats.json is true.
+   */
+  export interface JsonParams {
+    /**
+     * JSON Schema for the returned object. Must describe a top-level object; at most
+     * 50 KB serialized. Optional fields the page does not state are omitted, or null
+     * when their type allows null, while required non-nullable fields always receive a
+     * best-effort value, so prefer nullable or optional fields for data a page may
+     * omit. Zod users can pass the output of z.toJSONSchema().
+     */
+    schema: { [key: string]: unknown };
+
+    /**
+     * Optional guidance on which facts to prioritize or how to interpret schema
+     * fields.
+     */
+    instructions?: string;
   }
 
   /**

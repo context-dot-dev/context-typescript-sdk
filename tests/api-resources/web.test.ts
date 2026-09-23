@@ -138,12 +138,22 @@ describe('resource web', () => {
         bytes: true,
         html: true,
         images: true,
+        json: true,
         markdown: true,
         parse: true,
         screenshot: true,
       },
       url: 'https://example.com',
       imageParams: { dedupe: 'none', enrich: ['dimensions'] },
+      jsonParams: {
+        schema: {
+          type: 'bar',
+          properties: 'bar',
+          required: 'bar',
+          additionalProperties: 'bar',
+        },
+        instructions: 'instructions',
+      },
       markdownParams: {
         includeImages: true,
         includeLinks: true,
