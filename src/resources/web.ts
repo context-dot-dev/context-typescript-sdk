@@ -86,14 +86,16 @@ export class Web extends APIResource {
   /**
    * Reuse cached outputs independently and capture missing formats in one page
    * visit. Each cache key includes only the settings that affect that output. HTML
-   * is shared with Markdown, parsed fields, and JSON extraction. Cached outputs can
-   * come from different visits within maxAgeMs; use 0 for a fresh capture. HTML-only
-   * requests use the existing fast acquisition path. One credit per request,
-   * including cache hits and missing pages, or two with browser actions; JSON
-   * extraction adds four credits and runs an LLM over the page Markdown on every
-   * request that has text to extract; PDF OCR adds one credit per recovered page on
-   * fresh extraction. Original response bytes and screenshots are limited to 20 MiB
-   * each, screenshots to 40 megapixels, and the combined browser capture to 60 MiB.
+   * is shared with Markdown, parsed fields, highlights, and JSON extraction. Cached
+   * outputs can come from different visits within maxAgeMs; use 0 for a fresh
+   * capture. HTML-only requests use the existing fast acquisition path. Highlights
+   * return the plain-text passages most relevant to highlightsParams.query. One
+   * credit per request, including cache hits and missing pages, or two with browser
+   * actions; highlights add 3 credits when passages are returned; JSON extraction
+   * adds four credits and runs an LLM over the page Markdown on every request that
+   * has text to extract; PDF OCR adds one credit per recovered page on fresh
+   * extraction. Original response bytes and screenshots are limited to 20 MiB each,
+   * screenshots to 40 megapixels, and the combined browser capture to 60 MiB.
    *
    * @example
    * ```ts
@@ -942,6 +944,13 @@ export interface WebScrapeResponse {
   cache_metadata: WebScrapeResponse.CacheMetadata;
 
   /**
+   * Plain-text passages relevant to highlightsParams.query, in page order, each
+   * prefixed with its section heading in square brackets. Empty when the page has no
+   * text.
+   */
+  highlights: WebScrapeResponse.Highlights;
+
+  /**
    * Rendered HTML after content filters.
    */
   html: WebScrapeResponse.HTML;
@@ -1041,6 +1050,17 @@ export namespace WebScrapeResponse {
      * zero-data-retention cache bypass.
      */
     status: 'hit' | 'miss' | 'zdr';
+  }
+
+  /**
+   * Plain-text passages relevant to highlightsParams.query, in page order, each
+   * prefixed with its section heading in square brackets. Empty when the page has no
+   * text.
+   */
+  export interface Highlights {
+    data: Array<string> | null;
+
+    requested: boolean;
   }
 
   /**
@@ -2072,6 +2092,11 @@ export interface WebScrapeParams {
   url: string;
 
   /**
+   * Highlight options. Requires formats.highlights: true.
+   */
+  highlightsParams?: WebScrapeParams.HighlightsParams;
+
+  /**
    * Image options. Requires formats.images: true.
    */
   imageParams?: WebScrapeParams.ImageParams;
@@ -2128,7 +2153,8 @@ export interface WebScrapeParams {
 
   /**
    * Zero data retention. Bypasses caches and uploads; excludes request/response
-   * content and tags from logs. Must be enabled for your organization.
+   * content and tags from logs. Must be enabled for your organization. Not available
+   * with the highlights output.
    */
   zdr?: 'enabled' | 'disabled';
 }
@@ -2142,6 +2168,13 @@ export namespace WebScrapeParams {
      * The original HTTP response body.
      */
     bytes?: boolean;
+
+    /**
+     * Plain-text passages from the page that are most relevant to
+     * highlightsParams.query, each prefixed with its section heading. Adds 3 credits.
+     * Not available with zdr enabled.
+     */
+    highlights?: boolean;
 
     /**
      * Rendered HTML.
@@ -2175,6 +2208,21 @@ export namespace WebScrapeParams {
      * An inline image of the page.
      */
     screenshot?: boolean;
+  }
+
+  /**
+   * Highlight options. Requires formats.highlights: true.
+   */
+  export interface HighlightsParams {
+    /**
+     * The question or topic to find passages for.
+     */
+    query: string;
+
+    /**
+     * Maximum combined length of the returned passages, in characters.
+     */
+    maxCharacters?: number;
   }
 
   /**
