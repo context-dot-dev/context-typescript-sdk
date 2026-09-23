@@ -946,9 +946,7 @@ export interface WebScrapeResponse {
   cache_metadata: WebScrapeResponse.CacheMetadata;
 
   /**
-   * Plain-text passages relevant to highlightsParams.query, in page order, each
-   * prefixed with its section heading in square brackets. Empty when the page has no
-   * text.
+   * Relevant passages for your question or topic.
    */
   highlights: WebScrapeResponse.Highlights;
 
@@ -963,10 +961,7 @@ export interface WebScrapeResponse {
   images: WebScrapeResponse.Images;
 
   /**
-   * Page data extracted into jsonParams.schema, after shared content filters. Values
-   * are grounded in the page; optional fields the page does not state are omitted,
-   * or null when their type allows null. An empty object when the filters leave no
-   * text.
+   * Page data extracted using your schema.
    */
   json: WebScrapeResponse.Json;
 
@@ -986,7 +981,7 @@ export interface WebScrapeResponse {
   parsed: WebScrapeResponse.Parsed;
 
   /**
-   * Product detail page classification and the extracted product.
+   * Product details found on the page.
    */
   product: WebScrapeResponse.Product;
 
@@ -1062,9 +1057,7 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Plain-text passages relevant to highlightsParams.query, in page order, each
-   * prefixed with its section heading in square brackets. Empty when the page has no
-   * text.
+   * Relevant passages for your question or topic.
    */
   export interface Highlights {
     data: Array<string> | null;
@@ -1125,10 +1118,7 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Page data extracted into jsonParams.schema, after shared content filters. Values
-   * are grounded in the page; optional fields the page does not state are omitted,
-   * or null when their type allows null. An empty object when the filters leave no
-   * text.
+   * Page data extracted using your schema.
    */
   export interface Json {
     data: { [key: string]: unknown } | null;
@@ -1287,7 +1277,7 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Product detail page classification and the extracted product.
+   * Product details found on the page.
    */
   export interface Product {
     data: Product.Data | null;
@@ -2309,8 +2299,7 @@ export interface WebScrapeParams {
 
   /**
    * Zero data retention. Bypasses caches and uploads; excludes request/response
-   * content and tags from logs. Must be enabled for your organization. Not available
-   * with the highlights output.
+   * content and tags from logs. Must be enabled for your organization.
    */
   zdr?: 'enabled' | 'disabled';
 }
@@ -2326,9 +2315,7 @@ export namespace WebScrapeParams {
     bytes?: boolean;
 
     /**
-     * Plain-text passages from the page that are most relevant to
-     * highlightsParams.query, each prefixed with its section heading. Adds 3 credits.
-     * Not available with zdr enabled.
+     * Relevant passages for your question or topic. Adds 3 credits.
      */
     highlights?: boolean;
 
@@ -2343,10 +2330,7 @@ export namespace WebScrapeParams {
     images?: boolean;
 
     /**
-     * Page data extracted by an LLM from the page Markdown into jsonParams.schema;
-     * values carried only in attributes or CSS classes need formats.parse instead.
-     * Adds four credits when the page has text to extract; when shared content filters
-     * leave no text the result is an empty object and only the base price applies.
+     * Page data extracted using your schema. Adds 4 credits.
      */
     json?: boolean;
 
@@ -2361,7 +2345,7 @@ export namespace WebScrapeParams {
     parse?: boolean;
 
     /**
-     * Structured product data for product detail pages. Adds one credit.
+     * Product details such as name, price, and availability. Adds 1 credit.
      */
     product?: boolean;
 
