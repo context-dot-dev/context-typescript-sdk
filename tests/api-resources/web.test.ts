@@ -136,6 +136,7 @@ describe('resource web', () => {
     const response = await client.web.scrape({
       formats: {
         bytes: true,
+        highlights: true,
         html: true,
         images: true,
         json: true,
@@ -144,6 +145,7 @@ describe('resource web', () => {
         screenshot: true,
       },
       url: 'https://example.com',
+      highlightsParams: { query: 'x', maxCharacters: 100 },
       imageParams: { dedupe: 'none', enrich: ['dimensions'] },
       jsonParams: {
         schema: {
