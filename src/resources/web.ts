@@ -89,21 +89,21 @@ export class Web extends APIResource {
    * is shared with Markdown, parsed fields, product data, highlights, and JSON
    * extraction. Cached outputs can come from different visits within maxAgeMs; use 0
    * for a fresh capture. HTML-only requests use the existing fast acquisition path.
-   * Highlights return the plain-text passages most relevant to
-   * highlightsParams.query. Requests with at least one successful output cost one
-   * base credit, including cache hits, or two with browser actions. All-failed
-   * responses are unbilled except missing pages, which retain the base price and the
-   * one-credit product charge when product was requested. Highlights add 3 credits
-   * when passages are returned. JSON extraction runs an LLM over nonempty page
-   * Markdown and adds four credits only when its result is returned successfully.
-   * PDF OCR adds one credit per recovered page on fresh extraction. Product adds one
-   * credit when its successful result is returned, plus six if that result used the
-   * specialized model. Original response bytes and screenshots are limited to 20 MiB
-   * each, screenshots to 40 megapixels, and the combined response to 60 MiB. An
-   * oversized output has success: false and data: null. If the combined response
-   * exceeds its limit, the largest outputs are marked failed until the remaining
-   * outputs fit. Valid captured pieces may still be cached when omitted to meet the
-   * response size limit.
+   * Highlights return Markdown excerpts most relevant to highlightsParams.query.
+   * Requests with at least one successful output cost one base credit, including
+   * cache hits, or two with browser actions. All-failed responses are unbilled
+   * except missing pages, which retain the base price and the one-credit product
+   * charge when product was requested. Highlights add 3 credits when passages are
+   * returned. JSON extraction runs an LLM over nonempty page Markdown and adds four
+   * credits only when its result is returned successfully. PDF OCR adds one credit
+   * per recovered page on fresh extraction. Product adds one credit when its
+   * successful result is returned, plus six if that result used the specialized
+   * model. Original response bytes and screenshots are limited to 20 MiB each,
+   * screenshots to 40 megapixels, and the combined response to 60 MiB. An oversized
+   * output has success: false and data: null. If the combined response exceeds its
+   * limit, the largest outputs are marked failed until the remaining outputs fit.
+   * Valid captured pieces may still be cached when omitted to meet the response size
+   * limit.
    *
    * @example
    * ```ts
@@ -952,9 +952,9 @@ export interface WebScrapeResponse {
   cache_metadata: WebScrapeResponse.CacheMetadata;
 
   /**
-   * Relevant passages for your question or topic, in page order. A heading in square
-   * brackets is included when needed to interpret a passage. Empty when the page has
-   * no text.
+   * Relevant Markdown excerpts for your question or topic, in page order. Headings
+   * in square brackets supply necessary context; ellipses mark omitted portions.
+   * Empty when the page has no text.
    */
   highlights: WebScrapeResponse.Highlights;
 
@@ -1071,9 +1071,9 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Relevant passages for your question or topic, in page order. A heading in square
-   * brackets is included when needed to interpret a passage. Empty when the page has
-   * no text.
+   * Relevant Markdown excerpts for your question or topic, in page order. Headings
+   * in square brackets supply necessary context; ellipses mark omitted portions.
+   * Empty when the page has no text.
    */
   export interface Highlights {
     data: Array<string> | null;
@@ -2375,8 +2375,9 @@ export namespace WebScrapeParams {
     bytes?: boolean;
 
     /**
-     * Relevant passages for your question or topic, with headings included when needed
-     * for context. Adds 3 credits when passages are returned.
+     * Relevant Markdown excerpts for your question or topic, preserving code, lists,
+     * and tables, with headings included when needed for context. Adds 3 credits when
+     * passages are returned.
      */
     highlights?: boolean;
 
