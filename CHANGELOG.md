@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.2.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.1.0...v3.2.0) (2026-09-26)
+
+
+### Features
+
+* **highlights:** preserve Markdown structure in scrape excerpts ([#1236](https://github.com/context-dot-dev/context-typescript-sdk/issues/1236)) ([503abec](https://github.com/context-dot-dev/context-typescript-sdk/commit/503abec171290eaab2c4fa97bfacffd28d4e70f3))
+* **scrape:** enable highlights with zero data retention ([#1246](https://github.com/context-dot-dev/context-typescript-sdk/issues/1246)) ([abfa08c](https://github.com/context-dot-dev/context-typescript-sdk/commit/abfa08c189f56daa91f53fd53fbf1b29ad58322d))
+
+
+### Bug Fixes
+
+* **openapi:** document exclusive news filters ([#1265](https://github.com/context-dot-dev/context-typescript-sdk/issues/1265)) ([b3b4267](https://github.com/context-dot-dev/context-typescript-sdk/commit/b3b4267a2b4452dc71546243888dc1333e30ef19))
+* **scrape:** preserve successful formats when other outputs fail ([#1263](https://github.com/context-dot-dev/context-typescript-sdk/issues/1263)) ([a31d02e](https://github.com/context-dot-dev/context-typescript-sdk/commit/a31d02e8c30a229cfd8b0fa0f3aa79ed9f301f10))
+* **scrape:** retain highlight headings only when needed ([#1245](https://github.com/context-dot-dev/context-typescript-sdk/issues/1245)) ([54b38a5](https://github.com/context-dot-dev/context-typescript-sdk/commit/54b38a5dec14bd25540894b112826262d175c620))
+
 ## [3.1.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.0.0...v3.1.0) (2026-09-23)
 
 
