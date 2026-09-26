@@ -11,9 +11,10 @@ export class News extends APIResource {
   /**
    * Searches live and historical company news for one company, identified in
    * searchBy by name, domain, ticker (optionally disambiguated by exchange), or
-   * ISIN. Results can be filtered by publisher domain, publisher country, article
-   * language, article type, and published-at date, and include stable story IDs,
-   * source metadata, verified entity relevance, and cursor pagination.
+   * ISIN. Results can be filtered by one of publisher domain, publisher country,
+   * article language, or article type, optionally combined with a published-at date
+   * range, and include stable story IDs, source metadata, verified entity relevance,
+   * and cursor pagination.
    *
    * @example
    * ```ts
@@ -208,7 +209,9 @@ export interface NewsSearchParams {
   cursor?: string | null;
 
   /**
-   * Optional result filters.
+   * Optional result filters. Use at most one of sourceDomain, sourceCountry,
+   * articleLanguage, or articleType. A date range may accompany that category;
+   * date.from must not exceed date.to.
    */
   filterBy?: NewsSearchParams.FilterBy;
 
@@ -377,7 +380,9 @@ export namespace NewsSearchParams {
   }
 
   /**
-   * Optional result filters.
+   * Optional result filters. Use at most one of sourceDomain, sourceCountry,
+   * articleLanguage, or articleType. A date range may accompany that category;
+   * date.from must not exceed date.to.
    */
   export interface FilterBy {
     /**
@@ -393,7 +398,7 @@ export namespace NewsSearchParams {
     articleType?: Array<'editorial' | 'press_release' | 'regulatory_filing' | 'advisory'>;
 
     /**
-     * Published-at window in epoch milliseconds.
+     * Published-at window in epoch milliseconds. from must be before or equal to to.
      */
     date?: FilterBy.Date;
 
@@ -437,7 +442,7 @@ export namespace NewsSearchParams {
 
   export namespace FilterBy {
     /**
-     * Published-at window in epoch milliseconds.
+     * Published-at window in epoch milliseconds. from must be before or equal to to.
      */
     export interface Date {
       /**
