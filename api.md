@@ -185,3 +185,13 @@ Methods:
 
 - <code title="get /logs/{request_id}">client.logs.<a href="./src/resources/logs.ts">retrieve</a>(requestID) -> LogRetrieveResponse</code>
 - <code title="get /logs">client.logs.<a href="./src/resources/logs.ts">list</a>({ ...params }) -> LogListResponse</code>
+
+# Feedback
+
+Types:
+
+- <code><a href="./src/resources/feedback.ts">FeedbackSubmitResponse</a></code>
+
+Methods:
+
+- <code title="post /feedback">client.feedback.<a href="./src/resources/feedback.ts">submit</a>({ ...params }) -> FeedbackSubmitResponse</code>

@@ -40,6 +40,7 @@ import {
   BrandSearchParams,
   BrandSearchResponse,
 } from './resources/brand';
+import { Feedback, FeedbackSubmitParams, FeedbackSubmitResponse } from './resources/feedback';
 import {
   Industry,
   IndustryRetrieveNaicsParams,
@@ -840,6 +841,10 @@ export class ContextDev {
    * Read your organization's API request logs to debug failed calls. These endpoints cost no credits and use a separate rate limit.
    */
   logs: API.Logs = new API.Logs(this);
+  /**
+   * Report bugs, docs mismatches, and friction with any Context.dev API. Submissions cost no credits and use a separate rate limit.
+   */
+  feedback: API.Feedback = new API.Feedback(this);
 }
 
 ContextDev.Parse = Parse;
@@ -853,6 +858,7 @@ ContextDev.Webhooks = Webhooks;
 ContextDev.People = People;
 ContextDev.News = News;
 ContextDev.Logs = Logs;
+ContextDev.Feedback = Feedback;
 
 export declare namespace ContextDev {
   export type RequestOptions = Opts.RequestOptions;
@@ -970,5 +976,11 @@ export declare namespace ContextDev {
     type LogRetrieveResponse as LogRetrieveResponse,
     type LogListResponse as LogListResponse,
     type LogListParams as LogListParams,
+  };
+
+  export {
+    Feedback as Feedback,
+    type FeedbackSubmitResponse as FeedbackSubmitResponse,
+    type FeedbackSubmitParams as FeedbackSubmitParams,
   };
 }

@@ -23,6 +23,7 @@ export {
   type BrandRetrieveParams,
   type BrandSearchParams,
 } from './brand';
+export { Feedback, type FeedbackSubmitResponse, type FeedbackSubmitParams } from './feedback';
 export {
   Industry,
   type IndustryRetrieveNaicsResponse,
