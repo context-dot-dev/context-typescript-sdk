@@ -1658,7 +1658,8 @@ export namespace BatchSubmitParams {
         includeSelectors?: Array<string> | null;
 
         /**
-         * Maximum cache age in milliseconds. Defaults to 1 day. `0` fetches fresh.
+         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
+         * year (31536000000 ms). `0` fetches fresh.
          */
         maxAgeMs?: number | null;
 
@@ -1987,7 +1988,8 @@ export namespace BatchSubmitParams {
         includeSelectors?: Array<string> | null;
 
         /**
-         * Maximum cache age in milliseconds. Defaults to 1 day. `0` fetches fresh.
+         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
+         * year (31536000000 ms). `0` fetches fresh.
          */
         maxAgeMs?: number | null;
 
@@ -2410,7 +2412,8 @@ export namespace BatchSubmitParams {
         includeSelectors?: Array<string> | null;
 
         /**
-         * Maximum cache age in milliseconds. Defaults to 1 day. `0` fetches fresh.
+         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
+         * year (31536000000 ms). `0` fetches fresh.
          */
         maxAgeMs?: number | null;
 
@@ -2806,7 +2809,8 @@ export namespace BatchSubmitParams {
         includeSelectors?: Array<string> | null;
 
         /**
-         * Maximum cache age in milliseconds. Defaults to 1 day. `0` fetches fresh.
+         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
+         * year (31536000000 ms). `0` fetches fresh.
          */
         maxAgeMs?: number | null;
 
