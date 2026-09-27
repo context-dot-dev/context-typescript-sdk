@@ -74,8 +74,8 @@ export class Web extends APIResource {
   }
 
   /**
-   * Returns the outputs you enable in `formats` from one visit to a URL. Each output
-   * reports its own `success`, so a failed output does not fail the request.
+   * Scrape anything from a URL on the internet. Returns the outputs you enable in
+   * formats. Handles PDFs, DOCX, PPT, XLSX, and 40 other file formats.
    *
    * @example
    * ```ts
