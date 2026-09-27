@@ -6,7 +6,7 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Industry extends APIResource {
   /**
-   * Classify any brand into 2022 NAICS industry codes from its domain or name.
+   * Classify a company into NAICS industry codes.
    */
   retrieveNaics(
     query: IndustryRetrieveNaicsParams,
@@ -16,9 +16,7 @@ export class Industry extends APIResource {
   }
 
   /**
-   * Classify any brand into Standard Industrial Classification (SIC) codes from its
-   * domain or name. Choose between the original SIC system (`original_sic`) or the
-   * latest SIC list maintained by the SEC (`latest_sec`).
+   * Classify a company into SIC industry codes.
    */
   retrieveSic(
     query: IndustryRetrieveSicParams,
@@ -30,8 +28,8 @@ export class Industry extends APIResource {
 
 export interface IndustryRetrieveNaicsResponse {
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
@@ -46,7 +44,7 @@ export interface IndustryRetrieveNaicsResponse {
   domain?: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: IndustryRetrieveNaicsResponse.KeyMetadata;
 
@@ -57,7 +55,7 @@ export interface IndustryRetrieveNaicsResponse {
   partial?: boolean;
 
   /**
-   * Status of the response, e.g., 'ok'
+   * Always `ok` on success.
    */
   status?: string;
 
@@ -86,11 +84,11 @@ export namespace IndustryRetrieveNaicsResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -103,8 +101,8 @@ export namespace IndustryRetrieveNaicsResponse {
 
 export interface IndustryRetrieveSicResponse {
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
@@ -126,7 +124,7 @@ export interface IndustryRetrieveSicResponse {
   domain?: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: IndustryRetrieveSicResponse.KeyMetadata;
 
@@ -137,7 +135,7 @@ export interface IndustryRetrieveSicResponse {
   partial?: boolean;
 
   /**
-   * Status of the response, e.g., 'ok'
+   * Always `ok` on success.
    */
   status?: string;
 
@@ -184,11 +182,11 @@ export namespace IndustryRetrieveSicResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -219,45 +217,35 @@ export interface IndustryRetrieveNaicsParams {
   minResults?: number;
 
   /**
-   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
-   * characters.
+   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
    */
   tags?: Array<string>;
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: IndustryRetrieveNaicsParams.TimeoutOpts;
 
   /**
-   * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
-   * omitted. Requires zero data retention to be enabled for your organization
-   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
-   * Successful ZDR responses include X-Context-ZDR: true.
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }
 
 export namespace IndustryRetrieveNaicsParams {
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-     * credits. "return-partial" returns usable results collected so far; if none are
-     * available, the request still fails without charging credits. Partial results are
-     * not cached as complete results.
+     * "fail" returns 408 at the deadline. "return-partial" returns available results;
+     * inspect the response’s partial flag.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -282,52 +270,40 @@ export interface IndustryRetrieveSicParams {
   minResults?: number;
 
   /**
-   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
-   * characters.
+   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
    */
   tags?: Array<string>;
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: IndustryRetrieveSicParams.TimeoutOpts;
 
   /**
-   * Which SIC dataset to classify against. `original_sic` uses the 1987 Standard
-   * Industrial Classification system; `latest_sec` uses the current SIC list as
-   * published by the SEC. Defaults to `original_sic`.
+   * SIC dataset: `original_sic` (1987) or `latest_sec` (current SEC list).
    */
   type?: 'original_sic' | 'latest_sec';
 
   /**
-   * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
-   * omitted. Requires zero data retention to be enabled for your organization
-   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
-   * Successful ZDR responses include X-Context-ZDR: true.
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }
 
 export namespace IndustryRetrieveSicParams {
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-     * credits. "return-partial" returns usable results collected so far; if none are
-     * available, the request still fails without charging credits. Partial results are
-     * not cached as complete results.
+     * "fail" returns 408 at the deadline. "return-partial" returns available results;
+     * inspect the response’s partial flag.
      */
     behavior?: 'fail' | 'return-partial';
   }

@@ -5,12 +5,12 @@ import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
 /**
- * Report bugs, docs mismatches, and friction with any Context.dev API. Submissions cost no credits and use a separate rate limit.
+ * Report API issues and documentation mismatches.
  */
 export class Feedback extends APIResource {
   /**
-   * Report a problem with a Context.dev API call, docs page, SDK, or CLI. Include
-   * request_id, url, or both.
+   * Report an API issue or documentation mismatch, including request IDs when
+   * available.
    *
    * @example
    * ```ts
@@ -40,24 +40,24 @@ export interface FeedbackSubmitResponse {
   feedback_id: string;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: FeedbackSubmitResponse.KeyMetadata;
 }
 
 export namespace FeedbackSubmitResponse {
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -86,7 +86,7 @@ export interface FeedbackSubmitParams {
   request_id?: string;
 
   /**
-   * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+   * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;
 

@@ -8,11 +8,11 @@ import { RequestOptions } from '../../internal/request-options';
 import { path } from '../../internal/utils/path';
 
 /**
- * Inspect and retry webhook deliveries. These endpoints cost no credits.
+ * Inspect and retry batch and monitor webhook deliveries.
  */
 export class Deliveries extends APIResource {
   /**
-   * Get a webhook delivery, including its status and latest attempt.
+   * Retrieve a webhook delivery’s status and original payload.
    *
    * @example
    * ```ts
@@ -30,7 +30,7 @@ export class Deliveries extends APIResource {
   }
 
   /**
-   * List your batch or monitor webhook deliveries, newest first.
+   * List batch and monitor webhook deliveries from the last 30 days.
    *
    * @example
    * ```ts
@@ -46,7 +46,7 @@ export class Deliveries extends APIResource {
   }
 
   /**
-   * List delivery attempts, newest first.
+   * List a delivery’s attempts, newest first.
    *
    * @example
    * ```ts
@@ -65,7 +65,8 @@ export class Deliveries extends APIResource {
   }
 
   /**
-   * Retry a webhook delivery within seven days of creation.
+   * Resend the original payload using the source’s current URL and secret. Available
+   * for 7 days after the event.
    *
    * @example
    * ```ts
@@ -118,7 +119,7 @@ export interface Attempt {
   started_at: string;
 
   /**
-   * What started this attempt.
+   * `initial`, `automatic` (scheduled retry), or `manual` (Retry endpoint).
    */
   trigger: 'initial' | 'automatic' | 'manual';
 
@@ -192,7 +193,7 @@ export interface Delivery {
   retry: WebhooksAPI.RetryConfig;
 
   /**
-   * Manual retry deadline, seven days after event creation.
+   * Last time you can retry manually (7 days after the event).
    */
   retry_expires_at: string;
 
@@ -202,7 +203,8 @@ export interface Delivery {
   source: Delivery.Batch | Delivery.Monitor;
 
   /**
-   * Current delivery status.
+   * `pending`, `delivering`, `retrying`, `delivered`, `failed`, or `cancelled`
+   * (source or its webhook was removed).
    */
   status: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
 
@@ -235,7 +237,7 @@ export namespace Delivery {
     batch_id: string;
 
     /**
-     * Delivery source.
+     * Which deliveries to list: `batch` or `monitor`.
      */
     type: 'batch';
   }
@@ -252,7 +254,7 @@ export namespace Delivery {
     run_id: string;
 
     /**
-     * Delivery source.
+     * Which deliveries to list: `batch` or `monitor`.
      */
     type: 'monitor';
   }
@@ -290,7 +292,7 @@ export interface DeliverySummary {
   next_attempt_at: string | null;
 
   /**
-   * Manual retry deadline, seven days after event creation.
+   * Last time you can retry manually (7 days after the event).
    */
   retry_expires_at: string;
 
@@ -300,7 +302,8 @@ export interface DeliverySummary {
   source: DeliverySummary.Batch | DeliverySummary.Monitor;
 
   /**
-   * Current delivery status.
+   * `pending`, `delivering`, `retrying`, `delivered`, `failed`, or `cancelled`
+   * (source or its webhook was removed).
    */
   status: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
 
@@ -333,7 +336,7 @@ export namespace DeliverySummary {
     batch_id: string;
 
     /**
-     * Delivery source.
+     * Which deliveries to list: `batch` or `monitor`.
      */
     type: 'batch';
   }
@@ -350,7 +353,7 @@ export namespace DeliverySummary {
     run_id: string;
 
     /**
-     * Delivery source.
+     * Which deliveries to list: `batch` or `monitor`.
      */
     type: 'monitor';
   }
@@ -358,24 +361,24 @@ export namespace DeliverySummary {
 
 export interface DeliveryRetrieveResponse extends Delivery {
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: DeliveryRetrieveResponse.KeyMetadata;
 }
 
 export namespace DeliveryRetrieveResponse {
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -403,24 +406,24 @@ export interface DeliveryListResponse {
   next_cursor: string | null;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: DeliveryListResponse.KeyMetadata;
 }
 
 export namespace DeliveryListResponse {
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -448,24 +451,24 @@ export interface DeliveryListAttemptsResponse {
   next_cursor: string | null;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: DeliveryListAttemptsResponse.KeyMetadata;
 }
 
 export namespace DeliveryListAttemptsResponse {
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -483,24 +486,24 @@ export interface DeliveryRetryResponse {
   id: string;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: DeliveryRetryResponse.KeyMetadata;
 }
 
 export namespace DeliveryRetryResponse {
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -513,8 +516,7 @@ export namespace DeliveryRetryResponse {
 
 export interface DeliveryRetrieveParams {
   /**
-   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
-   * characters.
+   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
    */
   tags?: Array<string>;
 }
@@ -554,7 +556,7 @@ export declare namespace DeliveryListParams {
     status?: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
 
     /**
-     * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+     * Labels for filtering usage in the dashboard.
      */
     tags?: Array<string>;
   }
@@ -596,7 +598,7 @@ export declare namespace DeliveryListParams {
     status?: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
 
     /**
-     * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+     * Labels for filtering usage in the dashboard.
      */
     tags?: Array<string>;
   }
@@ -614,21 +616,19 @@ export interface DeliveryListAttemptsParams {
   limit?: number;
 
   /**
-   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
-   * characters.
+   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
    */
   tags?: Array<string>;
 }
 
 export interface DeliveryRetryParams {
   /**
-   * Body param: Resend a delivery that already succeeded.
+   * Body param: Resend even if the delivery already succeeded. Defaults to false.
    */
   force?: boolean;
 
   /**
-   * Body param: Optional tags for tracking usage. Up to 20 tags, each 1 to 50
-   * characters.
+   * Body param: Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;
 

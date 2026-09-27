@@ -6,10 +6,8 @@ import { RequestOptions } from '../internal/request-options';
 
 export class People extends APIResource {
   /**
-   * Finds and normalizes the best available person candidate from additive identity
-   * clues, then assigns an identity match score from 0 to 100. Available on all paid
-   * plans. Successful requests cost 20 credits. Disposable and free email addresses
-   * (like gmail.com, yahoo.com) will throw a 422 error.
+   * Find a person from identity clues and return their profile with a match score.
+   * Requires a paid plan; free or disposable email addresses return 422.
    *
    * @example
    * ```ts
@@ -39,13 +37,13 @@ export interface PersonEnrichResponse {
     | PersonEnrichResponse.PersonEnrichmentNotFoundMatch;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: PersonEnrichResponse.KeyMetadata;
 
@@ -265,11 +263,11 @@ export namespace PersonEnrichResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -281,95 +279,160 @@ export namespace PersonEnrichResponse {
 }
 
 export interface PersonEnrichParams {
+  /**
+   * Company context to help identify the person. Provide a name or domain.
+   */
   company?: PersonEnrichParams.Company;
 
+  /**
+   * Education history to help distinguish people with similar names.
+   */
   education?: Array<PersonEnrichParams.Education>;
 
+  /**
+   * Email address of the person to find.
+   */
   email?: string;
 
+  /**
+   * Location context to help identify the person. Provide a city, region, or
+   * country.
+   */
   location?: PersonEnrichParams.Location;
 
+  /**
+   * Person name. Without an email or person-profile URL, provide both first and last
+   * name plus company, education, or location.
+   */
   name?: PersonEnrichParams.Name;
 
+  /**
+   * Public profile URLs for the person. A person-profile URL can identify the person
+   * without a name.
+   */
   social_urls?: Array<string>;
 
   /**
-   * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+   * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: PersonEnrichParams.TimeoutOpts;
 
   /**
-   * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
-   * omitted. Requires zero data retention to be enabled for your organization
-   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
-   * Successful ZDR responses include X-Context-ZDR: true.
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }
 
 export namespace PersonEnrichParams {
+  /**
+   * Company context to help identify the person. Provide a name or domain.
+   */
   export interface Company {
+    /**
+     * Website domain of a company associated with the person.
+     */
     domain?: string;
 
+    /**
+     * Name of a company associated with the person.
+     */
     name?: string;
   }
 
   export interface Education {
+    /**
+     * Degree or qualification earned.
+     */
     degree?: string;
 
+    /**
+     * Subject or major studied.
+     */
     field_of_study?: string;
 
+    /**
+     * Four-digit graduation year.
+     */
     graduation_year?: number;
 
+    /**
+     * School or university, identified by name or domain.
+     */
     institution?: Education.Institution;
   }
 
   export namespace Education {
+    /**
+     * School or university, identified by name or domain.
+     */
     export interface Institution {
+      /**
+       * Website domain of the school or university.
+       */
       domain?: string;
 
+      /**
+       * Name of the school or university.
+       */
       name?: string;
     }
   }
 
+  /**
+   * Location context to help identify the person. Provide a city, region, or
+   * country.
+   */
   export interface Location {
+    /**
+     * City associated with the person.
+     */
     city?: string;
 
+    /**
+     * Country associated with the person.
+     */
     country?: string;
 
+    /**
+     * State, province, or region associated with the person.
+     */
     region?: string;
   }
 
+  /**
+   * Person name. Without an email or person-profile URL, provide both first and last
+   * name plus company, education, or location.
+   */
   export interface Name {
+    /**
+     * First or given name.
+     */
     first?: string;
 
+    /**
+     * Last or family name.
+     */
     last?: string;
   }
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-     * credits. "return-partial" returns usable results collected so far; if none are
-     * available, the request still fails without charging credits. Partial results are
-     * not cached as complete results.
+     * "fail" returns 408 at the deadline. "return-partial" returns available results;
+     * inspect the response’s partial flag.
      */
     behavior?: 'fail' | 'return-partial';
   }
