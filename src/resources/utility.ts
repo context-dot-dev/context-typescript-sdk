@@ -6,16 +6,12 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Utility extends APIResource {
   /**
-   * Signal that you may fetch data soon to improve latency. The type field selects
-   * what to prefetch ('brand' queues a brand data fetch, 'styleguide' queues a
-   * styleguide extraction) and identifier carries exactly one lookup key: a domain,
-   * or an email whose domain is extracted and validated (free email providers and
-   * disposable email addresses are not allowed).
+   * Queue brand or styleguide data so a later lookup can return sooner.
    *
    * @example
    * ```ts
    * const response = await client.utility.prefetch({
-   *   identifier: { domain: 'xxx' },
+   *   identifier: { domain: 'stripe.com' },
    *   type: 'brand',
    * });
    * ```
@@ -27,8 +23,8 @@ export class Utility extends APIResource {
 
 export interface UtilityPrefetchResponse {
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
@@ -38,7 +34,7 @@ export interface UtilityPrefetchResponse {
   domain?: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: UtilityPrefetchResponse.KeyMetadata;
 
@@ -48,7 +44,7 @@ export interface UtilityPrefetchResponse {
   message?: string;
 
   /**
-   * Status of the response, e.g., 'ok'
+   * Always `ok` on success.
    */
   status?: string;
 
@@ -60,11 +56,11 @@ export interface UtilityPrefetchResponse {
 
 export namespace UtilityPrefetchResponse {
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -84,20 +80,17 @@ export interface UtilityPrefetchParams {
     | UtilityPrefetchParams.UtilityPrefetchEmailIdentifier;
 
   /**
-   * What to prefetch: 'brand' warms the brand data cache, 'styleguide' warms the
-   * styleguide cache.
+   * Data to prefetch.
    */
   type: 'brand' | 'styleguide';
 
   /**
-   * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+   * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: UtilityPrefetchParams.TimeoutOpts;
 }
@@ -108,7 +101,7 @@ export namespace UtilityPrefetchParams {
    */
   export interface UtilityPrefetchDomainIdentifier {
     /**
-     * Domain name to prefetch data for
+     * Domain, e.g. `stripe.com`.
      */
     domain: string;
   }
@@ -126,19 +119,16 @@ export namespace UtilityPrefetchParams {
   }
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. This endpoint supports "fail": return 408
-     * REQUEST_TIMEOUT without charging credits.
+     * Only "fail" is supported: return 408 at the deadline.
      */
     behavior?: 'fail';
   }

@@ -90,7 +90,7 @@ describe('resource web', () => {
 
   // Mock server tests are disabled
   test.skip('mapUrls: only required params', async () => {
-    const responsePromise = client.web.mapUrls({ domain: 'xxx' });
+    const responsePromise = client.web.mapUrls({ domain: 'stripe.com' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -103,7 +103,7 @@ describe('resource web', () => {
   // Mock server tests are disabled
   test.skip('mapUrls: required and optional params', async () => {
     const response = await client.web.mapUrls({
-      domain: 'xxx',
+      domain: 'stripe.com',
       headers: { foo: 'J!' },
       includeSubdomains: true,
       maxLinks: 1,
@@ -245,7 +245,7 @@ describe('resource web', () => {
 
   // Mock server tests are disabled
   test.skip('search: only required params', async () => {
-    const responsePromise = client.web.search({ query: 'x' });
+    const responsePromise = client.web.search({ query: 'Stripe API authentication' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -258,7 +258,7 @@ describe('resource web', () => {
   // Mock server tests are disabled
   test.skip('search: required and optional params', async () => {
     const response = await client.web.search({
-      query: 'x',
+      query: 'Stripe API authentication',
       country: 'af',
       excludeDomains: ['string'],
       freshness: 'last_24_hours',
@@ -312,7 +312,7 @@ describe('resource web', () => {
       includeSelectors: ['string'],
       maxAgeMs: 0,
       maxDepth: 0,
-      maxPages: 1,
+      maxPages: 10,
       pdf: {
         end: 1,
         ocr: true,

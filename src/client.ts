@@ -824,7 +824,7 @@ export class ContextDev {
   industry: API.Industry = new API.Industry(this);
   utility: API.Utility = new API.Utility(this);
   /**
-   * Monitor pages, sitemaps, and extracted website data for exact or semantic changes. Webhook payloads are documented by the MonitorsChangeDetectedWebhookPayload and MonitorsRunCompletedWebhookPayload schemas.
+   * Watch websites for exact or meaningful changes.
    */
   monitors: API.Monitors = new API.Monitors(this);
   /**
@@ -834,15 +834,15 @@ export class ContextDev {
   webhooks: API.Webhooks = new API.Webhooks(this);
   people: API.People = new API.People(this);
   /**
-   * Search live first-party RSS and free historical news data by company identity.
+   * Search live and historical news about a company.
    */
   news: API.News = new API.News(this);
   /**
-   * Read your organization's API request logs to debug failed calls. These endpoints cost no credits and use a separate rate limit.
+   * Read your organization's API request logs.
    */
   logs: API.Logs = new API.Logs(this);
   /**
-   * Report bugs, docs mismatches, and friction with any Context.dev API. Submissions cost no credits and use a separate rate limit.
+   * Report API issues and documentation mismatches.
    */
   feedback: API.Feedback = new API.Feedback(this);
 }

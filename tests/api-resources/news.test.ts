@@ -12,7 +12,7 @@ describe('resource news', () => {
   test.skip('search: only required params', async () => {
     const responsePromise = client.news.search({
       searchBy: {
-        entity: { name: 'xx', type: 'name' },
+        entity: { domain: 'stripe.com', type: 'domain' },
         type: 'entity',
       },
     });
@@ -29,7 +29,7 @@ describe('resource news', () => {
   test.skip('search: required and optional params', async () => {
     const response = await client.news.search({
       searchBy: {
-        entity: { name: 'xx', type: 'name' },
+        entity: { domain: 'stripe.com', type: 'domain' },
         type: 'entity',
       },
       cursor: 'cursor',

@@ -8,8 +8,7 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Parse extends APIResource {
   /**
-   * Converts raw text, source code, web/data, PDF, Microsoft Office, and image bytes
-   * into LLM-usable Markdown.
+   * Convert uploaded file bytes into Markdown and optional HTML.
    */
   handle(
     body: Uploadable,
@@ -55,8 +54,8 @@ export interface ParseHandleResponse {
   markdown: string;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
@@ -112,18 +111,18 @@ export interface ParseHandleResponse {
     | 'pnm';
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: ParseHandleResponse.KeyMetadata;
 }
 
 export namespace ParseHandleResponse {
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -227,11 +226,8 @@ export interface ParseHandleParams {
   includeLinks?: boolean;
 
   /**
-   * Query param: When true for PDF inputs, OCR the selected pages that have no
-   * usable text layer (scans), replacing each recovered page's text with the OCR
-   * result while pages with a real text layer keep it. pdf.start/pdf.end limit the
-   * inclusive page range. Billed at 1 credit per page OCR actually recovered, on top
-   * of the base request cost. When false, no OCR runs.
+   * Query param: Read text from images and scanned PDF pages. PDF page ranges still
+   * apply.
    */
   ocr?: boolean;
 
@@ -247,8 +243,8 @@ export interface ParseHandleParams {
   shortenBase64Images?: boolean;
 
   /**
-   * Query param: Comma-separated tags for tracking request usage. Up to 20 tags,
-   * each 1-50 characters.
+   * Query param: Comma-separated labels for filtering usage, e.g.
+   * `production,team-alpha`.
    */
   tags?: Array<string>;
 
@@ -258,11 +254,8 @@ export interface ParseHandleParams {
   useMainContentOnly?: boolean;
 
   /**
-   * Query param: Set to enabled to bypass shared caches and omit request and
-   * response content from retained usage logs. Asset uploads are skipped, so hosted
-   * image URLs are omitted. Requires zero data retention to be enabled for your
-   * organization (contact support@context.dev), otherwise the request fails with
-   * ZDR_NOT_ENABLED. Successful ZDR responses include X-Context-ZDR: true.
+   * Query param: `enabled` turns on zero data retention. Returns 403
+   * `ZDR_NOT_ENABLED` unless your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }

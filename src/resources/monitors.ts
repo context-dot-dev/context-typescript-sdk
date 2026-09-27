@@ -8,13 +8,12 @@ import { RequestOptions } from '../internal/request-options';
 import { path } from '../internal/utils/path';
 
 /**
- * Monitor pages, sitemaps, and extracted website data for exact or semantic changes. Webhook payloads are documented by the MonitorsChangeDetectedWebhookPayload and MonitorsRunCompletedWebhookPayload schemas.
+ * Watch websites for exact or meaningful changes.
  */
 export class Monitors extends APIResource {
   /**
-   * Creates a monitor. The request body is a union of the supported target/change
-   * detection combinations. The monitor runs immediately after creation to create
-   * its initial baseline.
+   * Watch a page, URL inventory, or extracted website data on a schedule. A run
+   * starts immediately to capture the baseline.
    *
    * @example
    * ```ts
@@ -37,7 +36,7 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Get a monitor
+   * Retrieve a monitor’s configuration and current state.
    *
    * @example
    * ```ts
@@ -49,9 +48,8 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Updates a monitor. If `target` or `change_detection` changes, the monitor
-   * creates a new baseline. Unsupported target/change detection combinations are
-   * rejected.
+   * Update a monitor. Changing its target or change detection replaces the baseline
+   * and queues a new baseline run.
    *
    * @example
    * ```ts
@@ -76,9 +74,7 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Lists monitors for the authenticated organization. Supports free-text search
-   * (`q` over `search_by` fields, `prefix` or `exact` via `search_type`) plus
-   * status/type/tag filters. Results are paginated via the opaque `cursor`.
+   * List your monitors with optional search and filters.
    *
    * @example
    * ```ts
@@ -93,7 +89,7 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Delete a monitor
+   * Delete a monitor and stop future runs and webhook retries.
    *
    * @example
    * ```ts
@@ -105,8 +101,8 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Returns credits charged per monitor over an optional [since, until] window,
-   * newest spenders first.
+   * Return usage per monitor, highest first, for up to the 10,000 most recent runs
+   * in the requested window.
    *
    * @example
    * ```ts
@@ -121,7 +117,7 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Returns how many monitors the account has and the maximum it allows.
+   * Retrieve your organization’s monitor allowance and usage.
    *
    * @example
    * ```ts
@@ -133,7 +129,7 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Returns an account-wide feed of detected changes across monitors.
+   * List full change records across your monitors, newest first.
    *
    * @example
    * ```ts
@@ -148,7 +144,7 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Returns an account-wide feed of monitor runs across all monitors.
+   * List runs across your monitors, newest first.
    *
    * @example
    * ```ts
@@ -163,7 +159,7 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * List changes for a monitor
+   * List full change records for a monitor, newest first.
    *
    * @example
    * ```ts
@@ -181,7 +177,7 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * List monitor runs
+   * List a monitor’s runs, newest first.
    *
    * @example
    * ```ts
@@ -197,7 +193,7 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Get a change
+   * Retrieve a detected change, including its diff and available evidence.
    *
    * @example
    * ```ts
@@ -211,8 +207,7 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Fetches one run for a monitor, including lifecycle status, timing, credits
-   * charged, and any detected change.
+   * Retrieve the status, timing, and results of one monitor run.
    *
    * @example
    * ```ts
@@ -232,9 +227,8 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Generates a new signing secret for the monitor's webhook and returns the updated
-   * monitor (including the new `webhook.secret`). The previous secret stops signing
-   * deliveries immediately, so update your endpoint before rotating.
+   * Generate and return a new signing secret. It takes effect immediately for all
+   * subsequent delivery attempts.
    *
    * @example
    * ```ts
@@ -251,8 +245,7 @@ export class Monitors extends APIResource {
   }
 
   /**
-   * Triggers an immediate run of the monitor outside its normal schedule. The run is
-   * queued and processed asynchronously.
+   * Queue a run without changing the regular schedule. Paused monitors return 409.
    *
    * @example
    * ```ts
@@ -287,9 +280,7 @@ export interface WebhookDelivery {
   http_status: number | null;
 
   /**
-   * Delivery outcome. delivered means any 2xx response; rejected means a non-2xx
-   * response; failed means no HTTP response was received; skipped_unsafe_url means
-   * the URL failed the public-endpoint safety check.
+   * Outcome of the delivery attempt. Any 2xx response counts as delivered.
    */
   status: 'delivered' | 'rejected' | 'failed' | 'skipped_unsafe_url';
 
@@ -307,15 +298,12 @@ export namespace WebhookDelivery {
   }
 }
 
-/**
- * A newly created monitor plus `initial_run_id`, the id of the baseline run queued
- * at creation.
- */
 export interface MonitorCreateResponse {
   id: string;
 
   /**
-   * Discriminated union describing how changes are detected.
+   * How changes are judged. Defaults to `semantic` for extract targets and page
+   * targets with `instructions`, otherwise `exact`.
    */
   change_detection:
     | MonitorCreateResponse.MonitorsExactChangeDetection
@@ -324,38 +312,32 @@ export interface MonitorCreateResponse {
   created_at: string;
 
   /**
-   * The baseline run queued by this create call, or null if it could not be queued
-   * immediately (in which case the baseline runs on the next scheduled tick). Poll
-   * GET /monitors/{monitor_id}/runs/{run_id}.
+   * ID of the baseline run queued at creation; null if it will start on the next
+   * scheduled tick.
    */
   initial_run_id: string | null;
 
   /**
-   * Top-level monitor category. Always `web` today; the concrete behavior is
-   * described by `target` and `change_detection`.
+   * Always `web`. Optional.
    */
   mode: 'web';
 
   name: string;
 
   /**
-   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
-   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
-   * between 10 minutes and 1 year.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
-  schedule: MonitorCreateResponse.Schedule;
+  request_id: string;
 
   /**
-   * Monitor lifecycle status. `failed` means the most recent run failed (see the
-   * monitor's `last_error`); failed monitors keep running on schedule and flip back
-   * to `active` on the next successful run. Monitors are auto-`paused` after
-   * repeated consecutive failures or insufficient-credit skips; resume by PATCHing
-   * status to `active`.
+   * Current state. Failed monitors keep running; paused monitors must be resumed
+   * with `status: "active"`.
    */
   status: 'active' | 'paused' | 'failed';
 
   /**
-   * Discriminated union describing what the monitor watches.
+   * What to watch: a page, a sitemap, or data extracted from a site.
    */
   target:
     | MonitorCreateResponse.MonitorsPageTarget
@@ -365,16 +347,19 @@ export interface MonitorCreateResponse {
   updated_at: string;
 
   /**
-   * Current baseline: the last observed value the monitor compares new snapshots
-   * against. Its shape follows `target.type` (page/sitemap/extract). Only populated
-   * on GET /monitors/{monitor_id}; null until the first baseline run completes (and
-   * after a target or change_detection update, which resets the baseline).
+   * Comparison baseline, included on Retrieve. Null until capture completes or after
+   * target changes.
    */
   baseline?:
     | MonitorCreateResponse.MonitorsPageBaseline
     | MonitorCreateResponse.MonitorsSitemapBaseline
     | MonitorCreateResponse.MonitorsExtractBaseline
     | null;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorCreateResponse.KeyMetadata;
 
   last_change_at?: string | null;
 
@@ -386,16 +371,25 @@ export interface MonitorCreateResponse {
   last_run_at?: string | null;
 
   /**
-   * When the next scheduled run is due.
+   * When the next scheduled run is due; null while paused.
    */
   next_run_at?: string | null;
 
   /**
-   * User-defined tags for grouping and filtering monitors and their changes.
-   * Duplicates are removed.
+   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
+   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
+   * between 10 minutes and 1 year.
+   */
+  schedule?: MonitorCreateResponse.Schedule;
+
+  /**
+   * Labels for filtering monitors, their changes, and their usage.
    */
   tags?: Array<string>;
 
+  /**
+   * Webhook destination and delivery settings. Null means no webhook is configured.
+   */
   webhook?: MonitorCreateResponse.Webhook | null;
 
   /**
@@ -412,37 +406,26 @@ export namespace MonitorCreateResponse {
    * sitemap targets, this means URL additions and removals.
    */
   export interface MonitorsExactChangeDetection {
+    /**
+     * Use `exact` to compare visible text or sitemap URLs.
+     */
     type: 'exact';
   }
 
   /**
-   * Detect meaning-level changes to page content, ignoring cosmetic or
-   * instruction-irrelevant differences. Which changes are meaningful is judged
-   * against the page or extract target's `instructions` (and an extract target's
-   * `schema`, when provided).
+   * Detect meaningful content changes using the target’s instructions and optional
+   * schema.
    */
   export interface MonitorsSemanticChangeDetection {
+    /**
+     * Use `semantic` to judge changes against the target instructions.
+     */
     type: 'semantic';
 
-    confidence_threshold?: number;
-  }
-
-  /**
-   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
-   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
-   * between 10 minutes and 1 year.
-   */
-  export interface Schedule {
     /**
-     * Number of units between runs. The resulting interval (frequency × unit) must be
-     * at least 10 minutes and at most 1 year (e.g. minimum 10 when unit is minutes;
-     * maximum 365 when unit is days).
+     * Minimum confidence required to report a meaningful change, from 0 to 1.
      */
-    frequency: number;
-
-    type: 'interval';
-
-    unit: 'minutes' | 'hours' | 'days';
+    confidence_threshold?: number;
   }
 
   /**
@@ -450,24 +433,24 @@ export namespace MonitorCreateResponse {
    * detection judges confirmed stable diffs against `instructions`.
    */
   export interface MonitorsPageTarget {
+    /**
+     * Use `page` to watch one web page.
+     */
     type: 'page';
 
+    /**
+     * Public HTTP(S) page URL to monitor.
+     */
     url: string;
 
     /**
-     * CSS selectors for HTML regions to remove before text extraction. Applied after
-     * include_selectors; exclusion takes precedence when an element matches both. Omit
-     * or pass an empty array to apply no explicit exclusions. Changing these selectors
-     * creates a new baseline.
+     * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
 
     /**
-     * CSS selectors defining the HTML regions to monitor. Matching subtrees are
-     * combined in document order before text extraction, instead of automatic
-     * main-content selection. Omit or pass an empty array to use automatic
-     * main-content extraction. If the filtered page has no usable text, the run fails
-     * without replacing the baseline. Changing these selectors creates a new baseline.
+     * Monitor these CSS-selected regions. Empty or omitted uses main content. Changes
+     * create a new baseline.
      */
     include_selectors?: Array<string>;
 
@@ -484,13 +467,12 @@ export namespace MonitorCreateResponse {
   }
 
   /**
-   * Watch a sitemap for URL additions and removals. Crawled URLs are normalized
-   * (lowercased host, no trailing slash/fragment) and scoped to the monitored site
-   * and its subdomains before comparison. On a detected difference the sitemap is
-   * re-fetched within the same run and only URLs both observations agree on are
-   * reported, suppressing transient crawl flaps.
+   * Watch a site’s URL inventory for confirmed additions and removals.
    */
   export interface MonitorsSitemapTarget {
+    /**
+     * Use `sitemap` to watch a site for added or removed URLs.
+     */
     type: 'sitemap';
 
     /**
@@ -515,11 +497,8 @@ export namespace MonitorCreateResponse {
   }
 
   /**
-   * Watch the monitor-relevant pages of a site for meaningful changes. A crawl
-   * guided by `schema`/`instructions` selects up to `max_pages` relevant pages to
-   * track; each run re-checks exactly those pages, and confirmed content changes are
-   * judged for relevance against the monitor's `instructions` (and `schema`, when
-   * provided). The tracked page set is refreshed by a periodic re-discovery crawl.
+   * Track relevant pages selected by `schema` and `instructions`; refresh the page
+   * set periodically.
    */
   export interface MonitorsExtractTarget {
     /**
@@ -528,6 +507,9 @@ export namespace MonitorCreateResponse {
      */
     instructions: string;
 
+    /**
+     * Use `extract` to watch structured data across selected pages.
+     */
     type: 'extract';
 
     /**
@@ -535,6 +517,9 @@ export namespace MonitorCreateResponse {
      */
     url: string;
 
+    /**
+     * Allow page discovery on subdomains of the target site.
+     */
     follow_subdomains?: boolean;
 
     /**
@@ -548,14 +533,8 @@ export namespace MonitorCreateResponse {
     max_pages?: number;
 
     /**
-     * JSON Schema describing the data you care about. It is used three ways: it guides
-     * which pages are selected for tracking, it gives the change judge extra context
-     * on which changes matter (alongside `instructions`), and it defines the shape of
-     * the baseline `data` snapshot on GET /monitors/{monitor_id} (refreshed at most
-     * about once a day). It is not a response format for changes: change events and
-     * webhook payloads always contain diffs, summaries, and evidence excerpts — never
-     * data in this schema's shape. If omitted, a default summary + key-points schema
-     * is used.
+     * JSON Schema for page selection and the baseline snapshot. Changes return diffs
+     * and evidence.
      */
     schema?: { [key: string]: unknown };
   }
@@ -607,10 +586,8 @@ export namespace MonitorCreateResponse {
     captured_at: string;
 
     /**
-     * The extracted structured data, matching the monitor's extraction schema (same
-     * shape as the /web/extract endpoint's `data`). Refreshed when the monitor
-     * re-discovers its page set (at most about once a day); `null` when no extraction
-     * has been captured yet.
+     * Latest structured snapshot matching the extraction schema, refreshed at most
+     * daily; `null` before capture.
      */
     data: unknown;
 
@@ -618,6 +595,21 @@ export namespace MonitorCreateResponse {
      * The page URLs the monitor tracks and analyzes for changes.
      */
     urls_analyzed: Array<string>;
+  }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
   }
 
   /**
@@ -629,18 +621,43 @@ export namespace MonitorCreateResponse {
     message: string;
   }
 
+  /**
+   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
+   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
+   * between 10 minutes and 1 year.
+   */
+  export interface Schedule {
+    /**
+     * Number of units between runs. The resulting interval (frequency × unit) must be
+     * at least 10 minutes and at most 1 year (e.g. minimum 10 when unit is minutes;
+     * maximum 365 when unit is days).
+     */
+    frequency: number;
+
+    /**
+     * Use `interval` to run on a repeating schedule.
+     */
+    type: 'interval';
+
+    /**
+     * Time unit used with `frequency` to set the run interval.
+     */
+    unit: 'minutes' | 'hours' | 'days';
+  }
+
+  /**
+   * Webhook destination and delivery settings. Null means no webhook is configured.
+   */
   export interface Webhook {
     /**
-     * Webhook URL events are delivered to. Slack incoming webhook URLs are
-     * automatically formatted as Slack messages.
+     * Public HTTP(S) URL that receives events. Slack and GovSlack URLs get formatted
+     * messages.
      */
     url: string;
 
     /**
-     * Events delivered to this endpoint. `change.detected` fires only when a run
-     * detects a change; `run.completed` fires on every completed run — including runs
-     * that detected no change — and embeds the change when one was detected. Defaults
-     * to `["change.detected"]` when omitted.
+     * Events to deliver. Defaults to `change.detected`; `run.completed` also includes
+     * unchanged runs.
      */
     events?: Array<'change.detected' | 'run.completed'>;
 
@@ -650,12 +667,8 @@ export namespace MonitorCreateResponse {
     retry?: WebhooksAPI.RetryConfig;
 
     /**
-     * Signing secret used to verify webhook authenticity. Omitted unless the API key
-     * has monitors:write permission or full access. Each delivery includes an
-     * `X-Context-Signature: t=<unix>,v1=<hmac>` header, where the HMAC is SHA-256 over
-     * `"{t}.{rawRequestBody}"` keyed by this secret. Recompute it with a constant-time
-     * compare and reject stale timestamps to prevent replay. Generated by the API;
-     * cannot be set by clients.
+     * API-generated signing secret. Visible only with full access or `monitors:write`
+     * permission.
      */
     secret?: string;
   }
@@ -687,15 +700,12 @@ export namespace MonitorCreateResponse {
   }
 }
 
-/**
- * A web monitor. `mode` is the constant `web`; behavior is described by `target`
- * (page/sitemap/extract) and `change_detection` (exact/semantic).
- */
 export interface MonitorRetrieveResponse {
   id: string;
 
   /**
-   * Discriminated union describing how changes are detected.
+   * How changes are judged. Defaults to `semantic` for extract targets and page
+   * targets with `instructions`, otherwise `exact`.
    */
   change_detection:
     | MonitorRetrieveResponse.MonitorsExactChangeDetection
@@ -704,31 +714,26 @@ export interface MonitorRetrieveResponse {
   created_at: string;
 
   /**
-   * Top-level monitor category. Always `web` today; the concrete behavior is
-   * described by `target` and `change_detection`.
+   * Always `web`. Optional.
    */
   mode: 'web';
 
   name: string;
 
   /**
-   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
-   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
-   * between 10 minutes and 1 year.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
-  schedule: MonitorRetrieveResponse.Schedule;
+  request_id: string;
 
   /**
-   * Monitor lifecycle status. `failed` means the most recent run failed (see the
-   * monitor's `last_error`); failed monitors keep running on schedule and flip back
-   * to `active` on the next successful run. Monitors are auto-`paused` after
-   * repeated consecutive failures or insufficient-credit skips; resume by PATCHing
-   * status to `active`.
+   * Current state. Failed monitors keep running; paused monitors must be resumed
+   * with `status: "active"`.
    */
   status: 'active' | 'paused' | 'failed';
 
   /**
-   * Discriminated union describing what the monitor watches.
+   * What to watch: a page, a sitemap, or data extracted from a site.
    */
   target:
     | MonitorRetrieveResponse.MonitorsPageTarget
@@ -738,16 +743,19 @@ export interface MonitorRetrieveResponse {
   updated_at: string;
 
   /**
-   * Current baseline: the last observed value the monitor compares new snapshots
-   * against. Its shape follows `target.type` (page/sitemap/extract). Only populated
-   * on GET /monitors/{monitor_id}; null until the first baseline run completes (and
-   * after a target or change_detection update, which resets the baseline).
+   * Comparison baseline, included on Retrieve. Null until capture completes or after
+   * target changes.
    */
   baseline?:
     | MonitorRetrieveResponse.MonitorsPageBaseline
     | MonitorRetrieveResponse.MonitorsSitemapBaseline
     | MonitorRetrieveResponse.MonitorsExtractBaseline
     | null;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorRetrieveResponse.KeyMetadata;
 
   last_change_at?: string | null;
 
@@ -759,16 +767,25 @@ export interface MonitorRetrieveResponse {
   last_run_at?: string | null;
 
   /**
-   * When the next scheduled run is due.
+   * When the next scheduled run is due; null while paused.
    */
   next_run_at?: string | null;
 
   /**
-   * User-defined tags for grouping and filtering monitors and their changes.
-   * Duplicates are removed.
+   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
+   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
+   * between 10 minutes and 1 year.
+   */
+  schedule?: MonitorRetrieveResponse.Schedule;
+
+  /**
+   * Labels for filtering monitors, their changes, and their usage.
    */
   tags?: Array<string>;
 
+  /**
+   * Webhook destination and delivery settings. Null means no webhook is configured.
+   */
   webhook?: MonitorRetrieveResponse.Webhook | null;
 
   /**
@@ -785,37 +802,26 @@ export namespace MonitorRetrieveResponse {
    * sitemap targets, this means URL additions and removals.
    */
   export interface MonitorsExactChangeDetection {
+    /**
+     * Use `exact` to compare visible text or sitemap URLs.
+     */
     type: 'exact';
   }
 
   /**
-   * Detect meaning-level changes to page content, ignoring cosmetic or
-   * instruction-irrelevant differences. Which changes are meaningful is judged
-   * against the page or extract target's `instructions` (and an extract target's
-   * `schema`, when provided).
+   * Detect meaningful content changes using the target’s instructions and optional
+   * schema.
    */
   export interface MonitorsSemanticChangeDetection {
+    /**
+     * Use `semantic` to judge changes against the target instructions.
+     */
     type: 'semantic';
 
-    confidence_threshold?: number;
-  }
-
-  /**
-   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
-   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
-   * between 10 minutes and 1 year.
-   */
-  export interface Schedule {
     /**
-     * Number of units between runs. The resulting interval (frequency × unit) must be
-     * at least 10 minutes and at most 1 year (e.g. minimum 10 when unit is minutes;
-     * maximum 365 when unit is days).
+     * Minimum confidence required to report a meaningful change, from 0 to 1.
      */
-    frequency: number;
-
-    type: 'interval';
-
-    unit: 'minutes' | 'hours' | 'days';
+    confidence_threshold?: number;
   }
 
   /**
@@ -823,24 +829,24 @@ export namespace MonitorRetrieveResponse {
    * detection judges confirmed stable diffs against `instructions`.
    */
   export interface MonitorsPageTarget {
+    /**
+     * Use `page` to watch one web page.
+     */
     type: 'page';
 
+    /**
+     * Public HTTP(S) page URL to monitor.
+     */
     url: string;
 
     /**
-     * CSS selectors for HTML regions to remove before text extraction. Applied after
-     * include_selectors; exclusion takes precedence when an element matches both. Omit
-     * or pass an empty array to apply no explicit exclusions. Changing these selectors
-     * creates a new baseline.
+     * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
 
     /**
-     * CSS selectors defining the HTML regions to monitor. Matching subtrees are
-     * combined in document order before text extraction, instead of automatic
-     * main-content selection. Omit or pass an empty array to use automatic
-     * main-content extraction. If the filtered page has no usable text, the run fails
-     * without replacing the baseline. Changing these selectors creates a new baseline.
+     * Monitor these CSS-selected regions. Empty or omitted uses main content. Changes
+     * create a new baseline.
      */
     include_selectors?: Array<string>;
 
@@ -857,13 +863,12 @@ export namespace MonitorRetrieveResponse {
   }
 
   /**
-   * Watch a sitemap for URL additions and removals. Crawled URLs are normalized
-   * (lowercased host, no trailing slash/fragment) and scoped to the monitored site
-   * and its subdomains before comparison. On a detected difference the sitemap is
-   * re-fetched within the same run and only URLs both observations agree on are
-   * reported, suppressing transient crawl flaps.
+   * Watch a site’s URL inventory for confirmed additions and removals.
    */
   export interface MonitorsSitemapTarget {
+    /**
+     * Use `sitemap` to watch a site for added or removed URLs.
+     */
     type: 'sitemap';
 
     /**
@@ -888,11 +893,8 @@ export namespace MonitorRetrieveResponse {
   }
 
   /**
-   * Watch the monitor-relevant pages of a site for meaningful changes. A crawl
-   * guided by `schema`/`instructions` selects up to `max_pages` relevant pages to
-   * track; each run re-checks exactly those pages, and confirmed content changes are
-   * judged for relevance against the monitor's `instructions` (and `schema`, when
-   * provided). The tracked page set is refreshed by a periodic re-discovery crawl.
+   * Track relevant pages selected by `schema` and `instructions`; refresh the page
+   * set periodically.
    */
   export interface MonitorsExtractTarget {
     /**
@@ -901,6 +903,9 @@ export namespace MonitorRetrieveResponse {
      */
     instructions: string;
 
+    /**
+     * Use `extract` to watch structured data across selected pages.
+     */
     type: 'extract';
 
     /**
@@ -908,6 +913,9 @@ export namespace MonitorRetrieveResponse {
      */
     url: string;
 
+    /**
+     * Allow page discovery on subdomains of the target site.
+     */
     follow_subdomains?: boolean;
 
     /**
@@ -921,14 +929,8 @@ export namespace MonitorRetrieveResponse {
     max_pages?: number;
 
     /**
-     * JSON Schema describing the data you care about. It is used three ways: it guides
-     * which pages are selected for tracking, it gives the change judge extra context
-     * on which changes matter (alongside `instructions`), and it defines the shape of
-     * the baseline `data` snapshot on GET /monitors/{monitor_id} (refreshed at most
-     * about once a day). It is not a response format for changes: change events and
-     * webhook payloads always contain diffs, summaries, and evidence excerpts — never
-     * data in this schema's shape. If omitted, a default summary + key-points schema
-     * is used.
+     * JSON Schema for page selection and the baseline snapshot. Changes return diffs
+     * and evidence.
      */
     schema?: { [key: string]: unknown };
   }
@@ -980,10 +982,8 @@ export namespace MonitorRetrieveResponse {
     captured_at: string;
 
     /**
-     * The extracted structured data, matching the monitor's extraction schema (same
-     * shape as the /web/extract endpoint's `data`). Refreshed when the monitor
-     * re-discovers its page set (at most about once a day); `null` when no extraction
-     * has been captured yet.
+     * Latest structured snapshot matching the extraction schema, refreshed at most
+     * daily; `null` before capture.
      */
     data: unknown;
 
@@ -991,6 +991,21 @@ export namespace MonitorRetrieveResponse {
      * The page URLs the monitor tracks and analyzes for changes.
      */
     urls_analyzed: Array<string>;
+  }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
   }
 
   /**
@@ -1002,18 +1017,43 @@ export namespace MonitorRetrieveResponse {
     message: string;
   }
 
+  /**
+   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
+   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
+   * between 10 minutes and 1 year.
+   */
+  export interface Schedule {
+    /**
+     * Number of units between runs. The resulting interval (frequency × unit) must be
+     * at least 10 minutes and at most 1 year (e.g. minimum 10 when unit is minutes;
+     * maximum 365 when unit is days).
+     */
+    frequency: number;
+
+    /**
+     * Use `interval` to run on a repeating schedule.
+     */
+    type: 'interval';
+
+    /**
+     * Time unit used with `frequency` to set the run interval.
+     */
+    unit: 'minutes' | 'hours' | 'days';
+  }
+
+  /**
+   * Webhook destination and delivery settings. Null means no webhook is configured.
+   */
   export interface Webhook {
     /**
-     * Webhook URL events are delivered to. Slack incoming webhook URLs are
-     * automatically formatted as Slack messages.
+     * Public HTTP(S) URL that receives events. Slack and GovSlack URLs get formatted
+     * messages.
      */
     url: string;
 
     /**
-     * Events delivered to this endpoint. `change.detected` fires only when a run
-     * detects a change; `run.completed` fires on every completed run — including runs
-     * that detected no change — and embeds the change when one was detected. Defaults
-     * to `["change.detected"]` when omitted.
+     * Events to deliver. Defaults to `change.detected`; `run.completed` also includes
+     * unchanged runs.
      */
     events?: Array<'change.detected' | 'run.completed'>;
 
@@ -1023,12 +1063,8 @@ export namespace MonitorRetrieveResponse {
     retry?: WebhooksAPI.RetryConfig;
 
     /**
-     * Signing secret used to verify webhook authenticity. Omitted unless the API key
-     * has monitors:write permission or full access. Each delivery includes an
-     * `X-Context-Signature: t=<unix>,v1=<hmac>` header, where the HMAC is SHA-256 over
-     * `"{t}.{rawRequestBody}"` keyed by this secret. Recompute it with a constant-time
-     * compare and reject stale timestamps to prevent replay. Generated by the API;
-     * cannot be set by clients.
+     * API-generated signing secret. Visible only with full access or `monitors:write`
+     * permission.
      */
     secret?: string;
   }
@@ -1060,15 +1096,12 @@ export namespace MonitorRetrieveResponse {
   }
 }
 
-/**
- * A web monitor. `mode` is the constant `web`; behavior is described by `target`
- * (page/sitemap/extract) and `change_detection` (exact/semantic).
- */
 export interface MonitorUpdateResponse {
   id: string;
 
   /**
-   * Discriminated union describing how changes are detected.
+   * How changes are judged. Defaults to `semantic` for extract targets and page
+   * targets with `instructions`, otherwise `exact`.
    */
   change_detection:
     | MonitorUpdateResponse.MonitorsExactChangeDetection
@@ -1077,31 +1110,26 @@ export interface MonitorUpdateResponse {
   created_at: string;
 
   /**
-   * Top-level monitor category. Always `web` today; the concrete behavior is
-   * described by `target` and `change_detection`.
+   * Always `web`. Optional.
    */
   mode: 'web';
 
   name: string;
 
   /**
-   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
-   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
-   * between 10 minutes and 1 year.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
-  schedule: MonitorUpdateResponse.Schedule;
+  request_id: string;
 
   /**
-   * Monitor lifecycle status. `failed` means the most recent run failed (see the
-   * monitor's `last_error`); failed monitors keep running on schedule and flip back
-   * to `active` on the next successful run. Monitors are auto-`paused` after
-   * repeated consecutive failures or insufficient-credit skips; resume by PATCHing
-   * status to `active`.
+   * Current state. Failed monitors keep running; paused monitors must be resumed
+   * with `status: "active"`.
    */
   status: 'active' | 'paused' | 'failed';
 
   /**
-   * Discriminated union describing what the monitor watches.
+   * What to watch: a page, a sitemap, or data extracted from a site.
    */
   target:
     | MonitorUpdateResponse.MonitorsPageTarget
@@ -1111,16 +1139,19 @@ export interface MonitorUpdateResponse {
   updated_at: string;
 
   /**
-   * Current baseline: the last observed value the monitor compares new snapshots
-   * against. Its shape follows `target.type` (page/sitemap/extract). Only populated
-   * on GET /monitors/{monitor_id}; null until the first baseline run completes (and
-   * after a target or change_detection update, which resets the baseline).
+   * Comparison baseline, included on Retrieve. Null until capture completes or after
+   * target changes.
    */
   baseline?:
     | MonitorUpdateResponse.MonitorsPageBaseline
     | MonitorUpdateResponse.MonitorsSitemapBaseline
     | MonitorUpdateResponse.MonitorsExtractBaseline
     | null;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorUpdateResponse.KeyMetadata;
 
   last_change_at?: string | null;
 
@@ -1132,16 +1163,25 @@ export interface MonitorUpdateResponse {
   last_run_at?: string | null;
 
   /**
-   * When the next scheduled run is due.
+   * When the next scheduled run is due; null while paused.
    */
   next_run_at?: string | null;
 
   /**
-   * User-defined tags for grouping and filtering monitors and their changes.
-   * Duplicates are removed.
+   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
+   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
+   * between 10 minutes and 1 year.
+   */
+  schedule?: MonitorUpdateResponse.Schedule;
+
+  /**
+   * Labels for filtering monitors, their changes, and their usage.
    */
   tags?: Array<string>;
 
+  /**
+   * Webhook destination and delivery settings. Null means no webhook is configured.
+   */
   webhook?: MonitorUpdateResponse.Webhook | null;
 
   /**
@@ -1158,37 +1198,26 @@ export namespace MonitorUpdateResponse {
    * sitemap targets, this means URL additions and removals.
    */
   export interface MonitorsExactChangeDetection {
+    /**
+     * Use `exact` to compare visible text or sitemap URLs.
+     */
     type: 'exact';
   }
 
   /**
-   * Detect meaning-level changes to page content, ignoring cosmetic or
-   * instruction-irrelevant differences. Which changes are meaningful is judged
-   * against the page or extract target's `instructions` (and an extract target's
-   * `schema`, when provided).
+   * Detect meaningful content changes using the target’s instructions and optional
+   * schema.
    */
   export interface MonitorsSemanticChangeDetection {
+    /**
+     * Use `semantic` to judge changes against the target instructions.
+     */
     type: 'semantic';
 
-    confidence_threshold?: number;
-  }
-
-  /**
-   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
-   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
-   * between 10 minutes and 1 year.
-   */
-  export interface Schedule {
     /**
-     * Number of units between runs. The resulting interval (frequency × unit) must be
-     * at least 10 minutes and at most 1 year (e.g. minimum 10 when unit is minutes;
-     * maximum 365 when unit is days).
+     * Minimum confidence required to report a meaningful change, from 0 to 1.
      */
-    frequency: number;
-
-    type: 'interval';
-
-    unit: 'minutes' | 'hours' | 'days';
+    confidence_threshold?: number;
   }
 
   /**
@@ -1196,24 +1225,24 @@ export namespace MonitorUpdateResponse {
    * detection judges confirmed stable diffs against `instructions`.
    */
   export interface MonitorsPageTarget {
+    /**
+     * Use `page` to watch one web page.
+     */
     type: 'page';
 
+    /**
+     * Public HTTP(S) page URL to monitor.
+     */
     url: string;
 
     /**
-     * CSS selectors for HTML regions to remove before text extraction. Applied after
-     * include_selectors; exclusion takes precedence when an element matches both. Omit
-     * or pass an empty array to apply no explicit exclusions. Changing these selectors
-     * creates a new baseline.
+     * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
 
     /**
-     * CSS selectors defining the HTML regions to monitor. Matching subtrees are
-     * combined in document order before text extraction, instead of automatic
-     * main-content selection. Omit or pass an empty array to use automatic
-     * main-content extraction. If the filtered page has no usable text, the run fails
-     * without replacing the baseline. Changing these selectors creates a new baseline.
+     * Monitor these CSS-selected regions. Empty or omitted uses main content. Changes
+     * create a new baseline.
      */
     include_selectors?: Array<string>;
 
@@ -1230,13 +1259,12 @@ export namespace MonitorUpdateResponse {
   }
 
   /**
-   * Watch a sitemap for URL additions and removals. Crawled URLs are normalized
-   * (lowercased host, no trailing slash/fragment) and scoped to the monitored site
-   * and its subdomains before comparison. On a detected difference the sitemap is
-   * re-fetched within the same run and only URLs both observations agree on are
-   * reported, suppressing transient crawl flaps.
+   * Watch a site’s URL inventory for confirmed additions and removals.
    */
   export interface MonitorsSitemapTarget {
+    /**
+     * Use `sitemap` to watch a site for added or removed URLs.
+     */
     type: 'sitemap';
 
     /**
@@ -1261,11 +1289,8 @@ export namespace MonitorUpdateResponse {
   }
 
   /**
-   * Watch the monitor-relevant pages of a site for meaningful changes. A crawl
-   * guided by `schema`/`instructions` selects up to `max_pages` relevant pages to
-   * track; each run re-checks exactly those pages, and confirmed content changes are
-   * judged for relevance against the monitor's `instructions` (and `schema`, when
-   * provided). The tracked page set is refreshed by a periodic re-discovery crawl.
+   * Track relevant pages selected by `schema` and `instructions`; refresh the page
+   * set periodically.
    */
   export interface MonitorsExtractTarget {
     /**
@@ -1274,6 +1299,9 @@ export namespace MonitorUpdateResponse {
      */
     instructions: string;
 
+    /**
+     * Use `extract` to watch structured data across selected pages.
+     */
     type: 'extract';
 
     /**
@@ -1281,6 +1309,9 @@ export namespace MonitorUpdateResponse {
      */
     url: string;
 
+    /**
+     * Allow page discovery on subdomains of the target site.
+     */
     follow_subdomains?: boolean;
 
     /**
@@ -1294,14 +1325,8 @@ export namespace MonitorUpdateResponse {
     max_pages?: number;
 
     /**
-     * JSON Schema describing the data you care about. It is used three ways: it guides
-     * which pages are selected for tracking, it gives the change judge extra context
-     * on which changes matter (alongside `instructions`), and it defines the shape of
-     * the baseline `data` snapshot on GET /monitors/{monitor_id} (refreshed at most
-     * about once a day). It is not a response format for changes: change events and
-     * webhook payloads always contain diffs, summaries, and evidence excerpts — never
-     * data in this schema's shape. If omitted, a default summary + key-points schema
-     * is used.
+     * JSON Schema for page selection and the baseline snapshot. Changes return diffs
+     * and evidence.
      */
     schema?: { [key: string]: unknown };
   }
@@ -1353,10 +1378,8 @@ export namespace MonitorUpdateResponse {
     captured_at: string;
 
     /**
-     * The extracted structured data, matching the monitor's extraction schema (same
-     * shape as the /web/extract endpoint's `data`). Refreshed when the monitor
-     * re-discovers its page set (at most about once a day); `null` when no extraction
-     * has been captured yet.
+     * Latest structured snapshot matching the extraction schema, refreshed at most
+     * daily; `null` before capture.
      */
     data: unknown;
 
@@ -1364,6 +1387,21 @@ export namespace MonitorUpdateResponse {
      * The page URLs the monitor tracks and analyzes for changes.
      */
     urls_analyzed: Array<string>;
+  }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
   }
 
   /**
@@ -1375,18 +1413,43 @@ export namespace MonitorUpdateResponse {
     message: string;
   }
 
+  /**
+   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
+   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
+   * between 10 minutes and 1 year.
+   */
+  export interface Schedule {
+    /**
+     * Number of units between runs. The resulting interval (frequency × unit) must be
+     * at least 10 minutes and at most 1 year (e.g. minimum 10 when unit is minutes;
+     * maximum 365 when unit is days).
+     */
+    frequency: number;
+
+    /**
+     * Use `interval` to run on a repeating schedule.
+     */
+    type: 'interval';
+
+    /**
+     * Time unit used with `frequency` to set the run interval.
+     */
+    unit: 'minutes' | 'hours' | 'days';
+  }
+
+  /**
+   * Webhook destination and delivery settings. Null means no webhook is configured.
+   */
   export interface Webhook {
     /**
-     * Webhook URL events are delivered to. Slack incoming webhook URLs are
-     * automatically formatted as Slack messages.
+     * Public HTTP(S) URL that receives events. Slack and GovSlack URLs get formatted
+     * messages.
      */
     url: string;
 
     /**
-     * Events delivered to this endpoint. `change.detected` fires only when a run
-     * detects a change; `run.completed` fires on every completed run — including runs
-     * that detected no change — and embeds the change when one was detected. Defaults
-     * to `["change.detected"]` when omitted.
+     * Events to deliver. Defaults to `change.detected`; `run.completed` also includes
+     * unchanged runs.
      */
     events?: Array<'change.detected' | 'run.completed'>;
 
@@ -1396,12 +1459,8 @@ export namespace MonitorUpdateResponse {
     retry?: WebhooksAPI.RetryConfig;
 
     /**
-     * Signing secret used to verify webhook authenticity. Omitted unless the API key
-     * has monitors:write permission or full access. Each delivery includes an
-     * `X-Context-Signature: t=<unix>,v1=<hmac>` header, where the HMAC is SHA-256 over
-     * `"{t}.{rawRequestBody}"` keyed by this secret. Recompute it with a constant-time
-     * compare and reject stale timestamps to prevent replay. Generated by the API;
-     * cannot be set by clients.
+     * API-generated signing secret. Visible only with full access or `monitors:write`
+     * permission.
      */
     secret?: string;
   }
@@ -1439,6 +1498,17 @@ export interface MonitorListResponse {
   has_more: boolean;
 
   next_cursor: string | null;
+
+  /**
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorListResponse.KeyMetadata;
 }
 
 export namespace MonitorListResponse {
@@ -1450,15 +1520,15 @@ export namespace MonitorListResponse {
     id: string;
 
     /**
-     * Discriminated union describing how changes are detected.
+     * How changes are judged. Defaults to `semantic` for extract targets and page
+     * targets with `instructions`, otherwise `exact`.
      */
     change_detection: Data.MonitorsExactChangeDetection | Data.MonitorsSemanticChangeDetection;
 
     created_at: string;
 
     /**
-     * Top-level monitor category. Always `web` today; the concrete behavior is
-     * described by `target` and `change_detection`.
+     * Always `web`. Optional.
      */
     mode: 'web';
 
@@ -1472,26 +1542,21 @@ export namespace MonitorListResponse {
     schedule: Data.Schedule;
 
     /**
-     * Monitor lifecycle status. `failed` means the most recent run failed (see the
-     * monitor's `last_error`); failed monitors keep running on schedule and flip back
-     * to `active` on the next successful run. Monitors are auto-`paused` after
-     * repeated consecutive failures or insufficient-credit skips; resume by PATCHing
-     * status to `active`.
+     * Current state. Failed monitors keep running; paused monitors must be resumed
+     * with `status: "active"`.
      */
     status: 'active' | 'paused' | 'failed';
 
     /**
-     * Discriminated union describing what the monitor watches.
+     * What to watch: a page, a sitemap, or data extracted from a site.
      */
     target: Data.MonitorsPageTarget | Data.MonitorsSitemapTarget | Data.MonitorsExtractTarget;
 
     updated_at: string;
 
     /**
-     * Current baseline: the last observed value the monitor compares new snapshots
-     * against. Its shape follows `target.type` (page/sitemap/extract). Only populated
-     * on GET /monitors/{monitor_id}; null until the first baseline run completes (and
-     * after a target or change_detection update, which resets the baseline).
+     * Comparison baseline, included on Retrieve. Null until capture completes or after
+     * target changes.
      */
     baseline?: Data.MonitorsPageBaseline | Data.MonitorsSitemapBaseline | Data.MonitorsExtractBaseline | null;
 
@@ -1505,16 +1570,18 @@ export namespace MonitorListResponse {
     last_run_at?: string | null;
 
     /**
-     * When the next scheduled run is due.
+     * When the next scheduled run is due; null while paused.
      */
     next_run_at?: string | null;
 
     /**
-     * User-defined tags for grouping and filtering monitors and their changes.
-     * Duplicates are removed.
+     * Labels for filtering monitors, their changes, and their usage.
      */
     tags?: Array<string>;
 
+    /**
+     * Webhook destination and delivery settings. Null means no webhook is configured.
+     */
     webhook?: Data.Webhook | null;
 
     /**
@@ -1531,18 +1598,25 @@ export namespace MonitorListResponse {
      * sitemap targets, this means URL additions and removals.
      */
     export interface MonitorsExactChangeDetection {
+      /**
+       * Use `exact` to compare visible text or sitemap URLs.
+       */
       type: 'exact';
     }
 
     /**
-     * Detect meaning-level changes to page content, ignoring cosmetic or
-     * instruction-irrelevant differences. Which changes are meaningful is judged
-     * against the page or extract target's `instructions` (and an extract target's
-     * `schema`, when provided).
+     * Detect meaningful content changes using the target’s instructions and optional
+     * schema.
      */
     export interface MonitorsSemanticChangeDetection {
+      /**
+       * Use `semantic` to judge changes against the target instructions.
+       */
       type: 'semantic';
 
+      /**
+       * Minimum confidence required to report a meaningful change, from 0 to 1.
+       */
       confidence_threshold?: number;
     }
 
@@ -1559,8 +1633,14 @@ export namespace MonitorListResponse {
        */
       frequency: number;
 
+      /**
+       * Use `interval` to run on a repeating schedule.
+       */
       type: 'interval';
 
+      /**
+       * Time unit used with `frequency` to set the run interval.
+       */
       unit: 'minutes' | 'hours' | 'days';
     }
 
@@ -1569,24 +1649,24 @@ export namespace MonitorListResponse {
      * detection judges confirmed stable diffs against `instructions`.
      */
     export interface MonitorsPageTarget {
+      /**
+       * Use `page` to watch one web page.
+       */
       type: 'page';
 
+      /**
+       * Public HTTP(S) page URL to monitor.
+       */
       url: string;
 
       /**
-       * CSS selectors for HTML regions to remove before text extraction. Applied after
-       * include_selectors; exclusion takes precedence when an element matches both. Omit
-       * or pass an empty array to apply no explicit exclusions. Changing these selectors
-       * creates a new baseline.
+       * Remove matching regions after inclusions. Changes create a new baseline.
        */
       exclude_selectors?: Array<string>;
 
       /**
-       * CSS selectors defining the HTML regions to monitor. Matching subtrees are
-       * combined in document order before text extraction, instead of automatic
-       * main-content selection. Omit or pass an empty array to use automatic
-       * main-content extraction. If the filtered page has no usable text, the run fails
-       * without replacing the baseline. Changing these selectors creates a new baseline.
+       * Monitor these CSS-selected regions. Empty or omitted uses main content. Changes
+       * create a new baseline.
        */
       include_selectors?: Array<string>;
 
@@ -1603,13 +1683,12 @@ export namespace MonitorListResponse {
     }
 
     /**
-     * Watch a sitemap for URL additions and removals. Crawled URLs are normalized
-     * (lowercased host, no trailing slash/fragment) and scoped to the monitored site
-     * and its subdomains before comparison. On a detected difference the sitemap is
-     * re-fetched within the same run and only URLs both observations agree on are
-     * reported, suppressing transient crawl flaps.
+     * Watch a site’s URL inventory for confirmed additions and removals.
      */
     export interface MonitorsSitemapTarget {
+      /**
+       * Use `sitemap` to watch a site for added or removed URLs.
+       */
       type: 'sitemap';
 
       /**
@@ -1634,11 +1713,8 @@ export namespace MonitorListResponse {
     }
 
     /**
-     * Watch the monitor-relevant pages of a site for meaningful changes. A crawl
-     * guided by `schema`/`instructions` selects up to `max_pages` relevant pages to
-     * track; each run re-checks exactly those pages, and confirmed content changes are
-     * judged for relevance against the monitor's `instructions` (and `schema`, when
-     * provided). The tracked page set is refreshed by a periodic re-discovery crawl.
+     * Track relevant pages selected by `schema` and `instructions`; refresh the page
+     * set periodically.
      */
     export interface MonitorsExtractTarget {
       /**
@@ -1647,6 +1723,9 @@ export namespace MonitorListResponse {
        */
       instructions: string;
 
+      /**
+       * Use `extract` to watch structured data across selected pages.
+       */
       type: 'extract';
 
       /**
@@ -1654,6 +1733,9 @@ export namespace MonitorListResponse {
        */
       url: string;
 
+      /**
+       * Allow page discovery on subdomains of the target site.
+       */
       follow_subdomains?: boolean;
 
       /**
@@ -1667,14 +1749,8 @@ export namespace MonitorListResponse {
       max_pages?: number;
 
       /**
-       * JSON Schema describing the data you care about. It is used three ways: it guides
-       * which pages are selected for tracking, it gives the change judge extra context
-       * on which changes matter (alongside `instructions`), and it defines the shape of
-       * the baseline `data` snapshot on GET /monitors/{monitor_id} (refreshed at most
-       * about once a day). It is not a response format for changes: change events and
-       * webhook payloads always contain diffs, summaries, and evidence excerpts — never
-       * data in this schema's shape. If omitted, a default summary + key-points schema
-       * is used.
+       * JSON Schema for page selection and the baseline snapshot. Changes return diffs
+       * and evidence.
        */
       schema?: { [key: string]: unknown };
     }
@@ -1726,10 +1802,8 @@ export namespace MonitorListResponse {
       captured_at: string;
 
       /**
-       * The extracted structured data, matching the monitor's extraction schema (same
-       * shape as the /web/extract endpoint's `data`). Refreshed when the monitor
-       * re-discovers its page set (at most about once a day); `null` when no extraction
-       * has been captured yet.
+       * Latest structured snapshot matching the extraction schema, refreshed at most
+       * daily; `null` before capture.
        */
       data: unknown;
 
@@ -1748,18 +1822,19 @@ export namespace MonitorListResponse {
       message: string;
     }
 
+    /**
+     * Webhook destination and delivery settings. Null means no webhook is configured.
+     */
     export interface Webhook {
       /**
-       * Webhook URL events are delivered to. Slack incoming webhook URLs are
-       * automatically formatted as Slack messages.
+       * Public HTTP(S) URL that receives events. Slack and GovSlack URLs get formatted
+       * messages.
        */
       url: string;
 
       /**
-       * Events delivered to this endpoint. `change.detected` fires only when a run
-       * detects a change; `run.completed` fires on every completed run — including runs
-       * that detected no change — and embeds the change when one was detected. Defaults
-       * to `["change.detected"]` when omitted.
+       * Events to deliver. Defaults to `change.detected`; `run.completed` also includes
+       * unchanged runs.
        */
       events?: Array<'change.detected' | 'run.completed'>;
 
@@ -1769,12 +1844,8 @@ export namespace MonitorListResponse {
       retry?: WebhooksAPI.RetryConfig;
 
       /**
-       * Signing secret used to verify webhook authenticity. Omitted unless the API key
-       * has monitors:write permission or full access. Each delivery includes an
-       * `X-Context-Signature: t=<unix>,v1=<hmac>` header, where the HMAC is SHA-256 over
-       * `"{t}.{rawRequestBody}"` keyed by this secret. Recompute it with a constant-time
-       * compare and reject stale timestamps to prevent replay. Generated by the API;
-       * cannot be set by clients.
+       * API-generated signing secret. Visible only with full access or `monitors:write`
+       * permission.
        */
       secret?: string;
     }
@@ -1805,21 +1876,75 @@ export namespace MonitorListResponse {
       last_status: 'rejected' | 'failed' | 'skipped_unsafe_url';
     }
   }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
 }
 
 export interface MonitorDeleteResponse {
   id: string;
 
   deleted: boolean;
+
+  /**
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorDeleteResponse.KeyMetadata;
+}
+
+export namespace MonitorDeleteResponse {
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
 }
 
 export interface MonitorGetCreditUsageResponse {
   data: Array<MonitorGetCreditUsageResponse.Data>;
 
   /**
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
    * Sum of credits across all monitors in the window.
    */
   total_credits: number;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorGetCreditUsageResponse.KeyMetadata;
 }
 
 export namespace MonitorGetCreditUsageResponse {
@@ -1841,12 +1966,26 @@ export namespace MonitorGetCreditUsageResponse {
      */
     runs: number;
   }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
 }
 
 export interface MonitorGetLimitsResponse {
   /**
-   * Maximum number of monitors allowed for the account. Defaults to the plan
-   * allowance unless a custom limit is set for the organization.
+   * Most monitors you can have: your plan's allowance or a custom limit.
    */
   monitors_limit: number;
 
@@ -1856,9 +1995,38 @@ export interface MonitorGetLimitsResponse {
   monitors_used: number;
 
   /**
-   * The plan tier the limit was resolved from.
+   * `starter` means Developer; `pro` means Pro or Growth; `scale` means Scale or
+   * Enterprise.
    */
   plan: 'free' | 'starter' | 'pro' | 'scale';
+
+  /**
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorGetLimitsResponse.KeyMetadata;
+}
+
+export namespace MonitorGetLimitsResponse {
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
 }
 
 export interface MonitorListAccountChangesResponse {
@@ -1867,15 +2035,22 @@ export interface MonitorListAccountChangesResponse {
   has_more: boolean;
 
   next_cursor: string | null;
+
+  /**
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorListAccountChangesResponse.KeyMetadata;
 }
 
 export namespace MonitorListAccountChangesResponse {
   /**
-   * A lightweight change summary. `mode` is the constant `web`; `target_type` and
-   * `change_detection_type` describe the change, and which optional fields are
-   * present depends on them (e.g. sitemap changes include
-   * `added_url_count`/`removed_url_count`; semantic changes include
-   * `confidence`/`importance`).
+   * Detected change, including applicable diffs, URLs, and supporting evidence.
    */
   export interface Data {
     id: string;
@@ -1885,14 +2060,23 @@ export namespace MonitorListAccountChangesResponse {
     detected_at: string;
 
     /**
-     * Top-level monitor category. Always `web` today; the concrete behavior is
-     * described by `target` and `change_detection`.
+     * Always `web`. Optional.
      */
     mode: 'web';
 
     monitor_id: string;
 
+    /**
+     * The run that detected this change.
+     */
+    run_id: string;
+
     summary: string;
+
+    /**
+     * Labels for filtering monitors, their changes, and their usage.
+     */
+    tags: Array<string>;
 
     target_type: 'page' | 'sitemap' | 'extract';
 
@@ -1902,19 +2086,73 @@ export namespace MonitorListAccountChangesResponse {
 
     added_url_count?: number;
 
+    /**
+     * At most 500 URLs are included; the corresponding count field is always exact.
+     */
+    added_urls?: Array<string>;
+
+    after_text_excerpt?: string;
+
+    before_text_excerpt?: string;
+
     confidence?: number;
+
+    /**
+     * Text diff between the previous and current page baseline (page targets).
+     */
+    diff?: string;
+
+    evidence?: Array<Data.Evidence>;
 
     importance?: 'low' | 'medium' | 'high';
 
     matched_url_count?: number;
 
+    /**
+     * At most 500 URLs are included; the corresponding count field is always exact.
+     */
+    matched_urls?: Array<string>;
+
     removed_url_count?: number;
 
     /**
-     * User-defined tags for grouping and filtering monitors and their changes.
-     * Duplicates are removed.
+     * At most 500 URLs are included; the corresponding count field is always exact.
      */
-    tags?: Array<string>;
+    removed_urls?: Array<string>;
+  }
+
+  export namespace Data {
+    export interface Evidence {
+      /**
+       * Snapshot of the content after the change.
+       */
+      after: string;
+
+      /**
+       * Snapshot of the content before the change.
+       */
+      before: string;
+
+      /**
+       * Optional URL the evidence relates to. Absent for whole-target diffs.
+       */
+      url?: string;
+    }
+  }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
   }
 }
 
@@ -1924,6 +2162,17 @@ export interface MonitorListAccountRunsResponse {
   has_more: boolean;
 
   next_cursor: string | null;
+
+  /**
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorListAccountRunsResponse.KeyMetadata;
 }
 
 export namespace MonitorListAccountRunsResponse {
@@ -1948,7 +2197,7 @@ export namespace MonitorListAccountRunsResponse {
     monitor_id: string;
 
     /**
-     * The first run after monitor creation is a baseline run.
+     * A baseline run follows creation or a target or detection change.
      */
     run_type: 'baseline' | 'scheduled';
 
@@ -1981,9 +2230,7 @@ export namespace MonitorListAccountRunsResponse {
     webhook_deliveries?: Array<MonitorsAPI.WebhookDelivery>;
 
     /**
-     * @deprecated Deprecated: use `webhook_deliveries`, which records every attempt
-     * now that a run can deliver multiple events. Omitted when no webhook was
-     * attempted, including historical runs created before delivery tracking was added.
+     * @deprecated Deprecated. Use `webhook_deliveries` for all attempts.
      */
     webhook_delivery?: MonitorsAPI.WebhookDelivery;
 
@@ -2000,6 +2247,21 @@ export namespace MonitorListAccountRunsResponse {
       message: string;
     }
   }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
 }
 
 export interface MonitorListChangesResponse {
@@ -2008,15 +2270,22 @@ export interface MonitorListChangesResponse {
   has_more: boolean;
 
   next_cursor: string | null;
+
+  /**
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorListChangesResponse.KeyMetadata;
 }
 
 export namespace MonitorListChangesResponse {
   /**
-   * A lightweight change summary. `mode` is the constant `web`; `target_type` and
-   * `change_detection_type` describe the change, and which optional fields are
-   * present depends on them (e.g. sitemap changes include
-   * `added_url_count`/`removed_url_count`; semantic changes include
-   * `confidence`/`importance`).
+   * Detected change, including applicable diffs, URLs, and supporting evidence.
    */
   export interface Data {
     id: string;
@@ -2026,14 +2295,23 @@ export namespace MonitorListChangesResponse {
     detected_at: string;
 
     /**
-     * Top-level monitor category. Always `web` today; the concrete behavior is
-     * described by `target` and `change_detection`.
+     * Always `web`. Optional.
      */
     mode: 'web';
 
     monitor_id: string;
 
+    /**
+     * The run that detected this change.
+     */
+    run_id: string;
+
     summary: string;
+
+    /**
+     * Labels for filtering monitors, their changes, and their usage.
+     */
+    tags: Array<string>;
 
     target_type: 'page' | 'sitemap' | 'extract';
 
@@ -2043,19 +2321,73 @@ export namespace MonitorListChangesResponse {
 
     added_url_count?: number;
 
+    /**
+     * At most 500 URLs are included; the corresponding count field is always exact.
+     */
+    added_urls?: Array<string>;
+
+    after_text_excerpt?: string;
+
+    before_text_excerpt?: string;
+
     confidence?: number;
+
+    /**
+     * Text diff between the previous and current page baseline (page targets).
+     */
+    diff?: string;
+
+    evidence?: Array<Data.Evidence>;
 
     importance?: 'low' | 'medium' | 'high';
 
     matched_url_count?: number;
 
+    /**
+     * At most 500 URLs are included; the corresponding count field is always exact.
+     */
+    matched_urls?: Array<string>;
+
     removed_url_count?: number;
 
     /**
-     * User-defined tags for grouping and filtering monitors and their changes.
-     * Duplicates are removed.
+     * At most 500 URLs are included; the corresponding count field is always exact.
      */
-    tags?: Array<string>;
+    removed_urls?: Array<string>;
+  }
+
+  export namespace Data {
+    export interface Evidence {
+      /**
+       * Snapshot of the content after the change.
+       */
+      after: string;
+
+      /**
+       * Snapshot of the content before the change.
+       */
+      before: string;
+
+      /**
+       * Optional URL the evidence relates to. Absent for whole-target diffs.
+       */
+      url?: string;
+    }
+  }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
   }
 }
 
@@ -2065,6 +2397,17 @@ export interface MonitorListRunsResponse {
   has_more: boolean;
 
   next_cursor: string | null;
+
+  /**
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorListRunsResponse.KeyMetadata;
 }
 
 export namespace MonitorListRunsResponse {
@@ -2089,7 +2432,7 @@ export namespace MonitorListRunsResponse {
     monitor_id: string;
 
     /**
-     * The first run after monitor creation is a baseline run.
+     * A baseline run follows creation or a target or detection change.
      */
     run_type: 'baseline' | 'scheduled';
 
@@ -2122,9 +2465,7 @@ export namespace MonitorListRunsResponse {
     webhook_deliveries?: Array<MonitorsAPI.WebhookDelivery>;
 
     /**
-     * @deprecated Deprecated: use `webhook_deliveries`, which records every attempt
-     * now that a run can deliver multiple events. Omitted when no webhook was
-     * attempted, including historical runs created before delivery tracking was added.
+     * @deprecated Deprecated. Use `webhook_deliveries` for all attempts.
      */
     webhook_delivery?: MonitorsAPI.WebhookDelivery;
 
@@ -2141,15 +2482,23 @@ export namespace MonitorListRunsResponse {
       message: string;
     }
   }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
 }
 
-/**
- * A detected change. `mode` is the constant `web`; `target_type` and
- * `change_detection_type` describe the change, and which optional fields are
- * present depends on them (page: `diff` + excerpts; sitemap:
- * `added_urls`/`removed_urls`; semantic:
- * `confidence`/`importance`/`evidence`/`matched_urls`).
- */
 export interface MonitorRetrieveChangeResponse {
   id: string;
 
@@ -2158,12 +2507,17 @@ export interface MonitorRetrieveChangeResponse {
   detected_at: string;
 
   /**
-   * Top-level monitor category. Always `web` today; the concrete behavior is
-   * described by `target` and `change_detection`.
+   * Always `web`. Optional.
    */
   mode: 'web';
 
   monitor_id: string;
+
+  /**
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
 
   /**
    * The run that detected this change.
@@ -2173,8 +2527,7 @@ export interface MonitorRetrieveChangeResponse {
   summary: string;
 
   /**
-   * User-defined tags for grouping and filtering monitors and their changes.
-   * Duplicates are removed.
+   * Labels for filtering monitors, their changes, and their usage.
    */
   tags: Array<string>;
 
@@ -2205,6 +2558,11 @@ export interface MonitorRetrieveChangeResponse {
   evidence?: Array<MonitorRetrieveChangeResponse.Evidence>;
 
   importance?: 'low' | 'medium' | 'high';
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorRetrieveChangeResponse.KeyMetadata;
 
   matched_url_count?: number;
 
@@ -2238,6 +2596,21 @@ export namespace MonitorRetrieveChangeResponse {
      */
     url?: string;
   }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
 }
 
 export interface MonitorRetrieveRunResponse {
@@ -2261,7 +2634,13 @@ export interface MonitorRetrieveRunResponse {
   monitor_id: string;
 
   /**
-   * The first run after monitor creation is a baseline run.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
+   * A baseline run follows creation or a target or detection change.
    */
   run_type: 'baseline' | 'scheduled';
 
@@ -2280,6 +2659,11 @@ export interface MonitorRetrieveRunResponse {
   error?: MonitorRetrieveRunResponse.Error | null;
 
   /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorRetrieveRunResponse.KeyMetadata;
+
+  /**
    * Why a skipped run never executed; null unless status is `skipped`.
    */
   skip_reason?: 'insufficient_credits' | 'monitor_paused' | 'superseded' | null;
@@ -2294,9 +2678,7 @@ export interface MonitorRetrieveRunResponse {
   webhook_deliveries?: Array<WebhookDelivery>;
 
   /**
-   * @deprecated Deprecated: use `webhook_deliveries`, which records every attempt
-   * now that a run can deliver multiple events. Omitted when no webhook was
-   * attempted, including historical runs created before delivery tracking was added.
+   * @deprecated Deprecated. Use `webhook_deliveries` for all attempts.
    */
   webhook_delivery?: WebhookDelivery;
 
@@ -2312,17 +2694,29 @@ export namespace MonitorRetrieveRunResponse {
 
     message: string;
   }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
 }
 
-/**
- * A web monitor. `mode` is the constant `web`; behavior is described by `target`
- * (page/sitemap/extract) and `change_detection` (exact/semantic).
- */
 export interface MonitorRotateWebhookSecretResponse {
   id: string;
 
   /**
-   * Discriminated union describing how changes are detected.
+   * How changes are judged. Defaults to `semantic` for extract targets and page
+   * targets with `instructions`, otherwise `exact`.
    */
   change_detection:
     | MonitorRotateWebhookSecretResponse.MonitorsExactChangeDetection
@@ -2331,31 +2725,26 @@ export interface MonitorRotateWebhookSecretResponse {
   created_at: string;
 
   /**
-   * Top-level monitor category. Always `web` today; the concrete behavior is
-   * described by `target` and `change_detection`.
+   * Always `web`. Optional.
    */
   mode: 'web';
 
   name: string;
 
   /**
-   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
-   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
-   * between 10 minutes and 1 year.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
-  schedule: MonitorRotateWebhookSecretResponse.Schedule;
+  request_id: string;
 
   /**
-   * Monitor lifecycle status. `failed` means the most recent run failed (see the
-   * monitor's `last_error`); failed monitors keep running on schedule and flip back
-   * to `active` on the next successful run. Monitors are auto-`paused` after
-   * repeated consecutive failures or insufficient-credit skips; resume by PATCHing
-   * status to `active`.
+   * Current state. Failed monitors keep running; paused monitors must be resumed
+   * with `status: "active"`.
    */
   status: 'active' | 'paused' | 'failed';
 
   /**
-   * Discriminated union describing what the monitor watches.
+   * What to watch: a page, a sitemap, or data extracted from a site.
    */
   target:
     | MonitorRotateWebhookSecretResponse.MonitorsPageTarget
@@ -2365,16 +2754,19 @@ export interface MonitorRotateWebhookSecretResponse {
   updated_at: string;
 
   /**
-   * Current baseline: the last observed value the monitor compares new snapshots
-   * against. Its shape follows `target.type` (page/sitemap/extract). Only populated
-   * on GET /monitors/{monitor_id}; null until the first baseline run completes (and
-   * after a target or change_detection update, which resets the baseline).
+   * Comparison baseline, included on Retrieve. Null until capture completes or after
+   * target changes.
    */
   baseline?:
     | MonitorRotateWebhookSecretResponse.MonitorsPageBaseline
     | MonitorRotateWebhookSecretResponse.MonitorsSitemapBaseline
     | MonitorRotateWebhookSecretResponse.MonitorsExtractBaseline
     | null;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorRotateWebhookSecretResponse.KeyMetadata;
 
   last_change_at?: string | null;
 
@@ -2386,16 +2778,25 @@ export interface MonitorRotateWebhookSecretResponse {
   last_run_at?: string | null;
 
   /**
-   * When the next scheduled run is due.
+   * When the next scheduled run is due; null while paused.
    */
   next_run_at?: string | null;
 
   /**
-   * User-defined tags for grouping and filtering monitors and their changes.
-   * Duplicates are removed.
+   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
+   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
+   * between 10 minutes and 1 year.
+   */
+  schedule?: MonitorRotateWebhookSecretResponse.Schedule;
+
+  /**
+   * Labels for filtering monitors, their changes, and their usage.
    */
   tags?: Array<string>;
 
+  /**
+   * Webhook destination and delivery settings. Null means no webhook is configured.
+   */
   webhook?: MonitorRotateWebhookSecretResponse.Webhook | null;
 
   /**
@@ -2412,37 +2813,26 @@ export namespace MonitorRotateWebhookSecretResponse {
    * sitemap targets, this means URL additions and removals.
    */
   export interface MonitorsExactChangeDetection {
+    /**
+     * Use `exact` to compare visible text or sitemap URLs.
+     */
     type: 'exact';
   }
 
   /**
-   * Detect meaning-level changes to page content, ignoring cosmetic or
-   * instruction-irrelevant differences. Which changes are meaningful is judged
-   * against the page or extract target's `instructions` (and an extract target's
-   * `schema`, when provided).
+   * Detect meaningful content changes using the target’s instructions and optional
+   * schema.
    */
   export interface MonitorsSemanticChangeDetection {
+    /**
+     * Use `semantic` to judge changes against the target instructions.
+     */
     type: 'semantic';
 
-    confidence_threshold?: number;
-  }
-
-  /**
-   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
-   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
-   * between 10 minutes and 1 year.
-   */
-  export interface Schedule {
     /**
-     * Number of units between runs. The resulting interval (frequency × unit) must be
-     * at least 10 minutes and at most 1 year (e.g. minimum 10 when unit is minutes;
-     * maximum 365 when unit is days).
+     * Minimum confidence required to report a meaningful change, from 0 to 1.
      */
-    frequency: number;
-
-    type: 'interval';
-
-    unit: 'minutes' | 'hours' | 'days';
+    confidence_threshold?: number;
   }
 
   /**
@@ -2450,24 +2840,24 @@ export namespace MonitorRotateWebhookSecretResponse {
    * detection judges confirmed stable diffs against `instructions`.
    */
   export interface MonitorsPageTarget {
+    /**
+     * Use `page` to watch one web page.
+     */
     type: 'page';
 
+    /**
+     * Public HTTP(S) page URL to monitor.
+     */
     url: string;
 
     /**
-     * CSS selectors for HTML regions to remove before text extraction. Applied after
-     * include_selectors; exclusion takes precedence when an element matches both. Omit
-     * or pass an empty array to apply no explicit exclusions. Changing these selectors
-     * creates a new baseline.
+     * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
 
     /**
-     * CSS selectors defining the HTML regions to monitor. Matching subtrees are
-     * combined in document order before text extraction, instead of automatic
-     * main-content selection. Omit or pass an empty array to use automatic
-     * main-content extraction. If the filtered page has no usable text, the run fails
-     * without replacing the baseline. Changing these selectors creates a new baseline.
+     * Monitor these CSS-selected regions. Empty or omitted uses main content. Changes
+     * create a new baseline.
      */
     include_selectors?: Array<string>;
 
@@ -2484,13 +2874,12 @@ export namespace MonitorRotateWebhookSecretResponse {
   }
 
   /**
-   * Watch a sitemap for URL additions and removals. Crawled URLs are normalized
-   * (lowercased host, no trailing slash/fragment) and scoped to the monitored site
-   * and its subdomains before comparison. On a detected difference the sitemap is
-   * re-fetched within the same run and only URLs both observations agree on are
-   * reported, suppressing transient crawl flaps.
+   * Watch a site’s URL inventory for confirmed additions and removals.
    */
   export interface MonitorsSitemapTarget {
+    /**
+     * Use `sitemap` to watch a site for added or removed URLs.
+     */
     type: 'sitemap';
 
     /**
@@ -2515,11 +2904,8 @@ export namespace MonitorRotateWebhookSecretResponse {
   }
 
   /**
-   * Watch the monitor-relevant pages of a site for meaningful changes. A crawl
-   * guided by `schema`/`instructions` selects up to `max_pages` relevant pages to
-   * track; each run re-checks exactly those pages, and confirmed content changes are
-   * judged for relevance against the monitor's `instructions` (and `schema`, when
-   * provided). The tracked page set is refreshed by a periodic re-discovery crawl.
+   * Track relevant pages selected by `schema` and `instructions`; refresh the page
+   * set periodically.
    */
   export interface MonitorsExtractTarget {
     /**
@@ -2528,6 +2914,9 @@ export namespace MonitorRotateWebhookSecretResponse {
      */
     instructions: string;
 
+    /**
+     * Use `extract` to watch structured data across selected pages.
+     */
     type: 'extract';
 
     /**
@@ -2535,6 +2924,9 @@ export namespace MonitorRotateWebhookSecretResponse {
      */
     url: string;
 
+    /**
+     * Allow page discovery on subdomains of the target site.
+     */
     follow_subdomains?: boolean;
 
     /**
@@ -2548,14 +2940,8 @@ export namespace MonitorRotateWebhookSecretResponse {
     max_pages?: number;
 
     /**
-     * JSON Schema describing the data you care about. It is used three ways: it guides
-     * which pages are selected for tracking, it gives the change judge extra context
-     * on which changes matter (alongside `instructions`), and it defines the shape of
-     * the baseline `data` snapshot on GET /monitors/{monitor_id} (refreshed at most
-     * about once a day). It is not a response format for changes: change events and
-     * webhook payloads always contain diffs, summaries, and evidence excerpts — never
-     * data in this schema's shape. If omitted, a default summary + key-points schema
-     * is used.
+     * JSON Schema for page selection and the baseline snapshot. Changes return diffs
+     * and evidence.
      */
     schema?: { [key: string]: unknown };
   }
@@ -2607,10 +2993,8 @@ export namespace MonitorRotateWebhookSecretResponse {
     captured_at: string;
 
     /**
-     * The extracted structured data, matching the monitor's extraction schema (same
-     * shape as the /web/extract endpoint's `data`). Refreshed when the monitor
-     * re-discovers its page set (at most about once a day); `null` when no extraction
-     * has been captured yet.
+     * Latest structured snapshot matching the extraction schema, refreshed at most
+     * daily; `null` before capture.
      */
     data: unknown;
 
@@ -2618,6 +3002,21 @@ export namespace MonitorRotateWebhookSecretResponse {
      * The page URLs the monitor tracks and analyzes for changes.
      */
     urls_analyzed: Array<string>;
+  }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
   }
 
   /**
@@ -2629,18 +3028,43 @@ export namespace MonitorRotateWebhookSecretResponse {
     message: string;
   }
 
+  /**
+   * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
+   * every 6 hours or every 2 days. The total interval (frequency × unit) must be
+   * between 10 minutes and 1 year.
+   */
+  export interface Schedule {
+    /**
+     * Number of units between runs. The resulting interval (frequency × unit) must be
+     * at least 10 minutes and at most 1 year (e.g. minimum 10 when unit is minutes;
+     * maximum 365 when unit is days).
+     */
+    frequency: number;
+
+    /**
+     * Use `interval` to run on a repeating schedule.
+     */
+    type: 'interval';
+
+    /**
+     * Time unit used with `frequency` to set the run interval.
+     */
+    unit: 'minutes' | 'hours' | 'days';
+  }
+
+  /**
+   * Webhook destination and delivery settings. Null means no webhook is configured.
+   */
   export interface Webhook {
     /**
-     * Webhook URL events are delivered to. Slack incoming webhook URLs are
-     * automatically formatted as Slack messages.
+     * Public HTTP(S) URL that receives events. Slack and GovSlack URLs get formatted
+     * messages.
      */
     url: string;
 
     /**
-     * Events delivered to this endpoint. `change.detected` fires only when a run
-     * detects a change; `run.completed` fires on every completed run — including runs
-     * that detected no change — and embeds the change when one was detected. Defaults
-     * to `["change.detected"]` when omitted.
+     * Events to deliver. Defaults to `change.detected`; `run.completed` also includes
+     * unchanged runs.
      */
     events?: Array<'change.detected' | 'run.completed'>;
 
@@ -2650,12 +3074,8 @@ export namespace MonitorRotateWebhookSecretResponse {
     retry?: WebhooksAPI.RetryConfig;
 
     /**
-     * Signing secret used to verify webhook authenticity. Omitted unless the API key
-     * has monitors:write permission or full access. Each delivery includes an
-     * `X-Context-Signature: t=<unix>,v1=<hmac>` header, where the HMAC is SHA-256 over
-     * `"{t}.{rawRequestBody}"` keyed by this secret. Recompute it with a constant-time
-     * compare and reject stale timestamps to prevent replay. Generated by the API;
-     * cannot be set by clients.
+     * API-generated signing secret. Visible only with full access or `monitors:write`
+     * permission.
      */
     secret?: string;
   }
@@ -2693,17 +3113,47 @@ export interface MonitorRunResponse {
   queued: boolean;
 
   /**
-   * The queued run. Poll GET /monitors/{monitor_id}/runs or use it to correlate
-   * results.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
+   * ID of the queued run; pass it to Retrieve a monitor run.
    */
   run_id: string;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: MonitorRunResponse.KeyMetadata;
+}
+
+export namespace MonitorRunResponse {
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
 }
 
 export interface MonitorCreateParams {
+  /**
+   * Display name for the monitor.
+   */
   name: string;
 
   /**
-   * Discriminated union describing what the monitor watches.
+   * What to watch: a page, a sitemap, or data extracted from a site.
    */
   target:
     | MonitorCreateParams.MonitorsPageTarget
@@ -2711,15 +3161,15 @@ export interface MonitorCreateParams {
     | MonitorCreateParams.MonitorsExtractTarget;
 
   /**
-   * Discriminated union describing how changes are detected.
+   * How changes are judged. Defaults to `semantic` for extract targets and page
+   * targets with `instructions`, otherwise `exact`.
    */
   change_detection?:
     | MonitorCreateParams.MonitorsExactChangeDetection
     | MonitorCreateParams.MonitorsSemanticChangeDetection;
 
   /**
-   * Top-level monitor category. Always `web` today; the concrete behavior is
-   * described by `target` and `change_detection`.
+   * Always `web`. Optional.
    */
   mode?: 'web';
 
@@ -2731,11 +3181,13 @@ export interface MonitorCreateParams {
   schedule?: MonitorCreateParams.Schedule;
 
   /**
-   * User-defined tags for grouping and filtering monitors and their changes.
-   * Duplicates are removed.
+   * Labels for filtering monitors, their changes, and their usage.
    */
   tags?: Array<string>;
 
+  /**
+   * Webhook destination and delivery settings. Null means no webhook is configured.
+   */
   webhook?: MonitorCreateParams.Webhook | null;
 }
 
@@ -2745,24 +3197,24 @@ export namespace MonitorCreateParams {
    * detection judges confirmed stable diffs against `instructions`.
    */
   export interface MonitorsPageTarget {
+    /**
+     * Use `page` to watch one web page.
+     */
     type: 'page';
 
+    /**
+     * Public HTTP(S) page URL to monitor.
+     */
     url: string;
 
     /**
-     * CSS selectors for HTML regions to remove before text extraction. Applied after
-     * include_selectors; exclusion takes precedence when an element matches both. Omit
-     * or pass an empty array to apply no explicit exclusions. Changing these selectors
-     * creates a new baseline.
+     * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
 
     /**
-     * CSS selectors defining the HTML regions to monitor. Matching subtrees are
-     * combined in document order before text extraction, instead of automatic
-     * main-content selection. Omit or pass an empty array to use automatic
-     * main-content extraction. If the filtered page has no usable text, the run fails
-     * without replacing the baseline. Changing these selectors creates a new baseline.
+     * Monitor these CSS-selected regions. Empty or omitted uses main content. Changes
+     * create a new baseline.
      */
     include_selectors?: Array<string>;
 
@@ -2779,13 +3231,12 @@ export namespace MonitorCreateParams {
   }
 
   /**
-   * Watch a sitemap for URL additions and removals. Crawled URLs are normalized
-   * (lowercased host, no trailing slash/fragment) and scoped to the monitored site
-   * and its subdomains before comparison. On a detected difference the sitemap is
-   * re-fetched within the same run and only URLs both observations agree on are
-   * reported, suppressing transient crawl flaps.
+   * Watch a site’s URL inventory for confirmed additions and removals.
    */
   export interface MonitorsSitemapTarget {
+    /**
+     * Use `sitemap` to watch a site for added or removed URLs.
+     */
     type: 'sitemap';
 
     /**
@@ -2810,11 +3261,8 @@ export namespace MonitorCreateParams {
   }
 
   /**
-   * Watch the monitor-relevant pages of a site for meaningful changes. A crawl
-   * guided by `schema`/`instructions` selects up to `max_pages` relevant pages to
-   * track; each run re-checks exactly those pages, and confirmed content changes are
-   * judged for relevance against the monitor's `instructions` (and `schema`, when
-   * provided). The tracked page set is refreshed by a periodic re-discovery crawl.
+   * Track relevant pages selected by `schema` and `instructions`; refresh the page
+   * set periodically.
    */
   export interface MonitorsExtractTarget {
     /**
@@ -2823,6 +3271,9 @@ export namespace MonitorCreateParams {
      */
     instructions: string;
 
+    /**
+     * Use `extract` to watch structured data across selected pages.
+     */
     type: 'extract';
 
     /**
@@ -2830,6 +3281,9 @@ export namespace MonitorCreateParams {
      */
     url: string;
 
+    /**
+     * Allow page discovery on subdomains of the target site.
+     */
     follow_subdomains?: boolean;
 
     /**
@@ -2843,14 +3297,8 @@ export namespace MonitorCreateParams {
     max_pages?: number;
 
     /**
-     * JSON Schema describing the data you care about. It is used three ways: it guides
-     * which pages are selected for tracking, it gives the change judge extra context
-     * on which changes matter (alongside `instructions`), and it defines the shape of
-     * the baseline `data` snapshot on GET /monitors/{monitor_id} (refreshed at most
-     * about once a day). It is not a response format for changes: change events and
-     * webhook payloads always contain diffs, summaries, and evidence excerpts — never
-     * data in this schema's shape. If omitted, a default summary + key-points schema
-     * is used.
+     * JSON Schema for page selection and the baseline snapshot. Changes return diffs
+     * and evidence.
      */
     schema?: { [key: string]: unknown };
   }
@@ -2860,18 +3308,25 @@ export namespace MonitorCreateParams {
    * sitemap targets, this means URL additions and removals.
    */
   export interface MonitorsExactChangeDetection {
+    /**
+     * Use `exact` to compare visible text or sitemap URLs.
+     */
     type: 'exact';
   }
 
   /**
-   * Detect meaning-level changes to page content, ignoring cosmetic or
-   * instruction-irrelevant differences. Which changes are meaningful is judged
-   * against the page or extract target's `instructions` (and an extract target's
-   * `schema`, when provided).
+   * Detect meaningful content changes using the target’s instructions and optional
+   * schema.
    */
   export interface MonitorsSemanticChangeDetection {
+    /**
+     * Use `semantic` to judge changes against the target instructions.
+     */
     type: 'semantic';
 
+    /**
+     * Minimum confidence required to report a meaningful change, from 0 to 1.
+     */
     confidence_threshold?: number;
   }
 
@@ -2888,23 +3343,30 @@ export namespace MonitorCreateParams {
      */
     frequency: number;
 
+    /**
+     * Use `interval` to run on a repeating schedule.
+     */
     type: 'interval';
 
+    /**
+     * Time unit used with `frequency` to set the run interval.
+     */
     unit: 'minutes' | 'hours' | 'days';
   }
 
+  /**
+   * Webhook destination and delivery settings. Null means no webhook is configured.
+   */
   export interface Webhook {
     /**
-     * Webhook URL events are delivered to. Slack incoming webhook URLs are
-     * automatically formatted as Slack messages.
+     * Public HTTP(S) URL that receives events. Slack and GovSlack URLs get formatted
+     * messages.
      */
     url: string;
 
     /**
-     * Events delivered to this endpoint. `change.detected` fires only when a run
-     * detects a change; `run.completed` fires on every completed run — including runs
-     * that detected no change — and embeds the change when one was detected. Defaults
-     * to `["change.detected"]` when omitted.
+     * Events to deliver. Defaults to `change.detected`; `run.completed` also includes
+     * unchanged runs.
      */
     events?: Array<'change.detected' | 'run.completed'>;
 
@@ -2917,12 +3379,16 @@ export namespace MonitorCreateParams {
 
 export interface MonitorUpdateParams {
   /**
-   * Discriminated union describing how changes are detected.
+   * How changes are judged. Defaults to `semantic` for extract targets and page
+   * targets with `instructions`, otherwise `exact`.
    */
   change_detection?:
     | MonitorUpdateParams.MonitorsExactChangeDetection
     | MonitorUpdateParams.MonitorsSemanticChangeDetection;
 
+  /**
+   * Display name for the monitor.
+   */
   name?: string;
 
   /**
@@ -2932,16 +3398,18 @@ export interface MonitorUpdateParams {
    */
   schedule?: MonitorUpdateParams.Schedule;
 
+  /**
+   * Set `paused` to stop scheduled runs or `active` to resume them.
+   */
   status?: 'active' | 'paused';
 
   /**
-   * User-defined tags for grouping and filtering monitors and their changes.
-   * Duplicates are removed.
+   * Labels for filtering monitors, their changes, and their usage.
    */
   tags?: Array<string>;
 
   /**
-   * Discriminated union describing what the monitor watches.
+   * What to watch: a page, a sitemap, or data extracted from a site.
    */
   target?:
     | MonitorUpdateParams.MonitorsPageTarget
@@ -2949,7 +3417,7 @@ export interface MonitorUpdateParams {
     | MonitorUpdateParams.MonitorsExtractTarget;
 
   /**
-   * Set to null to remove the webhook.
+   * Set to null to remove the webhook. Changing `url` issues a new secret.
    */
   webhook?: MonitorUpdateParams.Webhook | null;
 }
@@ -2960,18 +3428,25 @@ export namespace MonitorUpdateParams {
    * sitemap targets, this means URL additions and removals.
    */
   export interface MonitorsExactChangeDetection {
+    /**
+     * Use `exact` to compare visible text or sitemap URLs.
+     */
     type: 'exact';
   }
 
   /**
-   * Detect meaning-level changes to page content, ignoring cosmetic or
-   * instruction-irrelevant differences. Which changes are meaningful is judged
-   * against the page or extract target's `instructions` (and an extract target's
-   * `schema`, when provided).
+   * Detect meaningful content changes using the target’s instructions and optional
+   * schema.
    */
   export interface MonitorsSemanticChangeDetection {
+    /**
+     * Use `semantic` to judge changes against the target instructions.
+     */
     type: 'semantic';
 
+    /**
+     * Minimum confidence required to report a meaningful change, from 0 to 1.
+     */
     confidence_threshold?: number;
   }
 
@@ -2988,8 +3463,14 @@ export namespace MonitorUpdateParams {
      */
     frequency: number;
 
+    /**
+     * Use `interval` to run on a repeating schedule.
+     */
     type: 'interval';
 
+    /**
+     * Time unit used with `frequency` to set the run interval.
+     */
     unit: 'minutes' | 'hours' | 'days';
   }
 
@@ -2998,24 +3479,24 @@ export namespace MonitorUpdateParams {
    * detection judges confirmed stable diffs against `instructions`.
    */
   export interface MonitorsPageTarget {
+    /**
+     * Use `page` to watch one web page.
+     */
     type: 'page';
 
+    /**
+     * Public HTTP(S) page URL to monitor.
+     */
     url: string;
 
     /**
-     * CSS selectors for HTML regions to remove before text extraction. Applied after
-     * include_selectors; exclusion takes precedence when an element matches both. Omit
-     * or pass an empty array to apply no explicit exclusions. Changing these selectors
-     * creates a new baseline.
+     * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
 
     /**
-     * CSS selectors defining the HTML regions to monitor. Matching subtrees are
-     * combined in document order before text extraction, instead of automatic
-     * main-content selection. Omit or pass an empty array to use automatic
-     * main-content extraction. If the filtered page has no usable text, the run fails
-     * without replacing the baseline. Changing these selectors creates a new baseline.
+     * Monitor these CSS-selected regions. Empty or omitted uses main content. Changes
+     * create a new baseline.
      */
     include_selectors?: Array<string>;
 
@@ -3032,13 +3513,12 @@ export namespace MonitorUpdateParams {
   }
 
   /**
-   * Watch a sitemap for URL additions and removals. Crawled URLs are normalized
-   * (lowercased host, no trailing slash/fragment) and scoped to the monitored site
-   * and its subdomains before comparison. On a detected difference the sitemap is
-   * re-fetched within the same run and only URLs both observations agree on are
-   * reported, suppressing transient crawl flaps.
+   * Watch a site’s URL inventory for confirmed additions and removals.
    */
   export interface MonitorsSitemapTarget {
+    /**
+     * Use `sitemap` to watch a site for added or removed URLs.
+     */
     type: 'sitemap';
 
     /**
@@ -3063,11 +3543,8 @@ export namespace MonitorUpdateParams {
   }
 
   /**
-   * Watch the monitor-relevant pages of a site for meaningful changes. A crawl
-   * guided by `schema`/`instructions` selects up to `max_pages` relevant pages to
-   * track; each run re-checks exactly those pages, and confirmed content changes are
-   * judged for relevance against the monitor's `instructions` (and `schema`, when
-   * provided). The tracked page set is refreshed by a periodic re-discovery crawl.
+   * Track relevant pages selected by `schema` and `instructions`; refresh the page
+   * set periodically.
    */
   export interface MonitorsExtractTarget {
     /**
@@ -3076,6 +3553,9 @@ export namespace MonitorUpdateParams {
      */
     instructions: string;
 
+    /**
+     * Use `extract` to watch structured data across selected pages.
+     */
     type: 'extract';
 
     /**
@@ -3083,6 +3563,9 @@ export namespace MonitorUpdateParams {
      */
     url: string;
 
+    /**
+     * Allow page discovery on subdomains of the target site.
+     */
     follow_subdomains?: boolean;
 
     /**
@@ -3096,33 +3579,25 @@ export namespace MonitorUpdateParams {
     max_pages?: number;
 
     /**
-     * JSON Schema describing the data you care about. It is used three ways: it guides
-     * which pages are selected for tracking, it gives the change judge extra context
-     * on which changes matter (alongside `instructions`), and it defines the shape of
-     * the baseline `data` snapshot on GET /monitors/{monitor_id} (refreshed at most
-     * about once a day). It is not a response format for changes: change events and
-     * webhook payloads always contain diffs, summaries, and evidence excerpts — never
-     * data in this schema's shape. If omitted, a default summary + key-points schema
-     * is used.
+     * JSON Schema for page selection and the baseline snapshot. Changes return diffs
+     * and evidence.
      */
     schema?: { [key: string]: unknown };
   }
 
   /**
-   * Set to null to remove the webhook.
+   * Set to null to remove the webhook. Changing `url` issues a new secret.
    */
   export interface Webhook {
     /**
-     * Webhook URL events are delivered to. Slack incoming webhook URLs are
-     * automatically formatted as Slack messages.
+     * Public HTTP(S) URL that receives events. Slack and GovSlack URLs get formatted
+     * messages.
      */
     url: string;
 
     /**
-     * Events delivered to this endpoint. `change.detected` fires only when a run
-     * detects a change; `run.completed` fires on every completed run — including runs
-     * that detected no change — and embeds the change when one was detected. Defaults
-     * to `["change.detected"]` when omitted.
+     * Events to deliver. Defaults to `change.detected`; `run.completed` also includes
+     * unchanged runs.
      */
     events?: Array<'change.detected' | 'run.completed'>;
 
@@ -3155,8 +3630,8 @@ export interface MonitorListParams {
   q?: string;
 
   /**
-   * Comma-separated fields to search with `q`. Defaults to all of them. Note
-   * `instructions` only exists on extract monitors.
+   * Fields to search with `q`. Defaults to all fields; page and extract targets can
+   * have instructions.
    */
   search_by?: Array<'name' | 'url' | 'instructions' | 'tags'> | null;
 
@@ -3303,6 +3778,9 @@ export interface MonitorListRunsParams {
 }
 
 export interface MonitorRetrieveRunParams {
+  /**
+   * ID of the monitor.
+   */
   monitor_id: string;
 }
 

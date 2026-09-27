@@ -6,11 +6,8 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Brand extends APIResource {
   /**
-   * Retrieve logos, backdrops, colors, industry, description, and more. Provide
-   * exactly one lookup identifier in the request body: a domain, company name, email
-   * address, stock ticker, transaction descriptor, or direct URL. Note:
-   * `by_direct_url` fetches brand data only from the provided URL — not from the
-   * entire internet.
+   * Retrieve logos, colors, company details, and social links using one lookup
+   * identifier. A direct URL limits extraction to that page.
    *
    * @example
    * ```ts
@@ -25,7 +22,8 @@ export class Brand extends APIResource {
   }
 
   /**
-   * Search indexed brands by name or domain
+   * Find up to 10 brands by name or domain, ordered by popularity. Use the returned
+   * domain to retrieve a full brand profile.
    *
    * @example
    * ```ts
@@ -44,9 +42,7 @@ export interface BrandRetrieveResponse {
   brand: BrandRetrieveResponse.Brand;
 
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   cache_metadata: BrandRetrieveResponse.CacheMetadata;
 
@@ -56,18 +52,18 @@ export interface BrandRetrieveResponse {
   code: number;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   /**
-   * Status of the response, e.g., 'ok'
+   * Always `ok` on success.
    */
   status: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: BrandRetrieveResponse.KeyMetadata;
 
@@ -146,7 +142,7 @@ export namespace BrandRetrieveResponse {
     phone?: string;
 
     /**
-     * Language to force for the retrieved brand data.
+     * Language, e.g. `english`.
      */
     primary_language?:
       | 'afrikaans'
@@ -754,7 +750,7 @@ export namespace BrandRetrieveResponse {
       type?: 'icon' | 'logo';
 
       /**
-       * CDN hosted url of the logo (ready for display)
+       * Hosted logo URL.
        */
       url?: string;
     }
@@ -854,9 +850,7 @@ export namespace BrandRetrieveResponse {
   }
 
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   export interface CacheMetadata {
     /**
@@ -872,11 +866,11 @@ export namespace BrandRetrieveResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -889,8 +883,8 @@ export namespace BrandRetrieveResponse {
 
 export interface BrandSearchResponse {
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
@@ -901,7 +895,7 @@ export interface BrandSearchResponse {
   results: Array<BrandSearchResponse.Result>;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: BrandSearchResponse.KeyMetadata;
 }
@@ -926,11 +920,11 @@ export namespace BrandSearchResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -1085,10 +1079,8 @@ export declare namespace BrandRetrieveParams {
       | null;
 
     /**
-     * Maximum age in milliseconds for cached brand data before the API performs a hard
-     * refresh. Defaults to 3 months (7776000000 ms). Set to 0 to always perform a hard
-     * refresh. Negative values are clamped to 0; values above 1 year (31536000000 ms)
-     * are clamped to 1 year.
+     * Maximum age of cached brand data in ms. Defaults to 3 months; clamped to 0–1
+     * year. `0` refreshes.
      */
     maxAgeMs?: number;
 
@@ -1100,35 +1092,29 @@ export declare namespace BrandRetrieveParams {
     maxSpeed?: boolean;
 
     /**
-     * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+     * Labels for filtering usage in the dashboard.
      */
     tags?: Array<string>;
 
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveByDomainRequest.TimeoutOpts;
   }
 
   export namespace BrandRetrieveByDomainRequest {
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     export interface TimeoutOpts {
       /**
-       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       * Deadline in milliseconds.
        */
       milliseconds: number;
 
       /**
-       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-       * credits. "return-partial" returns usable results collected so far; if none are
-       * available, the request still fails without charging credits. Partial results are
-       * not cached as complete results.
+       * "fail" returns 408 at the deadline. "return-partial" returns available results;
+       * inspect the response’s partial flag.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -1275,10 +1261,8 @@ export declare namespace BrandRetrieveParams {
       | null;
 
     /**
-     * Maximum age in milliseconds for cached brand data before the API performs a hard
-     * refresh. Defaults to 3 months (7776000000 ms). Set to 0 to always perform a hard
-     * refresh. Negative values are clamped to 0; values above 1 year (31536000000 ms)
-     * are clamped to 1 year.
+     * Maximum age of cached brand data in ms. Defaults to 3 months; clamped to 0–1
+     * year. `0` refreshes.
      */
     maxAgeMs?: number;
 
@@ -1290,35 +1274,29 @@ export declare namespace BrandRetrieveParams {
     maxSpeed?: boolean;
 
     /**
-     * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+     * Labels for filtering usage in the dashboard.
      */
     tags?: Array<string>;
 
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveByNameRequest.TimeoutOpts;
   }
 
   export namespace BrandRetrieveByNameRequest {
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     export interface TimeoutOpts {
       /**
-       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       * Deadline in milliseconds.
        */
       milliseconds: number;
 
       /**
-       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-       * credits. "return-partial" returns usable results collected so far; if none are
-       * available, the request still fails without charging credits. Partial results are
-       * not cached as complete results.
+       * "fail" returns 408 at the deadline. "return-partial" returns available results;
+       * inspect the response’s partial flag.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -1459,10 +1437,8 @@ export declare namespace BrandRetrieveParams {
       | null;
 
     /**
-     * Maximum age in milliseconds for cached brand data before the API performs a hard
-     * refresh. Defaults to 3 months (7776000000 ms). Set to 0 to always perform a hard
-     * refresh. Negative values are clamped to 0; values above 1 year (31536000000 ms)
-     * are clamped to 1 year.
+     * Maximum age of cached brand data in ms. Defaults to 3 months; clamped to 0–1
+     * year. `0` refreshes.
      */
     maxAgeMs?: number;
 
@@ -1474,35 +1450,29 @@ export declare namespace BrandRetrieveParams {
     maxSpeed?: boolean;
 
     /**
-     * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+     * Labels for filtering usage in the dashboard.
      */
     tags?: Array<string>;
 
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveByEmailRequest.TimeoutOpts;
   }
 
   export namespace BrandRetrieveByEmailRequest {
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     export interface TimeoutOpts {
       /**
-       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       * Deadline in milliseconds.
        */
       milliseconds: number;
 
       /**
-       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-       * credits. "return-partial" returns usable results collected so far; if none are
-       * available, the request still fails without charging credits. Partial results are
-       * not cached as complete results.
+       * "fail" returns 408 at the deadline. "return-partial" returns available results;
+       * inspect the response’s partial flag.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -1643,10 +1613,8 @@ export declare namespace BrandRetrieveParams {
       | null;
 
     /**
-     * Maximum age in milliseconds for cached brand data before the API performs a hard
-     * refresh. Defaults to 3 months (7776000000 ms). Set to 0 to always perform a hard
-     * refresh. Negative values are clamped to 0; values above 1 year (31536000000 ms)
-     * are clamped to 1 year.
+     * Maximum age of cached brand data in ms. Defaults to 3 months; clamped to 0–1
+     * year. `0` refreshes.
      */
     maxAgeMs?: number;
 
@@ -1658,7 +1626,7 @@ export declare namespace BrandRetrieveParams {
     maxSpeed?: boolean;
 
     /**
-     * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+     * Labels for filtering usage in the dashboard.
      */
     tags?: Array<string>;
 
@@ -1668,30 +1636,24 @@ export declare namespace BrandRetrieveParams {
     ticker_exchange?: string;
 
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveByTickerRequest.TimeoutOpts;
   }
 
   export namespace BrandRetrieveByTickerRequest {
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     export interface TimeoutOpts {
       /**
-       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       * Deadline in milliseconds.
        */
       milliseconds: number;
 
       /**
-       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-       * credits. "return-partial" returns usable results collected so far; if none are
-       * available, the request still fails without charging credits. Partial results are
-       * not cached as complete results.
+       * "fail" returns 408 at the deadline. "return-partial" returns available results;
+       * inspect the response’s partial flag.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -1711,35 +1673,29 @@ export declare namespace BrandRetrieveParams {
     type: 'by_direct_url';
 
     /**
-     * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+     * Labels for filtering usage in the dashboard.
      */
     tags?: Array<string>;
 
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveByDirectURLRequest.TimeoutOpts;
   }
 
   export namespace BrandRetrieveByDirectURLRequest {
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     export interface TimeoutOpts {
       /**
-       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       * Deadline in milliseconds.
        */
       milliseconds: number;
 
       /**
-       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-       * credits. "return-partial" returns usable results collected so far; if none are
-       * available, the request still fails without charging credits. Partial results are
-       * not cached as complete results.
+       * "fail" returns 408 at the deadline. "return-partial" returns available results;
+       * inspect the response’s partial flag.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -1915,35 +1871,29 @@ export declare namespace BrandRetrieveParams {
     phone?: string | number;
 
     /**
-     * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+     * Labels for filtering usage in the dashboard.
      */
     tags?: Array<string>;
 
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveFromTransactionRequest.TimeoutOpts;
   }
 
   export namespace BrandRetrieveFromTransactionRequest {
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     export interface TimeoutOpts {
       /**
-       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       * Deadline in milliseconds.
        */
       milliseconds: number;
 
       /**
-       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-       * credits. "return-partial" returns usable results collected so far; if none are
-       * available, the request still fails without charging credits. Partial results are
-       * not cached as complete results.
+       * "fail" returns 408 at the deadline. "return-partial" returns available results;
+       * inspect the response’s partial flag.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -1970,8 +1920,7 @@ export interface BrandSearchParams {
   queryBy?: Array<'name' | 'domain'>;
 
   /**
-   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
-   * characters.
+   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
    */
   tags?: Array<string>;
 

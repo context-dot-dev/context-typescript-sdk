@@ -5,23 +5,19 @@ import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
 /**
- * Search live first-party RSS and free historical news data by company identity.
+ * Search live and historical news about a company.
  */
 export class News extends APIResource {
   /**
-   * Searches live and historical company news for one company, identified in
-   * searchBy by name, domain, ticker (optionally disambiguated by exchange), or
-   * ISIN. Results can be filtered by one of publisher domain, publisher country,
-   * article language, or article type, optionally combined with a published-at date
-   * range, and include stable story IDs, source metadata, verified entity relevance,
-   * and cursor pagination.
+   * Find company news by name, domain, ticker, or ISIN. Filter articles and continue
+   * through results with a cursor.
    *
    * @example
    * ```ts
    * const response = await client.news.search({
    *   searchBy: {
-   *     entity: { name: 'xx', type: 'name' },
    *     type: 'entity',
+   *     entity: { type: 'domain', domain: 'stripe.com' },
    *   },
    * });
    * ```
@@ -54,13 +50,13 @@ export interface NewsSearchResponse {
   next_cursor: string | null;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: NewsSearchResponse.KeyMetadata;
 }
@@ -182,11 +178,11 @@ export namespace NewsSearchResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -226,7 +222,7 @@ export interface NewsSearchParams {
   sortBy?: NewsSearchParams.SortBy;
 
   /**
-   * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+   * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;
 }
@@ -261,6 +257,9 @@ export namespace NewsSearchParams {
        */
       name: string;
 
+      /**
+       * Use `name` to identify the company by name.
+       */
       type: 'name';
     }
 
@@ -273,6 +272,9 @@ export namespace NewsSearchParams {
        */
       domain: string;
 
+      /**
+       * Use `domain` to identify the company by website domain.
+       */
       type: 'domain';
     }
 
@@ -285,6 +287,9 @@ export namespace NewsSearchParams {
        */
       ticker: string;
 
+      /**
+       * Use `ticker` to identify a publicly traded company.
+       */
       type: 'ticker';
 
       /**
@@ -375,6 +380,9 @@ export namespace NewsSearchParams {
        */
       isin: string;
 
+      /**
+       * Use `isin` to identify the company by its securities identifier.
+       */
       type: 'isin';
     }
   }

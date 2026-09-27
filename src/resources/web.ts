@@ -6,11 +6,8 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Web extends APIResource {
   /**
-   * Researches the live web and returns a sourced answer in your requested JSON
-   * shape. Select fast for a smaller research budget at 10 credits or ultra for
-   * deeper reasoning at 100 credits. Defaults to ultra. Fast research is limited to
-   * 30 seconds and ultra to 50 seconds; timeoutOpts.milliseconds can shorten either
-   * deadline.
+   * Research the web and return a sourced answer in your JSON shape. Choose `fast`
+   * for a short task or `ultra` for deeper research.
    *
    * @example
    * ```ts
@@ -47,8 +44,7 @@ export class Web extends APIResource {
   }
 
   /**
-   * Extract a comprehensive design system from a website including colors,
-   * typography, spacing, shadows, and UI components.
+   * Extract colors, typography, spacing, and component styles from a website.
    *
    * @example
    * ```ts
@@ -63,19 +59,13 @@ export class Web extends APIResource {
   }
 
   /**
-   * Discovers URLs using the same sitemap crawl, filters, and limits as
-   * /web/scrape/sitemap. Each URL includes its available title, description,
-   * keywords, and language. URLs without stored enrichment are returned immediately
-   * with only the URL and queued for background HTML scraping, so later requests can
-   * include their metadata. Responses are never cached as a whole; every request
-   * reads the current per-URL enrichment. Zero data retention and credential-bearing
-   * discovery requests return URLs without reading or storing shared enrichment or
-   * queuing background scrapes. Costs 1 credit, or 2 credits with search.
+   * Discover a site's URLs, with page titles, descriptions, keywords, and language
+   * when available. Metadata can be missing on newly discovered URLs.
    *
    * @example
    * ```ts
    * const response = await client.web.mapUrls({
-   *   domain: 'xxx',
+   *   domain: 'stripe.com',
    * });
    * ```
    */
@@ -84,31 +74,13 @@ export class Web extends APIResource {
   }
 
   /**
-   * Reuse cached outputs independently and capture missing formats in one page
-   * visit. Each cache key includes only the settings that affect that output. HTML
-   * is shared with Markdown, parsed fields, product data, highlights, and JSON
-   * extraction. Cached outputs can come from different visits within maxAgeMs; use 0
-   * for a fresh capture. HTML-only requests use the existing fast acquisition path.
-   * Highlights return Markdown excerpts most relevant to highlightsParams.query.
-   * Requests with at least one successful output cost one base credit, including
-   * cache hits, or two with browser actions. All-failed responses are unbilled
-   * except missing pages, which retain the base price and the one-credit product
-   * charge when product was requested. Highlights add 3 credits when passages are
-   * returned. JSON extraction runs an LLM over nonempty page Markdown and adds four
-   * credits only when its result is returned successfully. PDF OCR adds one credit
-   * per recovered page on fresh extraction. Product adds one credit when its
-   * successful result is returned, plus six if that result used the specialized
-   * model. Original response bytes and screenshots are limited to 20 MiB each,
-   * screenshots to 40 megapixels, and the combined response to 60 MiB. An oversized
-   * output has success: false and data: null. If the combined response exceeds its
-   * limit, the largest outputs are marked failed until the remaining outputs fit.
-   * Valid captured pieces may still be cached when omitted to meet the response size
-   * limit.
+   * Returns the outputs you enable in `formats` from one visit to a URL. Each output
+   * reports its own `success`, so a failed output does not fail the request.
    *
    * @example
    * ```ts
    * const response = await client.web.scrape({
-   *   formats: { html: true },
+   *   formats: { markdown: true },
    *   url: 'https://example.com',
    * });
    * ```
@@ -133,11 +105,14 @@ export class Web extends APIResource {
   }
 
   /**
-   * Search the web and optionally scrape each result to Markdown in one round-trip.
+   * Search the web and optionally return page content with each result.
    *
    * @example
    * ```ts
-   * const response = await client.web.search({ query: 'x' });
+   * const response = await client.web.search({
+   *   query: 'Stripe API authentication',
+   *   numResults: 10,
+   * });
    * ```
    */
   search(body: WebSearchParams, options?: RequestOptions): APIPromise<WebSearchResponse> {
@@ -145,13 +120,14 @@ export class Web extends APIResource {
   }
 
   /**
-   * Performs a crawl starting from a given URL, extracts page content as Markdown,
-   * and returns results for all crawled pages.
+   * Crawl a website and return page content as Markdown. Use a batch for crawls
+   * beyond 500 pages.
    *
    * @example
    * ```ts
    * const response = await client.web.webCrawlMd({
    *   url: 'https://example.com',
+   *   maxPages: 10,
    * });
    * ```
    */
@@ -173,7 +149,7 @@ export interface WebAnswersResponse {
   sources: Array<string>;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: WebAnswersResponse.KeyMetadata;
 
@@ -186,11 +162,11 @@ export interface WebAnswersResponse {
 
 export namespace WebAnswersResponse {
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -213,8 +189,8 @@ export interface WebExtractCompetitorsResponse {
   domain: string;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
@@ -229,7 +205,7 @@ export interface WebExtractCompetitorsResponse {
   target: WebExtractCompetitorsResponse.Target;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: WebExtractCompetitorsResponse.KeyMetadata;
 
@@ -299,11 +275,11 @@ export namespace WebExtractCompetitorsResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -316,15 +292,13 @@ export namespace WebExtractCompetitorsResponse {
 
 export interface WebExtractStyleguideResponse {
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   cache_metadata: WebExtractStyleguideResponse.CacheMetadata;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
@@ -339,21 +313,18 @@ export interface WebExtractStyleguideResponse {
   domain?: string;
 
   /**
-   * How complete the returned content is. `loaded` means the page finished the waits
-   * the request asked for. `still-loading` only occurs with
-   * timeoutOpts.behavior=return-partial: the timeoutOpts.milliseconds deadline was
-   * reached first, so the content reflects the DOM at that moment and late-rendering
-   * parts may be missing. Partial results are billed at the base request cost.
+   * `loaded`, or `still-loading` when capture ended before the page finished
+   * loading.
    */
   finalDOMState?: 'loaded' | 'still-loading';
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: WebExtractStyleguideResponse.KeyMetadata;
 
   /**
-   * Status of the response, e.g., 'ok'
+   * Always `ok` on success.
    */
   status?: string;
 
@@ -365,9 +336,7 @@ export interface WebExtractStyleguideResponse {
 
 export namespace WebExtractStyleguideResponse {
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   export interface CacheMetadata {
     /**
@@ -383,11 +352,11 @@ export namespace WebExtractStyleguideResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -525,7 +494,7 @@ export namespace WebExtractStyleguideResponse {
           minHeight: string;
 
           /**
-           * Sampled minimum width of the button box (typically px)
+           * Minimum width (usually px).
            */
           minWidth: string;
 
@@ -586,7 +555,7 @@ export namespace WebExtractStyleguideResponse {
           minHeight: string;
 
           /**
-           * Sampled minimum width of the button box (typically px)
+           * Minimum width (usually px).
            */
           minWidth: string;
 
@@ -647,7 +616,7 @@ export namespace WebExtractStyleguideResponse {
           minHeight: string;
 
           /**
-           * Sampled minimum width of the button box (typically px)
+           * Minimum width (usually px).
            */
           minWidth: string;
 
@@ -790,7 +759,7 @@ export namespace WebExtractStyleguideResponse {
           fontFallbacks: Array<string>;
 
           /**
-           * Primary face (first family in the computed stack)
+           * First font in the stack.
            */
           fontFamily: string;
 
@@ -810,7 +779,7 @@ export namespace WebExtractStyleguideResponse {
           fontFallbacks: Array<string>;
 
           /**
-           * Primary face (first family in the computed stack)
+           * First font in the stack.
            */
           fontFamily: string;
 
@@ -830,7 +799,7 @@ export namespace WebExtractStyleguideResponse {
           fontFallbacks: Array<string>;
 
           /**
-           * Primary face (first family in the computed stack)
+           * First font in the stack.
            */
           fontFamily: string;
 
@@ -850,7 +819,7 @@ export namespace WebExtractStyleguideResponse {
           fontFallbacks: Array<string>;
 
           /**
-           * Primary face (first family in the computed stack)
+           * First font in the stack.
            */
           fontFamily: string;
 
@@ -871,7 +840,7 @@ export namespace WebExtractStyleguideResponse {
         fontFallbacks: Array<string>;
 
         /**
-         * Primary face (first family in the computed stack)
+         * First font in the stack.
          */
         fontFamily: string;
 
@@ -891,8 +860,8 @@ export interface WebMapURLsResponse {
   domain: string;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
@@ -901,7 +870,7 @@ export interface WebMapURLsResponse {
   urls: Array<WebMapURLsResponse.URL>;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: WebMapURLsResponse.KeyMetadata;
 
@@ -922,11 +891,11 @@ export namespace WebMapURLsResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -939,22 +908,18 @@ export namespace WebMapURLsResponse {
 
 export interface WebScrapeResponse {
   /**
-   * Original HTTP response body. Waiting, actions, and content filters never change
-   * it.
+   * The original HTTP response body, unchanged by waits, actions, and filters.
    */
   bytes: WebScrapeResponse.Bytes;
 
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   cache_metadata: WebScrapeResponse.CacheMetadata;
 
   /**
-   * Relevant Markdown excerpts for your question or topic, in page order. Headings
-   * in square brackets supply necessary context; ellipses mark omitted portions.
-   * Empty when the page has no text.
+   * Relevant Markdown excerpts in page order. `[Heading]` adds context; `…` marks
+   * omitted text.
    */
   highlights: WebScrapeResponse.Highlights;
 
@@ -964,12 +929,12 @@ export interface WebScrapeResponse {
   html: WebScrapeResponse.HTML;
 
   /**
-   * Images after content filters. Empty when none are found.
+   * Images after content filters. `[]` when none are found.
    */
   images: WebScrapeResponse.Images;
 
   /**
-   * Page data extracted using your schema.
+   * Object matching `jsonParams.schema`.
    */
   json: WebScrapeResponse.Json;
 
@@ -979,12 +944,13 @@ export interface WebScrapeResponse {
   markdown: WebScrapeResponse.Markdown;
 
   /**
-   * Page details, when available.
+   * Page metadata. Fields are omitted when not found.
    */
   metadata: WebScrapeResponse.Metadata;
 
   /**
-   * Fields produced by parseParams.rules, after shared content filters.
+   * Fields from `parseParams.rules`, after content filters. Unmatched fields are
+   * `null` (`[]` for lists).
    */
   parsed: WebScrapeResponse.Parsed;
 
@@ -994,13 +960,13 @@ export interface WebScrapeResponse {
   product: WebScrapeResponse.Product;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   /**
-   * An image data URL. Use directly as an image src.
+   * Screenshot as a base64 image data URL.
    */
   screenshot: WebScrapeResponse.Screenshot;
 
@@ -1010,24 +976,20 @@ export interface WebScrapeResponse {
   url: string;
 
   /**
-   * Present when at least one requested output succeeds while another fails, or when
-   * successful outputs come from a page that is still loading or images returned
-   * before processing finished. Absent when every requested output fails. Check each
-   * output's success field for its result. Valid captured pieces may be cached
-   * independently; failed retrievals and incomplete captures are not cached.
+   * True when at least one requested output succeeds but the response has failed or
+   * incomplete outputs. Absent when all requested outputs fail.
    */
   isPartial?: true;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: WebScrapeResponse.KeyMetadata;
 }
 
 export namespace WebScrapeResponse {
   /**
-   * Original HTTP response body. Waiting, actions, and content filters never change
-   * it.
+   * The original HTTP response body, unchanged by waits, actions, and filters.
    */
   export interface Bytes {
     data: Bytes.Data | null;
@@ -1035,7 +997,7 @@ export namespace WebScrapeResponse {
     requested: boolean;
 
     /**
-     * True when retrieved, false when retrieval failed, and null when not requested.
+     * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
   }
@@ -1043,8 +1005,7 @@ export namespace WebScrapeResponse {
   export namespace Bytes {
     export interface Data {
       /**
-       * Original response body as base64, after HTTP decompression. Maximum decoded
-       * size: 20 MiB.
+       * Body as base64, after HTTP decompression. Up to 20 MiB decoded.
        */
       base64: string;
 
@@ -1053,9 +1014,7 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   export interface CacheMetadata {
     /**
@@ -1071,9 +1030,8 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Relevant Markdown excerpts for your question or topic, in page order. Headings
-   * in square brackets supply necessary context; ellipses mark omitted portions.
-   * Empty when the page has no text.
+   * Relevant Markdown excerpts in page order. `[Heading]` adds context; `…` marks
+   * omitted text.
    */
   export interface Highlights {
     data: Array<string> | null;
@@ -1081,7 +1039,7 @@ export namespace WebScrapeResponse {
     requested: boolean;
 
     /**
-     * True when retrieved, false when retrieval failed, and null when not requested.
+     * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
   }
@@ -1095,13 +1053,13 @@ export namespace WebScrapeResponse {
     requested: boolean;
 
     /**
-     * True when retrieved, false when retrieval failed, and null when not requested.
+     * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
   }
 
   /**
-   * Images after content filters. Empty when none are found.
+   * Images after content filters. `[]` when none are found.
    */
   export interface Images {
     data: Array<Images.Data> | null;
@@ -1109,7 +1067,7 @@ export namespace WebScrapeResponse {
     requested: boolean;
 
     /**
-     * True when retrieved, false when retrieval failed, and null when not requested.
+     * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
   }
@@ -1137,8 +1095,8 @@ export namespace WebScrapeResponse {
         | 'other';
 
       /**
-       * Hosted copy when file enrichment is requested and zdr is disabled. Valid for 24
-       * hours from the original capture.
+       * Hosted image URL, valid for 24 hours after capture. Requires `file` enrichment
+       * and ZDR disabled.
        */
       fileUrl?: string;
 
@@ -1149,7 +1107,7 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Page data extracted using your schema.
+   * Object matching `jsonParams.schema`.
    */
   export interface Json {
     data: { [key: string]: unknown } | null;
@@ -1157,7 +1115,7 @@ export namespace WebScrapeResponse {
     requested: boolean;
 
     /**
-     * True when retrieved, false when retrieval failed, and null when not requested.
+     * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
   }
@@ -1171,13 +1129,13 @@ export namespace WebScrapeResponse {
     requested: boolean;
 
     /**
-     * True when retrieved, false when retrieval failed, and null when not requested.
+     * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
   }
 
   /**
-   * Page details, when available.
+   * Page metadata. Fields are omitted when not found.
    */
   export interface Metadata {
     /**
@@ -1211,8 +1169,7 @@ export namespace WebScrapeResponse {
     favicon?: string;
 
     /**
-     * Page headings (h1–h6) in document order, extracted from the unfiltered document.
-     * Capped at the first 500 headings. Omitted when the page has none.
+     * Up to 500 h1–h6 headings in document order, before content filtering.
      */
     headings?: Array<Metadata.Heading>;
 
@@ -1309,7 +1266,8 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Fields produced by parseParams.rules, after shared content filters.
+   * Fields from `parseParams.rules`, after content filters. Unmatched fields are
+   * `null` (`[]` for lists).
    */
   export interface Parsed {
     data: { [key: string]: unknown } | null;
@@ -1317,7 +1275,7 @@ export namespace WebScrapeResponse {
     requested: boolean;
 
     /**
-     * True when retrieved, false when retrieval failed, and null when not requested.
+     * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
   }
@@ -1331,7 +1289,7 @@ export namespace WebScrapeResponse {
     requested: boolean;
 
     /**
-     * True when retrieved, false when retrieval failed, and null when not requested.
+     * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
   }
@@ -1470,7 +1428,7 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * An image data URL. Use directly as an image src.
+   * Screenshot as a base64 image data URL.
    */
   export interface Screenshot {
     data: string | null;
@@ -1478,17 +1436,17 @@ export namespace WebScrapeResponse {
     requested: boolean;
 
     /**
-     * True when retrieved, false when retrieval failed, and null when not requested.
+     * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -1501,15 +1459,13 @@ export namespace WebScrapeResponse {
 
 export interface WebScreenshotResponse {
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   cache_metadata: WebScreenshotResponse.CacheMetadata;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
@@ -1524,11 +1480,8 @@ export interface WebScreenshotResponse {
   domain?: string;
 
   /**
-   * How complete the returned content is. `loaded` means the page finished the waits
-   * the request asked for. `still-loading` only occurs with
-   * timeoutOpts.behavior=return-partial: the timeoutOpts.milliseconds deadline was
-   * reached first, so the content reflects the DOM at that moment and late-rendering
-   * parts may be missing. Partial results are billed at the base request cost.
+   * `loaded`, or `still-loading` when capture ended before the page finished
+   * loading.
    */
   finalDOMState?: 'loaded' | 'still-loading';
 
@@ -1538,7 +1491,7 @@ export interface WebScreenshotResponse {
   height?: number;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: WebScreenshotResponse.KeyMetadata;
 
@@ -1554,7 +1507,7 @@ export interface WebScreenshotResponse {
   screenshotType?: 'viewport' | 'fullPage';
 
   /**
-   * Status of the response, e.g., 'ok'
+   * Always `ok` on success.
    */
   status?: string;
 
@@ -1566,9 +1519,7 @@ export interface WebScreenshotResponse {
 
 export namespace WebScreenshotResponse {
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   export interface CacheMetadata {
     /**
@@ -1584,11 +1535,11 @@ export namespace WebScreenshotResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -1601,9 +1552,7 @@ export namespace WebScreenshotResponse {
 
 export interface WebSearchResponse {
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   cache_metadata: WebSearchResponse.CacheMetadata;
 
@@ -1613,15 +1562,15 @@ export interface WebSearchResponse {
   query: string;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   results: Array<WebSearchResponse.Result>;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: WebSearchResponse.KeyMetadata;
 
@@ -1635,9 +1584,7 @@ export interface WebSearchResponse {
 
 export namespace WebSearchResponse {
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   export interface CacheMetadata {
     /**
@@ -1697,22 +1644,19 @@ export namespace WebSearchResponse {
       markdown: string | null;
 
       /**
-       * How complete the returned content is. `loaded` means the page finished the waits
-       * the request asked for. `still-loading` only occurs with
-       * timeoutOpts.behavior=return-partial: the timeoutOpts.milliseconds deadline was
-       * reached first, so the content reflects the DOM at that moment and late-rendering
-       * parts may be missing. Partial results are billed at the base request cost.
+       * `loaded`, or `still-loading` when capture ended before the page finished
+       * loading.
        */
       finalDOMState?: 'loaded' | 'still-loading';
     }
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -1725,24 +1669,22 @@ export namespace WebSearchResponse {
 
 export interface WebWebCrawlMdResponse {
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   cache_metadata: WebWebCrawlMdResponse.CacheMetadata;
 
   metadata: WebWebCrawlMdResponse.Metadata;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   results: Array<WebWebCrawlMdResponse.Result>;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: WebWebCrawlMdResponse.KeyMetadata;
 
@@ -1756,9 +1698,7 @@ export interface WebWebCrawlMdResponse {
 
 export namespace WebWebCrawlMdResponse {
   /**
-   * Cache outcome for this response. Composite responses are hits only when every
-   * cache-controlled fetch contributing to the output was a hit; age_ms is the
-   * oldest contributing hit.
+   * Whether this response came from cache.
    */
   export interface CacheMetadata {
     /**
@@ -1973,11 +1913,11 @@ export namespace WebWebCrawlMdResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -1990,66 +1930,51 @@ export namespace WebWebCrawlMdResponse {
 
 export interface WebAnswersParams {
   /**
-   * What to research and answer, in plain language. Naming a domain in the task (for
-   * example "pricing on context.dev") makes the agent read that site before it
-   * searches.
+   * Research task. Name a domain to have it read before searching.
    */
   task: string;
 
   /**
-   * An example object with placeholder values (for example {"pricing_page_url": "",
-   * "plans": [{"name": "", "price": 0}]}). Object keys and value types are
-   * preserved; unknown values may be null. Empty arrays accept any JSON items.
-   * Defaults to {"result": ""}. Maximum 8 levels, 500 values, and 16000 characters.
+   * Example answer object, not JSON Schema. Up to 8 levels, 500 values, and 16000
+   * characters; unknowns may be null.
    */
   json_format?: { [key: string]: unknown };
 
   /**
-   * Research level: fast uses a smaller model and research budget for 10 credits;
-   * ultra uses deeper reasoning and research for 100 credits. Defaults to ultra.
-   * Only successful requests consume credits.
+   * `fast` for short tasks; `ultra` for deeper research (default).
    */
   mode?: 'fast' | 'ultra';
 
   /**
-   * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+   * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: WebAnswersParams.TimeoutOpts;
 
   /**
-   * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
-   * omitted. Requires zero data retention to be enabled for your organization
-   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
-   * Successful ZDR responses include X-Context-ZDR: true.
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebAnswersParams {
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-     * credits. "return-partial" returns usable results collected so far; if none are
-     * available, the request still fails without charging credits. Partial results are
-     * not cached as complete results.
+     * "fail" returns 408 at the deadline. "return-partial" returns available results;
+     * inspect the response’s partial flag.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -2068,45 +1993,35 @@ export interface WebExtractCompetitorsParams {
   numCompetitors?: number;
 
   /**
-   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
-   * characters.
+   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
    */
   tags?: Array<string>;
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: WebExtractCompetitorsParams.TimeoutOpts;
 
   /**
-   * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
-   * omitted. Requires zero data retention to be enabled for your organization
-   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
-   * Successful ZDR responses include X-Context-ZDR: true.
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebExtractCompetitorsParams {
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-     * credits. "return-partial" returns usable results collected so far; if none are
-     * available, the request still fails without charging credits. Partial results are
-     * not cached as complete results.
+     * "fail" returns 408 at the deadline. "return-partial" returns available results;
+     * inspect the response’s partial flag.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -2120,10 +2035,7 @@ export interface WebExtractStyleguideParams {
   colorScheme?: 'light' | 'dark';
 
   /**
-   * A specific URL to fetch the styleguide from directly, bypassing domain
-   * resolution (e.g., 'https://example.com/design-system'). When provided, the
-   * styleguide is extracted from this exact URL. You must provide either 'domain' or
-   * 'directUrl', but not both.
+   * Exact URL to inspect. Provide either `domain` or `directUrl`, not both.
    */
   directUrl?: string;
 
@@ -2135,54 +2047,41 @@ export interface WebExtractStyleguideParams {
   domain?: string;
 
   /**
-   * Maximum age in milliseconds for cached brand data before the API performs a hard
-   * refresh. Defaults to 3 months (7776000000 ms). Set to 0 to always perform a hard
-   * refresh. Negative values are clamped to 0; values above 1 year (31536000000 ms)
-   * are clamped to 1 year.
+   * Maximum age of cached brand data in ms. Defaults to 3 months; clamped to 0–1
+   * year. `0` refreshes.
    */
   maxAgeMs?: number | null;
 
   /**
-   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
-   * characters.
+   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
    */
   tags?: Array<string>;
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: WebExtractStyleguideParams.TimeoutOpts;
 
   /**
-   * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
-   * omitted. Requires zero data retention to be enabled for your organization
-   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
-   * Successful ZDR responses include X-Context-ZDR: true.
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebExtractStyleguideParams {
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-     * credits. "return-partial" returns usable results collected so far; if none are
-     * available, the request still fails without charging credits. Partial results are
-     * not cached as complete results. "return-partial" requires milliseconds of at
-     * least 5000.
+     * "fail" returns 408 at the deadline. "return-partial" returns available results;
+     * inspect the response’s partial flag. "return-partial" requires at least 5000 ms.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -2190,52 +2089,43 @@ export namespace WebExtractStyleguideParams {
 
 export interface WebMapURLsParams {
   /**
-   * Domain to build a sitemap for
+   * Domain to map, e.g. `stripe.com`.
    */
   domain: string;
 
   /**
-   * Optional outbound HTTP headers forwarded only to the target URL, sent as
-   * deep-object query params such as headers[X-Custom]=value. When provided, caching
-   * is bypassed: the result is neither read from nor written to cache.
+   * HTTP headers for the target origin. Non-empty headers bypass caching.
    */
   headers?: { [key: string]: string };
 
   /**
-   * When true, discover and include public pages and sitemaps on subdomains of the
-   * requested domain. Defaults to false.
+   * Include URLs on subdomains.
    */
   includeSubdomains?: boolean;
 
   /**
-   * Maximum number of links to return from the sitemap crawl. Defaults to 10,000.
-   * Minimum is 1, maximum is 100,000.
+   * Maximum number of URLs to return.
    */
   maxLinks?: number;
 
   /**
-   * Optional search phrase. When provided, the crawled sitemap is filtered to the
-   * pages whose URLs are about that phrase, most relevant first, and the request
-   * costs 2 credits instead of 1.
+   * Filter URLs by a topic or phrase, most relevant first.
    */
   search?: string;
 
   /**
-   * Optional explicit sitemap URL. When provided, exactly this sitemap is crawled
-   * instead of discovering the domain's sitemaps.
+   * Fetch this sitemap instead of discovering sitemaps. Must belong to the domain or
+   * a subdomain.
    */
   sitemapUrl?: string;
 
   /**
-   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
-   * characters.
+   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
    */
   tags?: Array<string>;
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: WebMapURLsParams.TimeoutOpts;
 
@@ -2246,32 +2136,25 @@ export interface WebMapURLsParams {
   urlRegex?: string;
 
   /**
-   * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
-   * omitted. Requires zero data retention to be enabled for your organization
-   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
-   * Successful ZDR responses include X-Context-ZDR: true.
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebMapURLsParams {
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-     * credits. "return-partial" returns usable results collected so far; if none are
-     * available, the request still fails without charging credits. Partial results are
-     * not cached as complete results.
+     * "fail" returns 408 at the deadline. "return-partial" returns available results;
+     * inspect the response’s partial flag.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -2279,17 +2162,17 @@ export namespace WebMapURLsParams {
 
 export interface WebScrapeParams {
   /**
-   * Outputs to return. Enable at least one; omitted formats are false.
+   * Outputs to return. Set at least one to `true`.
    */
   formats: WebScrapeParams.Formats;
 
   /**
-   * The URL to scrape.
+   * Public HTTP or HTTPS URL to scrape.
    */
   url: string;
 
   /**
-   * Highlight options. Requires formats.highlights: true.
+   * Required when `formats.highlights` is `true`.
    */
   highlightsParams?: WebScrapeParams.HighlightsParams;
 
@@ -2304,15 +2187,13 @@ export interface WebScrapeParams {
   jsonParams?: WebScrapeParams.JsonParams;
 
   /**
-   * Markdown options. Requires formats.markdown: true.
+   * Markdown options. Requires `formats.markdown`.
    */
   markdownParams?: WebScrapeParams.MarkdownParams;
 
   /**
-   * Maximum age of each cached output. Defaults to 1 day; 0 fetches fresh and
-   * updates the requested outputs. Compatible outputs are shared with the individual
-   * scrape endpoints. Image results with hosted files refresh after 23 hours; other
-   * outputs retain their own freshness.
+   * Maximum age of a cached output, in milliseconds. `0` fetches fresh. Defaults to
+   * 1 day.
    */
   maxAgeMs?: number;
 
@@ -2332,8 +2213,7 @@ export interface WebScrapeParams {
   screenshotParams?: WebScrapeParams.ScreenshotParams;
 
   /**
-   * Shared browser and content settings. Content filters leave screenshots and
-   * original bytes unchanged.
+   * Browser and content settings shared by all outputs.
    */
   sharedParams?: WebScrapeParams.SharedParams;
 
@@ -2343,30 +2223,20 @@ export interface WebScrapeParams {
   tags?: Array<string>;
 
   /**
-   * Total deadline, including navigation, actions, waiting, and all outputs.
-   * Defaults to 60000 milliseconds with behavior fail. Individual outputs have
-   * internal deadlines that reserve time to return completed outputs; timed-out
-   * outputs have success: false and data: null under either behavior. The overall
-   * request deadline remains enforced: fail returns an error if that deadline is
-   * reached. Use return-partial to allow the current page state and available
-   * outputs when the page is still loading. Partial responses set isPartial. Failed
-   * retrievals and incomplete captures are not cached; valid captured pieces may be
-   * cached independently. Fixed waits must fit before a response reserve of up to
-   * 5000 milliseconds (at most one quarter of the timeout) when using
-   * return-partial.
+   * Deadline for the whole request. Defaults to 60000 ms with `fail`. Fixed waits
+   * must end before it.
    */
   timeoutOpts?: WebScrapeParams.TimeoutOpts;
 
   /**
-   * Zero data retention. Bypasses caches and uploads; excludes request/response
-   * content and tags from logs. Must be enabled for your organization.
+   * `enabled` turns on zero data retention. Your organization must have ZDR enabled.
    */
   zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebScrapeParams {
   /**
-   * Outputs to return. Enable at least one; omitted formats are false.
+   * Outputs to return. Set at least one to `true`.
    */
   export interface Formats {
     /**
@@ -2375,9 +2245,7 @@ export namespace WebScrapeParams {
     bytes?: boolean;
 
     /**
-     * Relevant Markdown excerpts for your question or topic, preserving code, lists,
-     * and tables, with headings included when needed for context. Adds 3 credits when
-     * passages are returned.
+     * Markdown excerpts relevant to `highlightsParams.query`.
      */
     highlights?: boolean;
 
@@ -2392,8 +2260,7 @@ export namespace WebScrapeParams {
     images?: boolean;
 
     /**
-     * Page data extracted using your schema. Adds 4 credits when extraction succeeds
-     * and its result is returned.
+     * An object matching `jsonParams.schema`, extracted from the page.
      */
     json?: boolean;
 
@@ -2403,24 +2270,23 @@ export namespace WebScrapeParams {
     markdown?: boolean;
 
     /**
-     * Fields selected by parseParams.rules.
+     * Fields extracted with `parseParams.rules`, returned as `parsed`.
      */
     parse?: boolean;
 
     /**
-     * Product details such as name, price, and availability. Adds 1 credit when its
-     * successful result is returned or the target page is missing.
+     * Product details such as name, price, and availability.
      */
     product?: boolean;
 
     /**
-     * An inline image of the page.
+     * A screenshot of the page.
      */
     screenshot?: boolean;
   }
 
   /**
-   * Highlight options. Requires formats.highlights: true.
+   * Required when `formats.highlights` is `true`.
    */
   export interface HighlightsParams {
     /**
@@ -2429,7 +2295,7 @@ export namespace WebScrapeParams {
     query: string;
 
     /**
-     * Maximum combined length of the returned passages, in characters.
+     * Maximum combined length of returned passages.
      */
     maxCharacters?: number;
   }
@@ -2439,14 +2305,12 @@ export namespace WebScrapeParams {
    */
   export interface ImageParams {
     /**
-     * For visual duplicates, keep the largest image.
+     * Set `visual` to drop visual duplicates, keeping the largest copy.
      */
     dedupe?: 'none' | 'visual';
 
     /**
-     * Add dimensions, a visual category, or a hosted file URL. Each image has a
-     * maximum processing time of 30000 milliseconds, bounded by the remaining request
-     * deadline.
+     * Extra data per image: `dimensions`, `classification`, or a hosted `file` URL.
      */
     enrich?: Array<'dimensions' | 'classification' | 'file'>;
   }
@@ -2456,31 +2320,34 @@ export namespace WebScrapeParams {
    */
   export interface JsonParams {
     /**
-     * JSON Schema for the returned object. Must describe a top-level object; at most
-     * 50 KB serialized. Optional fields the page does not state are omitted, or null
-     * when their type allows null, while required non-nullable fields always receive a
-     * best-effort value, so prefer nullable or optional fields for data a page may
-     * omit. Zod users can pass the output of z.toJSONSchema().
+     * JSON Schema for a top-level object, up to 50 KB. Use optional or nullable fields
+     * for missing facts.
      */
     schema: { [key: string]: unknown };
 
     /**
-     * Optional guidance on which facts to prioritize or how to interpret schema
-     * fields.
+     * Extra guidance, such as which facts to prefer or how to read a field.
      */
     instructions?: string;
   }
 
   /**
-   * Markdown options. Requires formats.markdown: true.
+   * Markdown options. Requires `formats.markdown`.
    */
   export interface MarkdownParams {
+    /**
+     * Include images in the Markdown using image syntax with URLs and alt text.
+     */
     includeImages?: boolean;
 
+    /**
+     * Keep link URLs in the Markdown. Set false to return link text without URLs.
+     */
     includeLinks?: boolean;
 
     /**
-     * Base64 images use placeholders by default. Requires includeImages: true.
+     * How base64 images appear: `placeholder` (default) or `preserve`. Requires
+     * `includeImages`.
      */
     inlineImages?: 'placeholder' | 'preserve';
   }
@@ -2490,18 +2357,28 @@ export namespace WebScrapeParams {
    */
   export interface ParseParams {
     /**
-     * Map field names to CSS selectors or rules. Missing items return null; missing
-     * lists return [].
+     * Field names mapped to CSS selectors (`h1`, `a@href`) or rule objects. Max 100
+     * fields, 5 levels.
      */
     rules: { [key: string]: string | ParseParams.UnionMember1 };
   }
 
   export namespace ParseParams {
     export interface UnionMember1 {
+      /**
+       * CSS selector to match within the current page or parent rule.
+       */
       selector: string;
 
+      /**
+       * Return text, HTML, an attribute such as `@href`, or nested field rules. Defaults
+       * to text.
+       */
       output?: 'text' | 'html' | string | unknown;
 
+      /**
+       * Return the first match with `item` or all matches with `list`.
+       */
       type?: 'item' | 'list';
     }
   }
@@ -2511,11 +2388,7 @@ export namespace WebScrapeParams {
    */
   export interface ProductParams {
     /**
-     * Extract the product with a specialized model when the page has no structured
-     * product data. Adds six credits when the model verdict is returned successfully.
-     * If the fallback fails, the product output has success: false and data: null with
-     * no fallback charge; other outputs remain available. Request deadlines and client
-     * disconnects still apply.
+     * Use an AI model when the page has no structured product data.
      */
     useAIFallback?: boolean;
   }
@@ -2525,17 +2398,21 @@ export namespace WebScrapeParams {
    */
   export interface ScreenshotParams {
     /**
-     * Viewport, full page, one visible element, or a rectangle. Maximum 40 megapixels.
+     * What to capture: `viewport`, `fullPage`, one element, or a rectangle. Max 40
+     * megapixels.
      */
     area?: 'viewport' | 'fullPage' | ScreenshotParams.Element | ScreenshotParams.Rectangle;
 
+    /**
+     * Image format for the screenshot.
+     */
     format?: 'png' | 'jpeg' | 'webp';
   }
 
   export namespace ScreenshotParams {
     export interface Element {
       /**
-       * Must match one visible element.
+       * CSS selector matching exactly one visible element.
        */
       selector: string;
     }
@@ -2544,66 +2421,76 @@ export namespace WebScrapeParams {
      * Pixels from the document origin.
      */
     export interface Rectangle {
+      /**
+       * Height of the capture in pixels.
+       */
       height: number;
 
+      /**
+       * Width of the capture in pixels.
+       */
       width: number;
 
+      /**
+       * Left edge of the capture, in pixels from the document origin.
+       */
       x: number;
 
+      /**
+       * Top edge of the capture, in pixels from the document origin.
+       */
       y: number;
     }
   }
 
   /**
-   * Shared browser and content settings. Content filters leave screenshots and
-   * original bytes unchanged.
+   * Browser and content settings shared by all outputs.
    */
   export interface SharedParams {
     /**
-     * Run in order before capture. A failed action fails the request. Bypasses
-     * caching.
+     * Browser steps run in order before capture. Requires a paid plan. Skips the
+     * cache.
      */
     actions?: Array<SharedParams.Perform | SharedParams.Scroll | SharedParams.Wait | SharedParams.WaitFor>;
 
     /**
-     * Supported two-letter country code, case-insensitive. Applies to every output,
-     * including image downloads.
+     * Proxy country as a two-letter code, such as `US`. Case-insensitive.
      */
     country?: string;
 
     /**
-     * Dismiss cookie banners by accepting cookies before actions.
+     * Accept cookie banners before actions and capture.
      */
     dismissCookies?: boolean;
 
     /**
-     * Dismiss other popups before actions.
+     * Close other popups before actions and capture.
      */
     dismissPopups?: boolean;
 
     /**
-     * Remove matching content. Exclusions win.
+     * Remove elements matching these CSS selectors. Overrides `includeSelectors`.
      */
     excludeSelectors?: Array<string>;
 
     /**
-     * Headers for the target origin. Requests with custom headers bypass caching.
+     * HTTP headers to send to the target site. Requests with headers skip the cache.
      */
     headers?: { [key: string]: string };
 
     /**
-     * Include iframe content in extraction. Screenshots show visible frames
-     * regardless.
+     * Include iframe content in HTML and text outputs. Screenshots always show visible
+     * frames.
      */
     includeFrames?: boolean;
 
     /**
-     * Keep matching content after mainContentOnly.
+     * Keep only elements matching these CSS selectors.
      */
     includeSelectors?: Array<string>;
 
     /**
-     * Keep only main content in HTML, Markdown, images, and parsed fields.
+     * Keep only the main content. Doesn't affect `screenshot`, `bytes`, or `product`.
      */
     mainContentOnly?: boolean;
 
@@ -2613,42 +2500,61 @@ export namespace WebScrapeParams {
     parsers?: SharedParams.Parsers;
 
     /**
-     * Settle animations before capture. Defaults to true with screenshots, otherwise
-     * false.
+     * Wait for CSS animations to finish before capture. Defaults to `true` when
+     * `screenshot` is requested.
      */
     settleAnimations?: boolean;
 
     /**
-     * Override the browser color scheme.
+     * Emulate a light or dark color scheme.
      */
     theme?: 'light' | 'dark';
 
     /**
-     * Browser dimensions in pixels.
+     * Browser size in pixels. Omit for 1920 × 1080. When provided, missing dimensions
+     * default to 1440 × 900.
      */
     viewport?: SharedParams.Viewport;
 
     /**
-     * After actions, wait this many milliseconds or until a CSS selector is visible.
-     * Defaults to 500 ms, or 2000 ms with frames or an XML URL. Set 0 to skip.
+     * Milliseconds, or a CSS selector to wait for, after actions. Defaults to 500
+     * (2000 with frames or XML).
      */
     waitFor?: number | string;
   }
 
   export namespace SharedParams {
     export interface Perform {
+      /**
+       * One browser instruction, such as clicking a button or entering text.
+       */
       action: string;
 
+      /**
+       * Use `perform` for a plain-language browser instruction.
+       */
       type: 'perform';
     }
 
     export interface Scroll {
+      /**
+       * Use `scroll` to move through the page or a container.
+       */
       type: 'scroll';
 
+      /**
+       * Distance per scroll: pixels, one `viewport`, or `max` to reach the end.
+       */
       amount?: number | 'viewport' | 'max';
 
+      /**
+       * Direction to scroll.
+       */
       direction?: 'down' | 'up' | 'left' | 'right';
 
+      /**
+       * Maximum number of scroll steps for this action.
+       */
       maxScrolls?: number;
 
       /**
@@ -2658,14 +2564,26 @@ export namespace WebScrapeParams {
     }
 
     export interface Wait {
+      /**
+       * Time to pause in milliseconds before the next action.
+       */
       milliseconds: number;
 
+      /**
+       * Use `wait` to pause for a fixed duration.
+       */
       type: 'wait';
     }
 
     export interface WaitFor {
+      /**
+       * CSS selector to wait for before continuing.
+       */
       selector: string;
 
+      /**
+       * Use `waitFor` to wait for a matching element.
+       */
       type: 'waitFor';
     }
 
@@ -2674,23 +2592,23 @@ export namespace WebScrapeParams {
      */
     export interface Parsers {
       /**
-       * PDF text options for HTML, Markdown, and parsed fields.
+       * PDF page range and OCR.
        */
       pdf?: Parsers.Pdf;
     }
 
     export namespace Parsers {
       /**
-       * PDF text options for HTML, Markdown, and parsed fields.
+       * PDF page range and OCR.
        */
       export interface Pdf {
         /**
-         * Last page to parse. Must be at least startPage.
+         * Last page to parse. Must be at least `startPage`.
          */
         endPage?: number;
 
         /**
-         * Read text from scanned pages.
+         * Set `auto` to read scanned pages with OCR.
          */
         ocr?: 'off' | 'auto';
 
@@ -2702,40 +2620,35 @@ export namespace WebScrapeParams {
     }
 
     /**
-     * Browser dimensions in pixels.
+     * Browser size in pixels. Omit for 1920 × 1080. When provided, missing dimensions
+     * default to 1440 × 900.
      */
     export interface Viewport {
+      /**
+       * Browser viewport height in pixels.
+       */
       height?: number;
 
+      /**
+       * Browser viewport width in pixels.
+       */
       width?: number;
     }
   }
 
   /**
-   * Total deadline, including navigation, actions, waiting, and all outputs.
-   * Defaults to 60000 milliseconds with behavior fail. Individual outputs have
-   * internal deadlines that reserve time to return completed outputs; timed-out
-   * outputs have success: false and data: null under either behavior. The overall
-   * request deadline remains enforced: fail returns an error if that deadline is
-   * reached. Use return-partial to allow the current page state and available
-   * outputs when the page is still loading. Partial responses set isPartial. Failed
-   * retrievals and incomplete captures are not cached; valid captured pieces may be
-   * cached independently. Fixed waits must fit before a response reserve of up to
-   * 5000 milliseconds (at most one quarter of the timeout) when using
-   * return-partial.
+   * Deadline for the whole request. Defaults to 60000 ms with `fail`. Fixed waits
+   * must end before it.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-     * credits. "return-partial" returns usable results collected so far; if none are
-     * available, the request still fails without charging credits. Partial results are
-     * not cached as complete results. "return-partial" requires milliseconds of at
-     * least 5000.
+     * "fail" returns 408 at the deadline. "return-partial" returns available results;
+     * inspect the response’s partial flag. "return-partial" requires at least 5000 ms.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -2758,8 +2671,7 @@ export interface WebScreenshotParams {
   colorScheme?: 'light' | 'dark';
 
   /**
-   * Fetch the target page through a residential proxy in this country (ISO 3166-1
-   * alpha-2).
+   * Fetch from this country (ISO 3166-1 alpha-2).
    */
   country?:
     | 'ad'
@@ -3033,15 +2945,12 @@ export interface WebScreenshotParams {
   scrollOffset?: number | null;
 
   /**
-   * Comma-separated tags for tracking request usage. Up to 20 tags, each 1-50
-   * characters.
+   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
    */
   tags?: Array<string>;
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: WebScreenshotParams.TimeoutOpts;
 
@@ -3060,33 +2969,25 @@ export interface WebScreenshotParams {
   waitForMs?: number | null;
 
   /**
-   * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
-   * omitted. Requires zero data retention to be enabled for your organization
-   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
-   * Successful ZDR responses include X-Context-ZDR: true.
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebScreenshotParams {
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-     * credits. "return-partial" returns usable results collected so far; if none are
-     * available, the request still fails without charging credits. Partial results are
-     * not cached as complete results. "return-partial" requires milliseconds of at
-     * least 5000.
+     * "fail" returns 408 at the deadline. "return-partial" returns available results;
+     * inspect the response’s partial flag. "return-partial" requires at least 5000 ms.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -3387,28 +3288,23 @@ export interface WebSearchParams {
   numResults?: number;
 
   /**
-   * Expand the query into multiple parallel variants for broader recall.
+   * Currently has no effect.
    */
   queryFanout?: boolean;
 
   /**
-   * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+   * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: WebSearchParams.TimeoutOpts;
 
   /**
-   * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Asset uploads are skipped, so hosted image URLs are
-   * omitted. Requires zero data retention to be enabled for your organization
-   * (contact support@context.dev), otherwise the request fails with ZDR_NOT_ENABLED.
-   * Successful ZDR responses include X-Context-ZDR: true.
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }
@@ -3455,9 +3351,7 @@ export namespace WebSearchParams {
     shortenBase64Images?: boolean;
 
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     timeoutOpts?: MarkdownOptions.TimeoutOpts;
 
@@ -3496,43 +3390,34 @@ export namespace WebSearchParams {
     }
 
     /**
-     * Optional request deadline and behavior on timeout. For GET requests, use
-     * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-     * timeoutOpts object.
+     * Request deadline and what to return when it passes.
      */
     export interface TimeoutOpts {
       /**
-       * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+       * Deadline in milliseconds.
        */
       milliseconds: number;
 
       /**
-       * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-       * credits. "return-partial" returns usable results collected so far; if none are
-       * available, the request still fails without charging credits. Partial results are
-       * not cached as complete results. "return-partial" requires milliseconds of at
-       * least 5000.
+       * "fail" returns 408 at the deadline. "return-partial" returns available results;
+       * inspect the response’s partial flag. "return-partial" requires at least 5000 ms.
        */
       behavior?: 'fail' | 'return-partial';
     }
   }
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-     * credits. "return-partial" returns usable results collected so far; if none are
-     * available, the request still fails without charging credits. Partial results are
-     * not cached as complete results.
+     * "fail" returns 408 at the deadline. "return-partial" returns available results;
+     * inspect the response’s partial flag.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -3540,13 +3425,12 @@ export namespace WebSearchParams {
 
 export interface WebWebCrawlMdParams {
   /**
-   * The starting URL for the crawl (must include http:// or https:// protocol)
+   * Start URL, including `http://` or `https://`.
    */
   url: string;
 
   /**
-   * Fetch the target page through a residential proxy in this country (ISO 3166-1
-   * alpha-2).
+   * Fetch from this country (ISO 3166-1 alpha-2).
    */
   country?:
     | 'ad'
@@ -3755,9 +3639,7 @@ export interface WebWebCrawlMdParams {
     | 'zw';
 
   /**
-   * CSS selectors to remove before each crawled page is converted to Markdown.
-   * Applied after includeSelectors. Exclusion takes precedence: an element matching
-   * both is removed. Examples: "nav", "footer", ".ad-banner", "[aria-hidden=true]".
+   * Remove matching elements after inclusions. Exclusions take precedence.
    */
   excludeSelectors?: Array<string>;
 
@@ -3785,17 +3667,12 @@ export interface WebWebCrawlMdParams {
   includeLinks?: boolean;
 
   /**
-   * CSS selectors. When provided, only matching HTML subtrees (and their
-   * descendants) are kept before each crawled page is converted to Markdown. When
-   * omitted, the entire document is kept. Examples: "article.main", "#content",
-   * "[role=main]".
+   * Keep matching HTML subtrees before converting each page to Markdown.
    */
   includeSelectors?: Array<string>;
 
   /**
-   * Return a cached result if a prior scrape for the same parameters exists and is
-   * younger than this many milliseconds. Defaults to 1 day (86400000 ms) when
-   * omitted. Max is 30 days (2592000000 ms). Set to 0 to always scrape fresh.
+   * Maximum cache age in milliseconds. Defaults to 1 day; `0` fetches fresh.
    */
   maxAgeMs?: number;
 
@@ -3805,20 +3682,18 @@ export interface WebWebCrawlMdParams {
   maxDepth?: number;
 
   /**
-   * Maximum number of pages to crawl. Hard cap: 500.
+   * Maximum pages to crawl.
    */
   maxPages?: number;
 
   /**
-   * PDF parsing controls. Use start/end to limit text extraction and embedded-image
-   * detection/OCR to an inclusive 1-based page range.
+   * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
    */
   pdf?: WebWebCrawlMdParams.Pdf;
 
   /**
-   * When true, waits briefly for CSS and transition animations to settle before
-   * extracting each crawled page. Defaults to false. This adds a bit of latency in
-   * exchange for more stable output on animated pages.
+   * Wait briefly for CSS animations and transitions to settle before reading each
+   * page.
    */
   settleAnimations?: boolean;
 
@@ -3828,22 +3703,18 @@ export interface WebWebCrawlMdParams {
   shortenBase64Images?: boolean;
 
   /**
-   * Soft time budget for the crawl in milliseconds. After each scrape, the crawler
-   * checks the elapsed time and, if exceeded, returns the pages collected so far
-   * instead of continuing. Min: 10000 (10s). Max: 110000 (110s). Default: 80000
-   * (80s).
+   * Soft crawl deadline in milliseconds. Returns pages collected before the next
+   * deadline check.
    */
   stopAfterMs?: number;
 
   /**
-   * Optional tags for tracking usage. Up to 20 tags, each 1 to 50 characters.
+   * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: WebWebCrawlMdParams.TimeoutOpts;
 
@@ -3867,18 +3738,15 @@ export interface WebWebCrawlMdParams {
   waitForMs?: number;
 
   /**
-   * Set to enabled to bypass shared caches and omit request and response content
-   * from retained usage logs. Requires zero data retention to be enabled for your
-   * organization (contact support@context.dev), otherwise the request fails with
-   * ZDR_NOT_ENABLED. Successful ZDR responses include X-Context-ZDR: true.
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }
 
 export namespace WebWebCrawlMdParams {
   /**
-   * PDF parsing controls. Use start/end to limit text extraction and embedded-image
-   * detection/OCR to an inclusive 1-based page range.
+   * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
    */
   export interface Pdf {
     /**
@@ -3888,10 +3756,7 @@ export namespace WebWebCrawlMdParams {
     end?: number;
 
     /**
-     * When true, OCR the selected PDF pages that have no usable text layer (scans),
-     * replacing each recovered page's text with the OCR result while pages with a real
-     * text layer keep it. Billed at 1 credit per page OCR actually recovered, on top
-     * of the base request cost.
+     * Read scanned PDF pages with OCR; preserve pages that already contain text.
      */
     ocr?: boolean;
 
@@ -3908,21 +3773,17 @@ export namespace WebWebCrawlMdParams {
   }
 
   /**
-   * Optional request deadline and behavior on timeout. For GET requests, use
-   * timeoutOpts[milliseconds]=30000&timeoutOpts[behavior]=fail or a JSON-encoded
-   * timeoutOpts object.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
-     * Request deadline in milliseconds. Maximum: 300000 (5 minutes).
+     * Deadline in milliseconds.
      */
     milliseconds: number;
 
     /**
-     * What to do at the deadline. "fail" returns 408 REQUEST_TIMEOUT without charging
-     * credits. "return-partial" returns usable results collected so far; if none are
-     * available, the request still fails without charging credits. Partial results are
-     * not cached as complete results.
+     * "fail" returns 408 at the deadline. "return-partial" returns available results;
+     * inspect the response’s partial flag.
      */
     behavior?: 'fail' | 'return-partial';
   }

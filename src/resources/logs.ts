@@ -6,19 +6,19 @@ import { RequestOptions } from '../internal/request-options';
 import { path } from '../internal/utils/path';
 
 /**
- * Read your organization's API request logs to debug failed calls. These endpoints cost no credits and use a separate rate limit.
+ * Read your organization's API request logs.
  */
 export class Logs extends APIResource {
   /**
-   * Get one logged API call, including its request input and response body.
+   * Retrieve a request’s metadata, retained input, and response.
    */
   retrieve(requestID: string, options?: RequestOptions): APIPromise<LogRetrieveResponse> {
     return this._client.get(path`/logs/${requestID}`, options);
   }
 
   /**
-   * List your organization's API requests, newest first. Defaults to the last 24
-   * hours.
+   * List your organization’s request logs with filters and pagination. Logs also
+   * include batch settlements and monitor runs.
    */
   list(query: LogListParams | null | undefined = {}, options?: RequestOptions): APIPromise<LogListResponse> {
     return this._client.get('/logs', { query, ...options });
@@ -29,13 +29,13 @@ export interface LogRetrieveResponse {
   data: LogRetrieveResponse.Data;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: LogRetrieveResponse.KeyMetadata;
 }
@@ -68,7 +68,8 @@ export namespace LogRetrieveResponse {
     latency_ms: number;
 
     /**
-     * HTTP method.
+     * HTTP method, or `MONITOR` / `BATCH` for monitor-run and batch-settlement
+     * entries.
      */
     method: string;
 
@@ -108,11 +109,6 @@ export namespace LogRetrieveResponse {
     zdr: boolean;
 
     /**
-     * Credit usage, included whenever a valid API key is provided.
-     */
-    key_metadata?: Data.KeyMetadata;
-
-    /**
      * The retained JSON response with credentials redacted, or null when unavailable.
      */
     response?: unknown;
@@ -133,29 +129,14 @@ export namespace LogRetrieveResponse {
        */
       body?: unknown;
     }
-
-    /**
-     * Credit usage, included whenever a valid API key is provided.
-     */
-    export interface KeyMetadata {
-      /**
-       * Credits used by this request.
-       */
-      credits_consumed: number;
-
-      /**
-       * Credits remaining for your organization.
-       */
-      credits_remaining: number;
-    }
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
@@ -188,13 +169,13 @@ export interface LogListResponse {
   page: number;
 
   /**
-   * Unique id of this API call, also sent in the X-Request-Id response header. Quote
-   * it when contacting support about a failed request.
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
    */
   request_id: string;
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: LogListResponse.KeyMetadata;
 }
@@ -222,7 +203,8 @@ export namespace LogListResponse {
     latency_ms: number;
 
     /**
-     * HTTP method.
+     * HTTP method, or `MONITOR` / `BATCH` for monitor-run and batch-settlement
+     * entries.
      */
     method: string;
 
@@ -258,11 +240,11 @@ export namespace LogListResponse {
   }
 
   /**
-   * Credit usage, included whenever a valid API key is provided.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
-     * Credits used by this request.
+     * Credits charged for this request.
      */
     credits_consumed: number;
 
