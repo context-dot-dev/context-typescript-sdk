@@ -143,8 +143,9 @@ export interface WebAnswersResponse {
   json_content: { [key: string]: unknown };
 
   /**
-   * URLs that supplied search results or readable page content, in first-seen order.
-   * Unreadable pages are excluded.
+   * Public evidence URLs from searches, pages, or company/profile records, in
+   * first-seen order. A listed URL may identify a record without its page being
+   * read.
    */
   sources: Array<string>;
 
@@ -1940,7 +1941,8 @@ export namespace WebWebCrawlMdResponse {
 
 export interface WebAnswersParams {
   /**
-   * Research task. Name a domain to have it read before searching.
+   * Research task. The agent selects company/profile lookups, web searches, or page
+   * reads. Include domains or URLs to focus the research.
    */
   task: string;
 
@@ -1951,7 +1953,8 @@ export interface WebAnswersParams {
   json_format?: { [key: string]: unknown };
 
   /**
-   * `fast` for short tasks; `ultra` for deeper research (default).
+   * `fast` prioritizes speed, with extra verification for people and companies;
+   * `ultra` supports deeper research (default).
    */
   mode?: 'fast' | 'ultra';
 
