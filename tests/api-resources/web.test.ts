@@ -262,6 +262,7 @@ describe('resource web', () => {
       country: 'af',
       excludeDomains: ['string'],
       freshness: 'last_24_hours',
+      highlightsOptions: { enabled: true, maxCharacters: 100 },
       includeDomains: ['string'],
       markdownOptions: {
         enabled: true,
