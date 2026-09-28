@@ -1001,6 +1001,16 @@ export namespace WebScrapeResponse {
      * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
+
+    /**
+     * Why the output failed. Present only when `success` is `false`.
+     */
+    error_code?: string;
+
+    /**
+     * Explanation of the failure and possible next steps.
+     */
+    message?: string;
   }
 
   export namespace Bytes {
@@ -1043,6 +1053,16 @@ export namespace WebScrapeResponse {
      * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
+
+    /**
+     * Why the output failed. Present only when `success` is `false`.
+     */
+    error_code?: string;
+
+    /**
+     * Explanation of the failure and possible next steps.
+     */
+    message?: string;
   }
 
   /**
@@ -1057,6 +1077,16 @@ export namespace WebScrapeResponse {
      * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
+
+    /**
+     * Why the output failed. Present only when `success` is `false`.
+     */
+    error_code?: string;
+
+    /**
+     * Explanation of the failure and possible next steps.
+     */
+    message?: string;
   }
 
   /**
@@ -1071,6 +1101,16 @@ export namespace WebScrapeResponse {
      * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
+
+    /**
+     * Why the output failed. Present only when `success` is `false`.
+     */
+    error_code?: string;
+
+    /**
+     * Explanation of the failure and possible next steps.
+     */
+    message?: string;
   }
 
   export namespace Images {
@@ -1121,12 +1161,12 @@ export namespace WebScrapeResponse {
     success: boolean | null;
 
     /**
-     * Cause of a failed JSON extraction, when available.
+     * Why the output failed. Present only when `success` is `false`.
      */
     error_code?: string;
 
     /**
-     * Explanation of the JSON extraction failure and possible next steps.
+     * Explanation of the failure and possible next steps.
      */
     message?: string;
   }
@@ -1143,6 +1183,16 @@ export namespace WebScrapeResponse {
      * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
+
+    /**
+     * Why the output failed. Present only when `success` is `false`.
+     */
+    error_code?: string;
+
+    /**
+     * Explanation of the failure and possible next steps.
+     */
+    message?: string;
   }
 
   /**
@@ -1289,6 +1339,16 @@ export namespace WebScrapeResponse {
      * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
+
+    /**
+     * Why the output failed. Present only when `success` is `false`.
+     */
+    error_code?: string;
+
+    /**
+     * Explanation of the failure and possible next steps.
+     */
+    message?: string;
   }
 
   /**
@@ -1303,6 +1363,16 @@ export namespace WebScrapeResponse {
      * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
+
+    /**
+     * Why the output failed. Present only when `success` is `false`.
+     */
+    error_code?: string;
+
+    /**
+     * Explanation of the failure and possible next steps.
+     */
+    message?: string;
   }
 
   export namespace Product {
@@ -1450,6 +1520,16 @@ export namespace WebScrapeResponse {
      * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
+
+    /**
+     * Why the output failed. Present only when `success` is `false`.
+     */
+    error_code?: string;
+
+    /**
+     * Explanation of the failure and possible next steps.
+     */
+    message?: string;
   }
 
   /**
