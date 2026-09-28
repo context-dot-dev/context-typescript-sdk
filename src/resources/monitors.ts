@@ -444,6 +444,17 @@ export namespace MonitorCreateResponse {
     url: string;
 
     /**
+     * Optional browser actions executed in array order after the page loads, before
+     * content is captured, on every run. Requires a paid plan. Maximum: 5 actions.
+     * Changes create a new baseline.
+     */
+    actions?: Array<
+      | MonitorsPageTarget.WebScrapeWaitAction
+      | MonitorsPageTarget.WebScrapePerformAction
+      | MonitorsPageTarget.WebScrapeScrollAction
+    > | null;
+
+    /**
      * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
@@ -464,6 +475,71 @@ export namespace MonitorCreateResponse {
      * Normalize whitespace before comparing or analyzing text.
      */
     normalize_whitespace?: boolean;
+  }
+
+  export namespace MonitorsPageTarget {
+    /**
+     * Pause for a fixed number of milliseconds before continuing to the next action.
+     */
+    export interface WebScrapeWaitAction {
+      /**
+       * Use `wait` to pause for a fixed duration.
+       */
+      do: 'wait';
+
+      /**
+       * Time to pause in milliseconds before the next action.
+       */
+      timeMs: number;
+    }
+
+    /**
+     * Resolve and perform one natural-language browser action.
+     */
+    export interface WebScrapePerformAction {
+      /**
+       * One browser instruction, such as clicking a button or entering text.
+       */
+      action: string;
+
+      /**
+       * Use `perform` for a plain-language browser instruction.
+       */
+      do: 'perform';
+    }
+
+    /**
+     * Scroll the page or a selected scrollable container, waiting adaptively for
+     * content and dimensions to settle after each iteration.
+     */
+    export interface WebScrapeScrollAction {
+      /**
+       * Use `scroll` to move through the page or a container.
+       */
+      do: 'scroll';
+
+      /**
+       * Pixels per scroll, one visible viewport, or the current scroll boundary.
+       * Defaults to viewport.
+       */
+      amount?: number | 'viewport' | 'max';
+
+      /**
+       * CSS selector for the first matching scroll container. Defaults to the page.
+       */
+      container?: string;
+
+      /**
+       * Direction to scroll. Defaults to down.
+       */
+      direction?: 'up' | 'down' | 'left' | 'right';
+
+      /**
+       * Maximum scroll iterations. Stops early when scrolling and scrollable extent stop
+       * changing. Defaults to 1.
+       */
+      maxScrolls?: number;
+    }
   }
 
   /**
@@ -840,6 +916,17 @@ export namespace MonitorRetrieveResponse {
     url: string;
 
     /**
+     * Optional browser actions executed in array order after the page loads, before
+     * content is captured, on every run. Requires a paid plan. Maximum: 5 actions.
+     * Changes create a new baseline.
+     */
+    actions?: Array<
+      | MonitorsPageTarget.WebScrapeWaitAction
+      | MonitorsPageTarget.WebScrapePerformAction
+      | MonitorsPageTarget.WebScrapeScrollAction
+    > | null;
+
+    /**
      * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
@@ -860,6 +947,71 @@ export namespace MonitorRetrieveResponse {
      * Normalize whitespace before comparing or analyzing text.
      */
     normalize_whitespace?: boolean;
+  }
+
+  export namespace MonitorsPageTarget {
+    /**
+     * Pause for a fixed number of milliseconds before continuing to the next action.
+     */
+    export interface WebScrapeWaitAction {
+      /**
+       * Use `wait` to pause for a fixed duration.
+       */
+      do: 'wait';
+
+      /**
+       * Time to pause in milliseconds before the next action.
+       */
+      timeMs: number;
+    }
+
+    /**
+     * Resolve and perform one natural-language browser action.
+     */
+    export interface WebScrapePerformAction {
+      /**
+       * One browser instruction, such as clicking a button or entering text.
+       */
+      action: string;
+
+      /**
+       * Use `perform` for a plain-language browser instruction.
+       */
+      do: 'perform';
+    }
+
+    /**
+     * Scroll the page or a selected scrollable container, waiting adaptively for
+     * content and dimensions to settle after each iteration.
+     */
+    export interface WebScrapeScrollAction {
+      /**
+       * Use `scroll` to move through the page or a container.
+       */
+      do: 'scroll';
+
+      /**
+       * Pixels per scroll, one visible viewport, or the current scroll boundary.
+       * Defaults to viewport.
+       */
+      amount?: number | 'viewport' | 'max';
+
+      /**
+       * CSS selector for the first matching scroll container. Defaults to the page.
+       */
+      container?: string;
+
+      /**
+       * Direction to scroll. Defaults to down.
+       */
+      direction?: 'up' | 'down' | 'left' | 'right';
+
+      /**
+       * Maximum scroll iterations. Stops early when scrolling and scrollable extent stop
+       * changing. Defaults to 1.
+       */
+      maxScrolls?: number;
+    }
   }
 
   /**
@@ -1236,6 +1388,17 @@ export namespace MonitorUpdateResponse {
     url: string;
 
     /**
+     * Optional browser actions executed in array order after the page loads, before
+     * content is captured, on every run. Requires a paid plan. Maximum: 5 actions.
+     * Changes create a new baseline.
+     */
+    actions?: Array<
+      | MonitorsPageTarget.WebScrapeWaitAction
+      | MonitorsPageTarget.WebScrapePerformAction
+      | MonitorsPageTarget.WebScrapeScrollAction
+    > | null;
+
+    /**
      * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
@@ -1256,6 +1419,71 @@ export namespace MonitorUpdateResponse {
      * Normalize whitespace before comparing or analyzing text.
      */
     normalize_whitespace?: boolean;
+  }
+
+  export namespace MonitorsPageTarget {
+    /**
+     * Pause for a fixed number of milliseconds before continuing to the next action.
+     */
+    export interface WebScrapeWaitAction {
+      /**
+       * Use `wait` to pause for a fixed duration.
+       */
+      do: 'wait';
+
+      /**
+       * Time to pause in milliseconds before the next action.
+       */
+      timeMs: number;
+    }
+
+    /**
+     * Resolve and perform one natural-language browser action.
+     */
+    export interface WebScrapePerformAction {
+      /**
+       * One browser instruction, such as clicking a button or entering text.
+       */
+      action: string;
+
+      /**
+       * Use `perform` for a plain-language browser instruction.
+       */
+      do: 'perform';
+    }
+
+    /**
+     * Scroll the page or a selected scrollable container, waiting adaptively for
+     * content and dimensions to settle after each iteration.
+     */
+    export interface WebScrapeScrollAction {
+      /**
+       * Use `scroll` to move through the page or a container.
+       */
+      do: 'scroll';
+
+      /**
+       * Pixels per scroll, one visible viewport, or the current scroll boundary.
+       * Defaults to viewport.
+       */
+      amount?: number | 'viewport' | 'max';
+
+      /**
+       * CSS selector for the first matching scroll container. Defaults to the page.
+       */
+      container?: string;
+
+      /**
+       * Direction to scroll. Defaults to down.
+       */
+      direction?: 'up' | 'down' | 'left' | 'right';
+
+      /**
+       * Maximum scroll iterations. Stops early when scrolling and scrollable extent stop
+       * changing. Defaults to 1.
+       */
+      maxScrolls?: number;
+    }
   }
 
   /**
@@ -1660,6 +1888,17 @@ export namespace MonitorListResponse {
       url: string;
 
       /**
+       * Optional browser actions executed in array order after the page loads, before
+       * content is captured, on every run. Requires a paid plan. Maximum: 5 actions.
+       * Changes create a new baseline.
+       */
+      actions?: Array<
+        | MonitorsPageTarget.WebScrapeWaitAction
+        | MonitorsPageTarget.WebScrapePerformAction
+        | MonitorsPageTarget.WebScrapeScrollAction
+      > | null;
+
+      /**
        * Remove matching regions after inclusions. Changes create a new baseline.
        */
       exclude_selectors?: Array<string>;
@@ -1680,6 +1919,71 @@ export namespace MonitorListResponse {
        * Normalize whitespace before comparing or analyzing text.
        */
       normalize_whitespace?: boolean;
+    }
+
+    export namespace MonitorsPageTarget {
+      /**
+       * Pause for a fixed number of milliseconds before continuing to the next action.
+       */
+      export interface WebScrapeWaitAction {
+        /**
+         * Use `wait` to pause for a fixed duration.
+         */
+        do: 'wait';
+
+        /**
+         * Time to pause in milliseconds before the next action.
+         */
+        timeMs: number;
+      }
+
+      /**
+       * Resolve and perform one natural-language browser action.
+       */
+      export interface WebScrapePerformAction {
+        /**
+         * One browser instruction, such as clicking a button or entering text.
+         */
+        action: string;
+
+        /**
+         * Use `perform` for a plain-language browser instruction.
+         */
+        do: 'perform';
+      }
+
+      /**
+       * Scroll the page or a selected scrollable container, waiting adaptively for
+       * content and dimensions to settle after each iteration.
+       */
+      export interface WebScrapeScrollAction {
+        /**
+         * Use `scroll` to move through the page or a container.
+         */
+        do: 'scroll';
+
+        /**
+         * Pixels per scroll, one visible viewport, or the current scroll boundary.
+         * Defaults to viewport.
+         */
+        amount?: number | 'viewport' | 'max';
+
+        /**
+         * CSS selector for the first matching scroll container. Defaults to the page.
+         */
+        container?: string;
+
+        /**
+         * Direction to scroll. Defaults to down.
+         */
+        direction?: 'up' | 'down' | 'left' | 'right';
+
+        /**
+         * Maximum scroll iterations. Stops early when scrolling and scrollable extent stop
+         * changing. Defaults to 1.
+         */
+        maxScrolls?: number;
+      }
     }
 
     /**
@@ -2851,6 +3155,17 @@ export namespace MonitorRotateWebhookSecretResponse {
     url: string;
 
     /**
+     * Optional browser actions executed in array order after the page loads, before
+     * content is captured, on every run. Requires a paid plan. Maximum: 5 actions.
+     * Changes create a new baseline.
+     */
+    actions?: Array<
+      | MonitorsPageTarget.WebScrapeWaitAction
+      | MonitorsPageTarget.WebScrapePerformAction
+      | MonitorsPageTarget.WebScrapeScrollAction
+    > | null;
+
+    /**
      * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
@@ -2871,6 +3186,71 @@ export namespace MonitorRotateWebhookSecretResponse {
      * Normalize whitespace before comparing or analyzing text.
      */
     normalize_whitespace?: boolean;
+  }
+
+  export namespace MonitorsPageTarget {
+    /**
+     * Pause for a fixed number of milliseconds before continuing to the next action.
+     */
+    export interface WebScrapeWaitAction {
+      /**
+       * Use `wait` to pause for a fixed duration.
+       */
+      do: 'wait';
+
+      /**
+       * Time to pause in milliseconds before the next action.
+       */
+      timeMs: number;
+    }
+
+    /**
+     * Resolve and perform one natural-language browser action.
+     */
+    export interface WebScrapePerformAction {
+      /**
+       * One browser instruction, such as clicking a button or entering text.
+       */
+      action: string;
+
+      /**
+       * Use `perform` for a plain-language browser instruction.
+       */
+      do: 'perform';
+    }
+
+    /**
+     * Scroll the page or a selected scrollable container, waiting adaptively for
+     * content and dimensions to settle after each iteration.
+     */
+    export interface WebScrapeScrollAction {
+      /**
+       * Use `scroll` to move through the page or a container.
+       */
+      do: 'scroll';
+
+      /**
+       * Pixels per scroll, one visible viewport, or the current scroll boundary.
+       * Defaults to viewport.
+       */
+      amount?: number | 'viewport' | 'max';
+
+      /**
+       * CSS selector for the first matching scroll container. Defaults to the page.
+       */
+      container?: string;
+
+      /**
+       * Direction to scroll. Defaults to down.
+       */
+      direction?: 'up' | 'down' | 'left' | 'right';
+
+      /**
+       * Maximum scroll iterations. Stops early when scrolling and scrollable extent stop
+       * changing. Defaults to 1.
+       */
+      maxScrolls?: number;
+    }
   }
 
   /**
@@ -3208,6 +3588,17 @@ export namespace MonitorCreateParams {
     url: string;
 
     /**
+     * Optional browser actions executed in array order after the page loads, before
+     * content is captured, on every run. Requires a paid plan. Maximum: 5 actions.
+     * Changes create a new baseline.
+     */
+    actions?: Array<
+      | MonitorsPageTarget.WebScrapeWaitAction
+      | MonitorsPageTarget.WebScrapePerformAction
+      | MonitorsPageTarget.WebScrapeScrollAction
+    > | null;
+
+    /**
      * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
@@ -3228,6 +3619,71 @@ export namespace MonitorCreateParams {
      * Normalize whitespace before comparing or analyzing text.
      */
     normalize_whitespace?: boolean;
+  }
+
+  export namespace MonitorsPageTarget {
+    /**
+     * Pause for a fixed number of milliseconds before continuing to the next action.
+     */
+    export interface WebScrapeWaitAction {
+      /**
+       * Use `wait` to pause for a fixed duration.
+       */
+      do: 'wait';
+
+      /**
+       * Time to pause in milliseconds before the next action.
+       */
+      timeMs: number;
+    }
+
+    /**
+     * Resolve and perform one natural-language browser action.
+     */
+    export interface WebScrapePerformAction {
+      /**
+       * One browser instruction, such as clicking a button or entering text.
+       */
+      action: string;
+
+      /**
+       * Use `perform` for a plain-language browser instruction.
+       */
+      do: 'perform';
+    }
+
+    /**
+     * Scroll the page or a selected scrollable container, waiting adaptively for
+     * content and dimensions to settle after each iteration.
+     */
+    export interface WebScrapeScrollAction {
+      /**
+       * Use `scroll` to move through the page or a container.
+       */
+      do: 'scroll';
+
+      /**
+       * Pixels per scroll, one visible viewport, or the current scroll boundary.
+       * Defaults to viewport.
+       */
+      amount?: number | 'viewport' | 'max';
+
+      /**
+       * CSS selector for the first matching scroll container. Defaults to the page.
+       */
+      container?: string;
+
+      /**
+       * Direction to scroll. Defaults to down.
+       */
+      direction?: 'up' | 'down' | 'left' | 'right';
+
+      /**
+       * Maximum scroll iterations. Stops early when scrolling and scrollable extent stop
+       * changing. Defaults to 1.
+       */
+      maxScrolls?: number;
+    }
   }
 
   /**
@@ -3490,6 +3946,17 @@ export namespace MonitorUpdateParams {
     url: string;
 
     /**
+     * Optional browser actions executed in array order after the page loads, before
+     * content is captured, on every run. Requires a paid plan. Maximum: 5 actions.
+     * Changes create a new baseline.
+     */
+    actions?: Array<
+      | MonitorsPageTarget.WebScrapeWaitAction
+      | MonitorsPageTarget.WebScrapePerformAction
+      | MonitorsPageTarget.WebScrapeScrollAction
+    > | null;
+
+    /**
      * Remove matching regions after inclusions. Changes create a new baseline.
      */
     exclude_selectors?: Array<string>;
@@ -3510,6 +3977,71 @@ export namespace MonitorUpdateParams {
      * Normalize whitespace before comparing or analyzing text.
      */
     normalize_whitespace?: boolean;
+  }
+
+  export namespace MonitorsPageTarget {
+    /**
+     * Pause for a fixed number of milliseconds before continuing to the next action.
+     */
+    export interface WebScrapeWaitAction {
+      /**
+       * Use `wait` to pause for a fixed duration.
+       */
+      do: 'wait';
+
+      /**
+       * Time to pause in milliseconds before the next action.
+       */
+      timeMs: number;
+    }
+
+    /**
+     * Resolve and perform one natural-language browser action.
+     */
+    export interface WebScrapePerformAction {
+      /**
+       * One browser instruction, such as clicking a button or entering text.
+       */
+      action: string;
+
+      /**
+       * Use `perform` for a plain-language browser instruction.
+       */
+      do: 'perform';
+    }
+
+    /**
+     * Scroll the page or a selected scrollable container, waiting adaptively for
+     * content and dimensions to settle after each iteration.
+     */
+    export interface WebScrapeScrollAction {
+      /**
+       * Use `scroll` to move through the page or a container.
+       */
+      do: 'scroll';
+
+      /**
+       * Pixels per scroll, one visible viewport, or the current scroll boundary.
+       * Defaults to viewport.
+       */
+      amount?: number | 'viewport' | 'max';
+
+      /**
+       * CSS selector for the first matching scroll container. Defaults to the page.
+       */
+      container?: string;
+
+      /**
+       * Direction to scroll. Defaults to down.
+       */
+      direction?: 'up' | 'down' | 'left' | 'right';
+
+      /**
+       * Maximum scroll iterations. Stops early when scrolling and scrollable extent stop
+       * changing. Defaults to 1.
+       */
+      maxScrolls?: number;
+    }
   }
 
   /**
