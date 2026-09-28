@@ -105,7 +105,8 @@ export class Web extends APIResource {
   }
 
   /**
-   * Search the web and optionally return page content with each result.
+   * Search the web and optionally return page content or relevant passages with each
+   * result.
    *
    * @example
    * ```ts
@@ -1698,6 +1699,11 @@ export namespace WebSearchResponse {
     description: string;
 
     /**
+     * Highlights status and passages for this result.
+     */
+    highlights: Result.Highlights;
+
+    /**
      * Markdown scrape status and content for this result.
      */
     markdown: Result.Markdown;
@@ -1719,6 +1725,22 @@ export namespace WebSearchResponse {
   }
 
   export namespace Result {
+    /**
+     * Highlights status and passages for this result.
+     */
+    export interface Highlights {
+      /**
+       * Per-result highlights outcome. Inspect this before reading `highlights`.
+       */
+      code: 'SUCCESS' | 'NOT_REQUESTED' | 'TIMEOUT' | 'CONTENT_TOO_LARGE' | 'WEBSITE_ACCESS_ERROR' | 'ERROR';
+
+      /**
+       * Passages relevant to the query, in page order. Null unless
+       * highlightsOptions.enabled is true and the page was read.
+       */
+      highlights: Array<string> | null;
+    }
+
     /**
      * Markdown scrape status and content for this result.
      */
@@ -3365,6 +3387,12 @@ export interface WebSearchParams {
   freshness?: 'last_24_hours' | 'last_week' | 'last_month' | 'last_year';
 
   /**
+   * Passages from each result page that are relevant to the query. Pages are read
+   * with the `markdownOptions` settings.
+   */
+  highlightsOptions?: WebSearchParams.HighlightsOptions;
+
+  /**
    * Allowlist — only return results from these domains. Example: ["arxiv.org",
    * "github.com"].
    */
@@ -3404,11 +3432,27 @@ export interface WebSearchParams {
 
 export namespace WebSearchParams {
   /**
+   * Passages from each result page that are relevant to the query. Pages are read
+   * with the `markdownOptions` settings.
+   */
+  export interface HighlightsOptions {
+    /**
+     * Return relevant passages for each result. Adds 1 credit per 10 results.
+     */
+    enabled?: boolean;
+
+    /**
+     * Maximum combined length of passages per result.
+     */
+    maxCharacters?: number;
+  }
+
+  /**
    * Inline Markdown scraping for each result. Set `enabled: true` to activate.
    */
   export interface MarkdownOptions {
     /**
-     * Scrape each result to Markdown. Off by default to keep search cheap and fast.
+     * Scrape each result to Markdown. Adds 1 credit per 10 results.
      */
     enabled?: boolean;
 
@@ -3428,8 +3472,8 @@ export namespace WebSearchParams {
     includeLinks?: boolean;
 
     /**
-     * Cache TTL in ms for scraped Markdown keyed by URL + options. Default 1 day, max
-     * 30 days. Set to 0 to force a fresh scrape.
+     * Cache TTL in ms for scraped Markdown keyed by URL + options. Default 15 days,
+     * max 30 days. Set to 0 to force a fresh scrape.
      */
     maxAgeMs?: number;
 
