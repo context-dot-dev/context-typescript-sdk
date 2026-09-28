@@ -30,6 +30,7 @@ describe('resource monitors', () => {
       target: {
         type: 'page',
         url: 'https://acme.com/pricing',
+        actions: [{ do: 'wait', timeMs: 0 }],
         exclude_selectors: ['.carousel', '[id^="TA_"]'],
         include_selectors: ['#attraction-details'],
         instructions:
