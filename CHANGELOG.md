@@ -1,5 +1,29 @@
 # Changelog
 
+## [3.3.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.2.0...v3.3.0) (2026-09-29)
+
+
+### Features
+
+* **answers:** route people and company research with faster answers ([#1336](https://github.com/context-dot-dev/context-typescript-sdk/issues/1336)) ([8c27f11](https://github.com/context-dot-dev/context-typescript-sdk/commit/8c27f11e9869c560e48733e7eea567bcaac4f68b))
+* **api:** explain failed scrape outputs and fix agent-reported bugs ([#1360](https://github.com/context-dot-dev/context-typescript-sdk/issues/1360)) ([b552101](https://github.com/context-dot-dev/context-typescript-sdk/commit/b552101be2e060deff5ab065ec7dc557bf439f18))
+* **monitors:** support browser actions on page monitors ([#1365](https://github.com/context-dot-dev/context-typescript-sdk/issues/1365)) ([9c4d8c6](https://github.com/context-dot-dev/context-typescript-sdk/commit/9c4d8c6a032ab485a2dacb8e596641e69b910dad))
+* **scrape:** default cache age to three days and allow one year ([#1339](https://github.com/context-dot-dev/context-typescript-sdk/issues/1339)) ([56cf963](https://github.com/context-dot-dev/context-typescript-sdk/commit/56cf963833d23e8e663cea0cb241007b4f4e99f2))
+* **search:** add highlights to web search and bill page reads per 10 results ([#1387](https://github.com/context-dot-dev/context-typescript-sdk/issues/1387)) ([9a4d3cf](https://github.com/context-dot-dev/context-typescript-sdk/commit/9a4d3cfbd20e9181b84b5b60079cc232f0b94ae0))
+* **web-search:** extend page cache defaults ([#1408](https://github.com/context-dot-dev/context-typescript-sdk/issues/1408)) ([47f5a8e](https://github.com/context-dot-dev/context-typescript-sdk/commit/47f5a8e7dda03ff3d4507d3e45030d2e05ec3a69))
+
+
+### Bug Fixes
+
+* **api:** document search domain limits and clarify scrape parameter errors ([#1388](https://github.com/context-dot-dev/context-typescript-sdk/issues/1388)) ([d5f9ce1](https://github.com/context-dot-dev/context-typescript-sdk/commit/d5f9ce1b09edf45122372dfcbd1cebaa6108b90e))
+* **scrape:** resolve extracted URLs from source references ([#1333](https://github.com/context-dot-dev/context-typescript-sdk/issues/1333)) ([51b131b](https://github.com/context-dot-dev/context-typescript-sdk/commit/51b131b2c12a8903abeca139a66c070c64040304))
+
+
+### Documentation
+
+* **openapi:** complete concise API reference metadata ([#1329](https://github.com/context-dot-dev/context-typescript-sdk/issues/1329)) ([790d1f4](https://github.com/context-dot-dev/context-typescript-sdk/commit/790d1f42e0cd523501a3e7d038be664c64929765))
+* **scrape:** rename endpoint to Scrape Anything ([#1341](https://github.com/context-dot-dev/context-typescript-sdk/issues/1341)) ([84ace2a](https://github.com/context-dot-dev/context-typescript-sdk/commit/84ace2adbccb99145ab5930a3cca20aa6b71eeb7))
+
 ## [3.2.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.1.0...v3.2.0) (2026-09-27)
 
 
