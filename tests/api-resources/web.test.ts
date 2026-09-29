@@ -173,7 +173,7 @@ describe('resource web', () => {
           },
         },
       },
-      productParams: { useAIFallback: true },
+      productParams: { dedupeImages: true },
       screenshotParams: { area: 'viewport', format: 'png' },
       sharedParams: {
         actions: [{ action: 'Click the product details tab', type: 'perform' }],

@@ -2503,9 +2503,9 @@ export namespace WebScrapeParams {
    */
   export interface ProductParams {
     /**
-     * Use an AI model when the page has no structured product data.
+     * Drop visually duplicate product images, keeping the largest copy.
      */
-    useAIFallback?: boolean;
+    dedupeImages?: boolean;
   }
 
   /**
