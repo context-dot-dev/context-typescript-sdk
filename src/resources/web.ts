@@ -2338,7 +2338,7 @@ export interface WebScrapeParams {
   tags?: Array<string>;
 
   /**
-   * Deadline for the whole request. Defaults to 60000 ms with `fail`. Fixed waits
+   * Deadline for the whole request. Defaults to 90000 ms with `fail`. Fixed waits
    * must end before it.
    */
   timeoutOpts?: WebScrapeParams.TimeoutOpts;
@@ -2752,7 +2752,7 @@ export namespace WebScrapeParams {
   }
 
   /**
-   * Deadline for the whole request. Defaults to 60000 ms with `fail`. Fixed waits
+   * Deadline for the whole request. Defaults to 90000 ms with `fail`. Fixed waits
    * must end before it.
    */
   export interface TimeoutOpts {
