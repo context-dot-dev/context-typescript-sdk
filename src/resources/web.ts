@@ -2287,7 +2287,7 @@ export interface WebScrapeParams {
   url: string;
 
   /**
-   * Required when `formats.highlights` is `true`.
+   * Requires `formats.highlights: true`; required when it is set.
    */
   highlightsParams?: WebScrapeParams.HighlightsParams;
 
@@ -2297,7 +2297,7 @@ export interface WebScrapeParams {
   imageParams?: WebScrapeParams.ImageParams;
 
   /**
-   * Required when formats.json is true.
+   * Requires `formats.json: true`; required when it is set.
    */
   jsonParams?: WebScrapeParams.JsonParams;
 
@@ -2313,7 +2313,7 @@ export interface WebScrapeParams {
   maxAgeMs?: number;
 
   /**
-   * Required when formats.parse is true.
+   * Requires `formats.parse: true`; required when it is set.
    */
   parseParams?: WebScrapeParams.ParseParams;
 
@@ -2401,7 +2401,7 @@ export namespace WebScrapeParams {
   }
 
   /**
-   * Required when `formats.highlights` is `true`.
+   * Requires `formats.highlights: true`; required when it is set.
    */
   export interface HighlightsParams {
     /**
@@ -2431,12 +2431,12 @@ export namespace WebScrapeParams {
   }
 
   /**
-   * Required when formats.json is true.
+   * Requires `formats.json: true`; required when it is set.
    */
   export interface JsonParams {
     /**
-     * JSON Schema for a top-level object, up to 50 KB. Use optional or nullable fields
-     * for missing facts.
+     * JSON Schema (not an example object) for a top-level object, up to 50 KB. Use
+     * optional or nullable fields for missing facts.
      */
     schema: { [key: string]: unknown };
 
@@ -2468,7 +2468,7 @@ export namespace WebScrapeParams {
   }
 
   /**
-   * Required when formats.parse is true.
+   * Requires `formats.parse: true`; required when it is set.
    */
   export interface ParseParams {
     /**
@@ -3376,8 +3376,8 @@ export interface WebSearchParams {
     | 'zw';
 
   /**
-   * Blocklist — drop results from these domains. Example: ["pinterest.com",
-   * "reddit.com"].
+   * Blocklist — drop results from these domains. Up to 100 domains. Example:
+   * ["pinterest.com", "reddit.com"].
    */
   excludeDomains?: Array<string>;
 
@@ -3393,8 +3393,8 @@ export interface WebSearchParams {
   highlightsOptions?: WebSearchParams.HighlightsOptions;
 
   /**
-   * Allowlist — only return results from these domains. Example: ["arxiv.org",
-   * "github.com"].
+   * Allowlist — only return results from these domains. Up to 100 domains. Example:
+   * ["arxiv.org", "github.com"].
    */
   includeDomains?: Array<string>;
 
