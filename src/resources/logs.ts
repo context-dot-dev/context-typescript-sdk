@@ -13,7 +13,7 @@ export class Logs extends APIResource {
    * Retrieve a request’s metadata, retained input, and response.
    */
   retrieve(requestID: string, options?: RequestOptions): APIPromise<LogRetrieveResponse> {
-    return this._client.get(path`/logs/${requestID}`, options);
+    return this._client.get(path`/org/logs/${requestID}`, options);
   }
 
   /**
@@ -21,7 +21,7 @@ export class Logs extends APIResource {
    * include batch settlements and monitor runs.
    */
   list(query: LogListParams | null | undefined = {}, options?: RequestOptions): APIPromise<LogListResponse> {
-    return this._client.get('/logs', { query, ...options });
+    return this._client.get('/org/logs', { query, ...options });
   }
 }
 
