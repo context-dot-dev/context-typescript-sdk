@@ -183,8 +183,8 @@ Types:
 
 Methods:
 
-- <code title="get /logs/{request_id}">client.logs.<a href="./src/resources/logs.ts">retrieve</a>(requestID) -> LogRetrieveResponse</code>
-- <code title="get /logs">client.logs.<a href="./src/resources/logs.ts">list</a>({ ...params }) -> LogListResponse</code>
+- <code title="get /org/logs/{request_id}">client.logs.<a href="./src/resources/logs.ts">retrieve</a>(requestID) -> LogRetrieveResponse</code>
+- <code title="get /org/logs">client.logs.<a href="./src/resources/logs.ts">list</a>({ ...params }) -> LogListResponse</code>
 
 # Feedback
 
