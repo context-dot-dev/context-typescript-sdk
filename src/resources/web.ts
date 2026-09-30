@@ -1017,7 +1017,7 @@ export namespace WebScrapeResponse {
   export namespace Bytes {
     export interface Data {
       /**
-       * Body as base64, after HTTP decompression. Up to 20 MiB decoded.
+       * Body as base64, after HTTP decompression. Up to 50 MiB decoded.
        */
       base64: string;
 
