@@ -1310,9 +1310,10 @@ export interface BatchListParams {
   status?: 'queued' | 'running' | 'cancelling' | 'completed' | 'cancelled' | 'failed';
 
   /**
-   * Comma-separated list of tags to filter by (matches batches having any of them).
+   * Tags to filter by (matches batches having any of them). Pass repeated `tags`
+   * params or one comma-separated list, e.g. `tags=docs,competitor`.
    */
-  tags?: string;
+  tags?: string | Array<string>;
 }
 
 export interface BatchGetResultsParams {
@@ -1664,8 +1665,7 @@ export namespace BatchSubmitParams {
         maxAgeMs?: number | null;
 
         /**
-         * PDF parsing controls. Use start/end to limit text extraction and embedded-image
-         * detection/OCR to an inclusive 1-based page range.
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
          */
         pdf?: Options.Pdf;
 
@@ -1692,13 +1692,12 @@ export namespace BatchSubmitParams {
 
       export namespace Options {
         /**
-         * PDF parsing controls. Use start/end to limit text extraction and embedded-image
-         * detection/OCR to an inclusive 1-based page range.
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
          */
         export interface Pdf {
           /**
-           * Last 1-based PDF page to parse. When omitted, parsing ends at the last page.
-           * Must be greater than or equal to start when both are provided.
+           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
+           * be >= start.
            */
           end?: number;
 
@@ -1713,7 +1712,7 @@ export namespace BatchSubmitParams {
           shouldParse?: boolean;
 
           /**
-           * First 1-based PDF page to parse. When omitted, parsing starts at the first page.
+           * First 1-based PDF page to parse.
            */
           start?: number;
         }
@@ -1994,8 +1993,7 @@ export namespace BatchSubmitParams {
         maxAgeMs?: number | null;
 
         /**
-         * PDF parsing controls. Use start/end to limit text extraction and embedded-image
-         * detection/OCR to an inclusive 1-based page range.
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
          */
         pdf?: Options.Pdf;
 
@@ -2017,13 +2015,12 @@ export namespace BatchSubmitParams {
 
       export namespace Options {
         /**
-         * PDF parsing controls. Use start/end to limit text extraction and embedded-image
-         * detection/OCR to an inclusive 1-based page range.
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
          */
         export interface Pdf {
           /**
-           * Last 1-based PDF page to parse. When omitted, parsing ends at the last page.
-           * Must be greater than or equal to start when both are provided.
+           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
+           * be >= start.
            */
           end?: number;
 
@@ -2038,7 +2035,7 @@ export namespace BatchSubmitParams {
           shouldParse?: boolean;
 
           /**
-           * First 1-based PDF page to parse. When omitted, parsing starts at the first page.
+           * First 1-based PDF page to parse.
            */
           start?: number;
         }
@@ -2418,8 +2415,7 @@ export namespace BatchSubmitParams {
         maxAgeMs?: number | null;
 
         /**
-         * PDF parsing controls. Use start/end to limit text extraction and embedded-image
-         * detection/OCR to an inclusive 1-based page range.
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
          */
         pdf?: Options.Pdf;
 
@@ -2446,13 +2442,12 @@ export namespace BatchSubmitParams {
 
       export namespace Options {
         /**
-         * PDF parsing controls. Use start/end to limit text extraction and embedded-image
-         * detection/OCR to an inclusive 1-based page range.
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
          */
         export interface Pdf {
           /**
-           * Last 1-based PDF page to parse. When omitted, parsing ends at the last page.
-           * Must be greater than or equal to start when both are provided.
+           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
+           * be >= start.
            */
           end?: number;
 
@@ -2467,7 +2462,7 @@ export namespace BatchSubmitParams {
           shouldParse?: boolean;
 
           /**
-           * First 1-based PDF page to parse. When omitted, parsing starts at the first page.
+           * First 1-based PDF page to parse.
            */
           start?: number;
         }
@@ -2815,8 +2810,7 @@ export namespace BatchSubmitParams {
         maxAgeMs?: number | null;
 
         /**
-         * PDF parsing controls. Use start/end to limit text extraction and embedded-image
-         * detection/OCR to an inclusive 1-based page range.
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
          */
         pdf?: Options.Pdf;
 
@@ -2838,13 +2832,12 @@ export namespace BatchSubmitParams {
 
       export namespace Options {
         /**
-         * PDF parsing controls. Use start/end to limit text extraction and embedded-image
-         * detection/OCR to an inclusive 1-based page range.
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
          */
         export interface Pdf {
           /**
-           * Last 1-based PDF page to parse. When omitted, parsing ends at the last page.
-           * Must be greater than or equal to start when both are provided.
+           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
+           * be >= start.
            */
           end?: number;
 
@@ -2859,7 +2852,7 @@ export namespace BatchSubmitParams {
           shouldParse?: boolean;
 
           /**
-           * First 1-based PDF page to parse. When omitted, parsing starts at the first page.
+           * First 1-based PDF page to parse.
            */
           start?: number;
         }

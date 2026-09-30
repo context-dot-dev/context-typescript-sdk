@@ -266,13 +266,13 @@ export namespace ParseHandleParams {
    */
   export interface Pdf {
     /**
-     * Last 1-based PDF page to parse. When omitted, parsing ends at the last page.
-     * Must be greater than or equal to start when both are provided.
+     * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
+     * be >= start.
      */
     end?: number;
 
     /**
-     * First 1-based PDF page to parse. When omitted, parsing starts at the first page.
+     * First 1-based PDF page to parse.
      */
     start?: number;
   }
