@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.4.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.3.0...v3.4.0) (2026-09-30)
+
+
+### Features
+
+* **logs:** serve request logs at /org/logs ([#1442](https://github.com/context-dot-dev/context-typescript-sdk/issues/1442)) ([f9b8c6d](https://github.com/context-dot-dev/context-typescript-sdk/commit/f9b8c6db3acad05121e5445207b05af08c69dfd7))
+* **scrape:** accept documents up to 50 MB ([#1436](https://github.com/context-dot-dev/context-typescript-sdk/issues/1436)) ([91e8d5e](https://github.com/context-dot-dev/context-typescript-sdk/commit/91e8d5e529c51b2b66554d877f756acf833a6366))
+* **scrape:** add productParams.dedupeImages, always run product AI fallback ([#1423](https://github.com/context-dot-dev/context-typescript-sdk/issues/1423)) ([889ef20](https://github.com/context-dot-dev/context-typescript-sdk/commit/889ef2055c8ba9e7f956990fe5a9237e2993af82))
+* **scrape:** default POST /web/scrape deadline to 90s ([#1428](https://github.com/context-dot-dev/context-typescript-sdk/issues/1428)) ([bc3912b](https://github.com/context-dot-dev/context-typescript-sdk/commit/bc3912b90e614a3889f8cd0449d6501bbed5c28e))
+
+
+### Bug Fixes
+
+* **api:** derive OpenAPI request docs from runtime Zod schemas ([#1421](https://github.com/context-dot-dev/context-typescript-sdk/issues/1421)) ([7020c30](https://github.com/context-dot-dev/context-typescript-sdk/commit/7020c30b863e8b5ecdb669a763ecf378172ff674))
+
 ## [3.3.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.2.0...v3.3.0) (2026-09-29)
 
 
