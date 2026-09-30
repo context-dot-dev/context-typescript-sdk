@@ -3390,7 +3390,7 @@ export interface WebSearchParams {
    * Passages from each result page that are relevant to the query. Pages are read
    * with the `markdownOptions` settings.
    */
-  highlightsOptions?: WebSearchParams.HighlightsOptions;
+  highlightsOptions?: WebSearchParams.HighlightsOptions | null;
 
   /**
    * Allowlist — only return results from these domains. Up to 100 domains. Example:
@@ -3401,7 +3401,7 @@ export interface WebSearchParams {
   /**
    * Inline Markdown scraping for each result. Set `enabled: true` to activate.
    */
-  markdownOptions?: WebSearchParams.MarkdownOptions;
+  markdownOptions?: WebSearchParams.MarkdownOptions | null;
 
   /**
    * Number of results to request and return (10–100). Defaults to 10.
@@ -3477,10 +3477,10 @@ export namespace WebSearchParams {
      * only highlights are requested. Explicit values override either default. Maximum:
      * 365 days. Set to 0 to force a fresh scrape.
      */
-    maxAgeMs?: number;
+    maxAgeMs?: number | null;
 
     /**
-     * PDF handling. Use start/end to bound text extraction and OCR to a page range.
+     * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
      */
     pdf?: MarkdownOptions.Pdf;
 
@@ -3503,12 +3503,12 @@ export namespace WebSearchParams {
      * Extra wait after page load before rendering, in ms (0–30000). Useful for
      * JS-heavy pages.
      */
-    waitForMs?: number;
+    waitForMs?: number | null;
   }
 
   export namespace MarkdownOptions {
     /**
-     * PDF handling. Use start/end to bound text extraction and OCR to a page range.
+     * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
      */
     export interface Pdf {
       /**
@@ -3523,7 +3523,7 @@ export namespace WebSearchParams {
       shouldParse?: boolean;
 
       /**
-       * First PDF page to parse (1-based, inclusive). Defaults to page 1.
+       * First 1-based PDF page to parse.
        */
       start?: number;
     }
@@ -3780,7 +3780,7 @@ export interface WebWebCrawlMdParams {
   /**
    * Remove matching elements after inclusions. Exclusions take precedence.
    */
-  excludeSelectors?: Array<string>;
+  excludeSelectors?: Array<string> | null;
 
   /**
    * When true, follow links on subdomains of the starting URL's domain (e.g.
@@ -3808,12 +3808,12 @@ export interface WebWebCrawlMdParams {
   /**
    * Keep matching HTML subtrees before converting each page to Markdown.
    */
-  includeSelectors?: Array<string>;
+  includeSelectors?: Array<string> | null;
 
   /**
    * Maximum cache age in milliseconds. Defaults to 1 day; `0` fetches fresh.
    */
-  maxAgeMs?: number;
+  maxAgeMs?: number | null;
 
   /**
    * Maximum link depth from the starting URL (0 = only the starting page)
@@ -3874,7 +3874,7 @@ export interface WebWebCrawlMdParams {
    * Browser wait time in milliseconds after initial page load for each crawled page.
    * Defaults to 3500 (3.5 seconds). Min: 0. Max: 30000 (30 seconds).
    */
-  waitForMs?: number;
+  waitForMs?: number | null;
 
   /**
    * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
@@ -3889,13 +3889,13 @@ export namespace WebWebCrawlMdParams {
    */
   export interface Pdf {
     /**
-     * Last 1-based PDF page to parse. When omitted, parsing ends at the last page.
-     * Must be greater than or equal to start when both are provided.
+     * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
+     * be >= start.
      */
     end?: number;
 
     /**
-     * Read scanned PDF pages with OCR; preserve pages that already contain text.
+     * Read scanned PDF pages with OCR; preserve pages that already have text.
      */
     ocr?: boolean;
 
@@ -3906,7 +3906,7 @@ export namespace WebWebCrawlMdParams {
     shouldParse?: boolean;
 
     /**
-     * First 1-based PDF page to parse. When omitted, parsing starts at the first page.
+     * First 1-based PDF page to parse.
      */
     start?: number;
   }

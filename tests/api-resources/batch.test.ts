@@ -92,7 +92,7 @@ describe('resource batch', () => {
     await expect(
       client.batch.getResults(
         'batch_9f2c8a',
-        { cursor: 'cursor', limit: 1 },
+        { cursor: '321669910225:155771193', limit: 1 },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(ContextDev.NotFoundError);
@@ -166,7 +166,7 @@ describe('resource batch', () => {
         url: 'https://example.com',
         retry: { delays_seconds: [10, 60, 300, 1800, 7200, 21600, 57600] },
       },
-      webhookUrl: 'webhookUrl',
+      webhookUrl: 'https://example.com',
       'Idempotency-Key': 'Idempotency-Key',
     });
   });
