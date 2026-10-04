@@ -1167,6 +1167,12 @@ export namespace WebScrapeResponse {
     error_code?: string;
 
     /**
+     * True when the page was too long to read in full, so values found only in the
+     * unread parts may be missing.
+     */
+    isTruncated?: true;
+
+    /**
      * Explanation of the failure and possible next steps.
      */
     message?: string;
