@@ -1732,7 +1732,14 @@ export namespace WebSearchResponse {
       /**
        * Per-result highlights outcome. Inspect this before reading `highlights`.
        */
-      code: 'SUCCESS' | 'NOT_REQUESTED' | 'TIMEOUT' | 'CONTENT_TOO_LARGE' | 'WEBSITE_ACCESS_ERROR' | 'ERROR';
+      code:
+        | 'SUCCESS'
+        | 'NOT_REQUESTED'
+        | 'TIMEOUT'
+        | 'CONTENT_TOO_LARGE'
+        | 'WEBSITE_ACCESS_ERROR'
+        | 'WEBSITE_BLOCKED'
+        | 'ERROR';
 
       /**
        * Passages relevant to the query, in page order. Null unless
@@ -1748,7 +1755,14 @@ export namespace WebSearchResponse {
       /**
        * Per-result scrape outcome. Inspect this before reading `markdown`.
        */
-      code: 'SUCCESS' | 'NOT_REQUESTED' | 'TIMEOUT' | 'CONTENT_TOO_LARGE' | 'WEBSITE_ACCESS_ERROR' | 'ERROR';
+      code:
+        | 'SUCCESS'
+        | 'NOT_REQUESTED'
+        | 'TIMEOUT'
+        | 'CONTENT_TOO_LARGE'
+        | 'WEBSITE_ACCESS_ERROR'
+        | 'WEBSITE_BLOCKED'
+        | 'ERROR';
 
       /**
        * GFM Markdown of the page. Null unless markdownOptions.enabled is true and
