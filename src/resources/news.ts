@@ -434,6 +434,7 @@ export namespace NewsSearchParams {
       | 'mx'
       | 'ng'
       | 'nl'
+      | 'pk'
       | 'qa'
       | 'sa'
       | 'se'
