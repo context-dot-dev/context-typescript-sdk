@@ -260,6 +260,7 @@ describe('resource web', () => {
     const response = await client.web.search({
       query: 'Stripe API authentication',
       country: 'af',
+      descriptionMaxCharacters: 0,
       excludeDomains: ['xxx'],
       freshness: 'last_24_hours',
       highlightsOptions: { enabled: true, maxCharacters: 100 },
