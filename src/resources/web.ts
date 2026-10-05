@@ -3395,6 +3395,11 @@ export interface WebSearchParams {
     | 'zw';
 
   /**
+   * Maximum length of each result's `description`, in characters.
+   */
+  descriptionMaxCharacters?: number | null;
+
+  /**
    * Blocklist — drop results from these domains. Up to 100 domains. Example:
    * ["pinterest.com", "reddit.com"].
    */
