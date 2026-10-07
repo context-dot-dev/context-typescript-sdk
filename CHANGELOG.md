@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.5.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.4.0...v3.5.0) (2026-10-07)
+
+
+### Features
+
+* **batches:** keep batch result files for 180 days ([#1638](https://github.com/context-dot-dev/context-typescript-sdk/issues/1638)) ([39fc762](https://github.com/context-dot-dev/context-typescript-sdk/commit/39fc762e0effa24906a76643429273e975eff203))
+* **news:** add Google News sitemap feeds for 52 sites from the NEEDLE 4-star gaps ([#1612](https://github.com/context-dot-dev/context-typescript-sdk/issues/1612)) ([e3ff127](https://github.com/context-dot-dev/context-typescript-sdk/commit/e3ff1272921ff10db0326beae6c2f94582efc04c))
+* **search:** /web/search - for news results extend description with matching passages from article. ([435424d](https://github.com/context-dot-dev/context-typescript-sdk/commit/435424d48a7bb8900febd3146e25a2bd453d2272))
+
+
+### Bug Fixes
+
+* **answers:** keep page links for the agent and only cite URLs it actually saw ([#1571](https://github.com/context-dot-dev/context-typescript-sdk/issues/1571)) ([da733ee](https://github.com/context-dot-dev/context-typescript-sdk/commit/da733eed4a52641246d71a24308c8b72094e9a4c))
+* **scrape:** keep the relevant sections of long pages for JSON extraction ([#1582](https://github.com/context-dot-dev/context-typescript-sdk/issues/1582)) ([8891890](https://github.com/context-dot-dev/context-typescript-sdk/commit/8891890369c39d18404d2859a6c181ed14d185bb))
+* **search:** shorter default page-read budget and blocked-page codes for search results ([#1573](https://github.com/context-dot-dev/context-typescript-sdk/issues/1573)) ([429afc2](https://github.com/context-dot-dev/context-typescript-sdk/commit/429afc288ed925f75a5b18a9204a47df0c65f869))
+
 ## [3.4.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.3.0...v3.4.0) (2026-09-30)
 
 
