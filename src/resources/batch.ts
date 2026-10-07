@@ -13,7 +13,7 @@ import { path } from '../internal/utils/path';
  */
 export class Batch extends APIResource {
   /**
-   * Get batch progress and result download links. Result files are deleted 7 days
+   * Get batch progress and result download links. Result files are deleted 180 days
    * after the batch finishes.
    *
    * @example
@@ -67,8 +67,8 @@ export class Batch extends APIResource {
   }
 
   /**
-   * Page through a finished batch’s results as JSON. Results remain available for 7
-   * days.
+   * Page through a finished batch’s results as JSON. Results remain available for
+   * 180 days.
    *
    * @example
    * ```ts
@@ -309,7 +309,7 @@ export interface BatchRetrieveResponse {
   request_id: string;
 
   /**
-   * Result download links; null until the batch finishes. Files are deleted 7 days
+   * Result download links; null until the batch finishes. Files are deleted 180 days
    * after the batch finishes.
    */
   results: BatchRetrieveResponse.Results | null;
@@ -397,7 +397,7 @@ export namespace BatchRetrieveResponse {
   }
 
   /**
-   * Result download links; null until the batch finishes. Files are deleted 7 days
+   * Result download links; null until the batch finishes. Files are deleted 180 days
    * after the batch finishes.
    */
   export interface Results {
@@ -546,7 +546,7 @@ export namespace BatchListResponse {
     progress: Data.Progress;
 
     /**
-     * Result download links; null until the batch finishes. Files are deleted 7 days
+     * Result download links; null until the batch finishes. Files are deleted 180 days
      * after the batch finishes.
      */
     results: Data.Results | null;
@@ -612,7 +612,7 @@ export namespace BatchListResponse {
     }
 
     /**
-     * Result download links; null until the batch finishes. Files are deleted 7 days
+     * Result download links; null until the batch finishes. Files are deleted 180 days
      * after the batch finishes.
      */
     export interface Results {
