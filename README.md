@@ -14,19 +14,25 @@ npm install context.dev
 
 ## Usage
 
+Set `CONTEXT_DEV_API_KEY` to your API key; the client reads it automatically.
+
+### Scrape markdown and HTML
+
 The full API of this library can be found in [api.md](api.md).
 
 <!-- prettier-ignore -->
-```js
+```ts
 import ContextDev from 'context.dev';
 
-const client = new ContextDev({
-  apiKey: process.env['CONTEXT_DEV_API_KEY'], // This is the default and can be omitted
+const client = new ContextDev();
+
+const page = await client.web.scrape({
+  url: 'https://example.com',
+  formats: { markdown: true, html: true },
 });
 
-const brand = await client.brand.retrieve({ domain: 'REPLACE_ME', type: 'by_domain' });
-
-console.log(brand.request_id);
+console.log(page.markdown.data);
+console.log(page.html.data);
 ```
 
 ### Extract structured JSON
@@ -52,19 +58,54 @@ const page = await client.web.scrape({
 console.log(page.json.data);
 ```
 
+### Extract relevant highlights
+
+Return the passages that answer a question about the page.
+
+```ts
+import ContextDev from 'context.dev';
+
+const client = new ContextDev();
+
+const page = await client.web.scrape({
+  url: 'https://example.com',
+  formats: { highlights: true },
+  highlightsParams: { query: 'What is this domain used for?' },
+});
+
+console.log(page.highlights.data);
+```
+
+### Take a screenshot
+
+The screenshot is returned as a base64 image data URL.
+
+```ts
+import ContextDev from 'context.dev';
+
+const client = new ContextDev();
+
+const page = await client.web.scrape({
+  url: 'https://example.com',
+  formats: { screenshot: true },
+});
+
+console.log(page.screenshot.data);
+```
+
 ## What you can do
 
-| Task                                                 | Method                   |
-| ---------------------------------------------------- | ------------------------ |
-| Scrape a URL to markdown, HTML, JSON or a screenshot | `client.web.scrape`      |
-| Crawl a site and get every page as markdown          | `client.web.webCrawlMd`  |
-| Map every URL on a domain                            | `client.web.mapUrls`     |
-| Search the web                                       | `client.web.search`      |
-| Take a screenshot of a page                          | `client.web.screenshot`  |
-| Parse PDFs and documents                             | `client.parse.handle`    |
-| Run thousands of URLs as a batch                     | `client.batch.submit`    |
-| Watch a page for changes                             | `client.monitors.create` |
-| Look up a company's logo, colors and brand data      | `client.brand.retrieve`  |
+| Task                                                             | Method                   |
+| ---------------------------------------------------------------- | ------------------------ |
+| Scrape a URL to markdown, HTML, JSON, highlights or a screenshot | `client.web.scrape`      |
+| Crawl a site and get every page as markdown                      | `client.web.webCrawlMd`  |
+| Map every URL on a domain                                        | `client.web.mapUrls`     |
+| Search the web                                                   | `client.web.search`      |
+| Take a screenshot of a page                                      | `client.web.screenshot`  |
+| Parse PDFs and documents                                         | `client.parse.handle`    |
+| Run thousands of URLs as a batch                                 | `client.batch.submit`    |
+| Watch a page for changes                                         | `client.monitors.create` |
+| Look up a company's logo, colors and brand data                  | `client.brand.retrieve`  |
 
 ## Use it from an AI agent
 
@@ -82,8 +123,8 @@ const client = new ContextDev({
   apiKey: process.env['CONTEXT_DEV_API_KEY'], // This is the default and can be omitted
 });
 
-const params: ContextDev.BrandRetrieveParams = { domain: 'REPLACE_ME', type: 'by_domain' };
-const brand: ContextDev.BrandRetrieveResponse = await client.brand.retrieve(params);
+const params: ContextDev.WebScrapeParams = { url: 'https://example.com', formats: { markdown: true } };
+const page: ContextDev.WebScrapeResponse = await client.web.scrape(params);
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
@@ -96,8 +137,8 @@ a subclass of `APIError` will be thrown:
 
 <!-- prettier-ignore -->
 ```ts
-const brand = await client.brand
-  .retrieve({ domain: 'REPLACE_ME', type: 'by_domain' })
+const page = await client.web
+  .scrape({ url: 'https://example.com', formats: { markdown: true } })
   .catch(async (err) => {
     if (err instanceof ContextDev.APIError) {
       console.log(err.status); // 400
@@ -138,7 +179,7 @@ const client = new ContextDev({
 });
 
 // Or, configure per-request:
-await client.brand.retrieve({ domain: 'REPLACE_ME', type: 'by_domain' }, {
+await client.web.scrape({ url: 'https://example.com', formats: { markdown: true } }, {
   maxRetries: 5,
 });
 ```
@@ -155,7 +196,7 @@ const client = new ContextDev({
 });
 
 // Override per-request:
-await client.brand.retrieve({ domain: 'REPLACE_ME', type: 'by_domain' }, {
+await client.web.scrape({ url: 'https://example.com', formats: { markdown: true } }, {
   timeout: 5 * 1000,
 });
 ```
@@ -178,17 +219,17 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 ```ts
 const client = new ContextDev();
 
-const response = await client.brand
-  .retrieve({ domain: 'REPLACE_ME', type: 'by_domain' })
+const response = await client.web
+  .scrape({ url: 'https://example.com', formats: { markdown: true } })
   .asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: brand, response: raw } = await client.brand
-  .retrieve({ domain: 'REPLACE_ME', type: 'by_domain' })
+const { data: page, response: raw } = await client.web
+  .scrape({ url: 'https://example.com', formats: { markdown: true } })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(brand.request_id);
+console.log(page.markdown.data);
 ```
 
 ### Logging
@@ -268,8 +309,9 @@ parameter. This library doesn't validate at runtime that the request matches the
 send will be sent as-is.
 
 ```ts
-client.brand.retrieve({
-  // ...
+client.web.scrape({
+  url: 'https://example.com',
+  formats: { markdown: true },
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',
 });
