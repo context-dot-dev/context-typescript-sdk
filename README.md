@@ -1,4 +1,4 @@
-# Context Dev TypeScript API Library
+# Context.dev TypeScript SDK API Library
 
 [![NPM version](<https://img.shields.io/npm/v/context.dev.svg?label=npm%20(stable)>)](https://npmjs.org/package/context.dev) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/context.dev)
 
@@ -26,9 +26,12 @@ const client = new ContextDev({
   apiKey: process.env['CONTEXT_DEV_API_KEY'], // This is the default and can be omitted
 });
 
-const brand = await client.brand.retrieve({ domain: 'REPLACE_ME', type: 'by_domain' });
+const page = await client.web.scrape({
+  formats: { markdown: true },
+  url: 'https://example.com',
+});
 
-console.log(brand.request_id);
+console.log(page.request_id);
 ```
 
 ### Request & Response types
@@ -229,7 +232,7 @@ parameter. This library doesn't validate at runtime that the request matches the
 send will be sent as-is.
 
 ```ts
-client.brand.retrieve({
+client.web.scrape({
   // ...
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',
