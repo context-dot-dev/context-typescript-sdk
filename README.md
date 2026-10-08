@@ -2,11 +2,9 @@
 
 [![NPM version](<https://img.shields.io/npm/v/context.dev.svg?label=npm%20(stable)>)](https://npmjs.org/package/context.dev) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/context.dev)
 
-This library provides convenient access to the Context Dev REST API from server-side TypeScript or JavaScript.
+Context.dev is a web scraping API for AI agents and LLMs. This SDK turns any URL into clean, LLM-ready markdown, crawls whole sites, searches the web, takes screenshots and extracts structured JSON against a schema you define, all with one API key. Proxies, JavaScript rendering and anti-bot handling run on Context.dev's side, so there is no headless browser to host.
 
 The REST API documentation can be found on [docs.context.dev](https://docs.context.dev/). The full API of this library can be found in [api.md](api.md).
-
-It is generated with [Stainless](https://www.stainless.com/).
 
 ## Installation
 
@@ -16,23 +14,102 @@ npm install context.dev
 
 ## Usage
 
+Set `CONTEXT_DEV_API_KEY` to your API key; the client reads it automatically.
+
+### Scrape markdown and HTML
+
 The full API of this library can be found in [api.md](api.md).
 
 <!-- prettier-ignore -->
-```js
+```ts
 import ContextDev from 'context.dev';
 
-const client = new ContextDev({
-  apiKey: process.env['CONTEXT_DEV_API_KEY'], // This is the default and can be omitted
+const client = new ContextDev();
+
+const page = await client.web.scrape({
+  url: 'https://example.com',
+  formats: { markdown: true, html: true },
+});
+
+console.log(page.markdown.data);
+console.log(page.html.data);
+```
+
+### Extract structured JSON
+
+`jsonParams.schema` accepts JSON Schema; install Zod 4 (`npm install zod@^4`) to build a schema with Zod and convert it with `z.toJSONSchema`.
+
+```ts
+import ContextDev from 'context.dev';
+import { z } from 'zod';
+
+const client = new ContextDev();
+const pageSchema = z.object({
+  title: z.string().nullable(),
+  description: z.string().nullable(),
 });
 
 const page = await client.web.scrape({
-  formats: { markdown: true, html: true },
   url: 'https://example.com',
+  formats: { json: true },
+  jsonParams: { schema: z.toJSONSchema(pageSchema) },
 });
 
-console.log(page.request_id);
+console.log(page.json.data);
 ```
+
+### Extract relevant highlights
+
+Return the passages that answer a question about the page.
+
+```ts
+import ContextDev from 'context.dev';
+
+const client = new ContextDev();
+
+const page = await client.web.scrape({
+  url: 'https://example.com',
+  formats: { highlights: true },
+  highlightsParams: { query: 'What is this domain used for?' },
+});
+
+console.log(page.highlights.data);
+```
+
+### Take a screenshot
+
+The screenshot is returned as a base64 image data URL.
+
+```ts
+import ContextDev from 'context.dev';
+
+const client = new ContextDev();
+
+const page = await client.web.scrape({
+  url: 'https://example.com',
+  formats: { screenshot: true },
+});
+
+console.log(page.screenshot.data);
+```
+
+## What you can do
+
+| Task                                                             | Method                   |
+| ---------------------------------------------------------------- | ------------------------ |
+| Scrape a URL to markdown, HTML, JSON, highlights or a screenshot | `client.web.scrape`      |
+| Crawl a site and get every page as markdown                      | `client.web.webCrawlMd`  |
+| Map every URL on a domain                                        | `client.web.mapUrls`     |
+| Search the web                                                   | `client.web.search`      |
+| Take a screenshot of a page                                      | `client.web.screenshot`  |
+| Parse PDFs and documents                                         | `client.parse.handle`    |
+| Run thousands of URLs as a batch                                 | `client.batch.submit`    |
+| Watch a page for changes                                         | `client.monitors.create` |
+| Look up a company's logo, colors and brand data                  | `client.brand.retrieve`  |
+
+## Use it from an AI agent
+
+Context.dev also ships as a plugin for [Claude](https://github.com/context-dot-dev/claude-plugin), [Cursor](https://github.com/context-dot-dev/cursor-plugin) and [Gemini CLI](https://github.com/context-dot-dev/gemini-cli-context), and as tools for [LangChain](https://github.com/context-dot-dev/langchain-context) and [Haystack](https://github.com/context-dot-dev/context-haystack).
 
 ### Request & Response types
 
@@ -46,10 +123,7 @@ const client = new ContextDev({
   apiKey: process.env['CONTEXT_DEV_API_KEY'], // This is the default and can be omitted
 });
 
-const params: ContextDev.WebScrapeParams = {
-  formats: { markdown: true },
-  url: 'https://example.com',
-};
+const params: ContextDev.WebScrapeParams = { url: 'https://example.com', formats: { markdown: true } };
 const page: ContextDev.WebScrapeResponse = await client.web.scrape(params);
 ```
 
@@ -64,10 +138,7 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 const page = await client.web
-  .scrape({
-    formats: { markdown: true },
-    url: 'https://example.com',
-  })
+  .scrape({ url: 'https://example.com', formats: { markdown: true } })
   .catch(async (err) => {
     if (err instanceof ContextDev.APIError) {
       console.log(err.status); // 400
@@ -108,10 +179,7 @@ const client = new ContextDev({
 });
 
 // Or, configure per-request:
-await client.web.scrape({
-  formats: { markdown: true },
-  url: 'https://example.com',
-}, {
+await client.web.scrape({ url: 'https://example.com', formats: { markdown: true } }, {
   maxRetries: 5,
 });
 ```
@@ -128,10 +196,7 @@ const client = new ContextDev({
 });
 
 // Override per-request:
-await client.web.scrape({
-  formats: { markdown: true },
-  url: 'https://example.com',
-}, {
+await client.web.scrape({ url: 'https://example.com', formats: { markdown: true } }, {
   timeout: 5 * 1000,
 });
 ```
@@ -155,22 +220,16 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 const client = new ContextDev();
 
 const response = await client.web
-  .scrape({
-    formats: { markdown: true },
-    url: 'https://example.com',
-  })
+  .scrape({ url: 'https://example.com', formats: { markdown: true } })
   .asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
 const { data: page, response: raw } = await client.web
-  .scrape({
-    formats: { markdown: true },
-    url: 'https://example.com',
-  })
+  .scrape({ url: 'https://example.com', formats: { markdown: true } })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(page.request_id);
+console.log(page.markdown.data);
 ```
 
 ### Logging
@@ -251,7 +310,8 @@ send will be sent as-is.
 
 ```ts
 client.web.scrape({
-  // ...
+  url: 'https://example.com',
+  formats: { markdown: true },
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',
 });
