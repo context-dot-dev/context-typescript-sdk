@@ -2,7 +2,7 @@
 
 [![NPM version](<https://img.shields.io/npm/v/context.dev.svg?label=npm%20(stable)>)](https://npmjs.org/package/context.dev) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/context.dev)
 
-This library provides convenient access to the Context Dev REST API from server-side TypeScript or JavaScript.
+Context.dev is a web scraping API for AI agents and LLMs. This SDK turns any URL into clean, LLM-ready markdown, crawls whole sites, searches the web, takes screenshots and extracts structured JSON against a schema you define, all with one API key. Proxies, JavaScript rendering and anti-bot handling run on Context.dev's side, so there is no headless browser to host.
 
 The REST API documentation can be found on [docs.context.dev](https://docs.context.dev/). The full API of this library can be found in [api.md](api.md).
 
@@ -30,6 +30,47 @@ const brand = await client.brand.retrieve({ domain: 'REPLACE_ME', type: 'by_doma
 
 console.log(brand.request_id);
 ```
+
+### Extract structured JSON
+
+`jsonParams.schema` accepts JSON Schema; install Zod 4 (`npm install zod@^4`) to build a schema with Zod and convert it with `z.toJSONSchema`.
+
+```ts
+import ContextDev from 'context.dev';
+import { z } from 'zod';
+
+const client = new ContextDev();
+const pageSchema = z.object({
+  title: z.string().nullable(),
+  description: z.string().nullable(),
+});
+
+const page = await client.web.scrape({
+  url: 'https://example.com',
+  formats: { json: true },
+  jsonParams: { schema: z.toJSONSchema(pageSchema) },
+});
+
+console.log(page.json.data);
+```
+
+## What you can do
+
+| Task | Method |
+| --- | --- |
+| Scrape a URL to markdown, HTML, JSON or a screenshot | `client.web.scrape` |
+| Crawl a site and get every page as markdown | `client.web.webCrawlMd` |
+| Map every URL on a domain | `client.web.mapUrls` |
+| Search the web | `client.web.search` |
+| Take a screenshot of a page | `client.web.screenshot` |
+| Parse PDFs and documents | `client.parse.handle` |
+| Run thousands of URLs as a batch | `client.batch.submit` |
+| Watch a page for changes | `client.monitors.create` |
+| Look up a company's logo, colors and brand data | `client.brand.retrieve` |
+
+## Use it from an AI agent
+
+Context.dev also ships as a plugin for [Claude](https://github.com/context-dot-dev/claude-plugin), [Cursor](https://github.com/context-dot-dev/cursor-plugin) and [Gemini CLI](https://github.com/context-dot-dev/gemini-cli-context), and as tools for [LangChain](https://github.com/context-dot-dev/langchain-context) and [Haystack](https://github.com/context-dot-dev/context-haystack).
 
 ### Request & Response types
 
