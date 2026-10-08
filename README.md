@@ -56,17 +56,17 @@ console.log(page.json.data);
 
 ## What you can do
 
-| Task | Method |
-| --- | --- |
-| Scrape a URL to markdown, HTML, JSON or a screenshot | `client.web.scrape` |
-| Crawl a site and get every page as markdown | `client.web.webCrawlMd` |
-| Map every URL on a domain | `client.web.mapUrls` |
-| Search the web | `client.web.search` |
-| Take a screenshot of a page | `client.web.screenshot` |
-| Parse PDFs and documents | `client.parse.handle` |
-| Run thousands of URLs as a batch | `client.batch.submit` |
-| Watch a page for changes | `client.monitors.create` |
-| Look up a company's logo, colors and brand data | `client.brand.retrieve` |
+| Task                                                 | Method                   |
+| ---------------------------------------------------- | ------------------------ |
+| Scrape a URL to markdown, HTML, JSON or a screenshot | `client.web.scrape`      |
+| Crawl a site and get every page as markdown          | `client.web.webCrawlMd`  |
+| Map every URL on a domain                            | `client.web.mapUrls`     |
+| Search the web                                       | `client.web.search`      |
+| Take a screenshot of a page                          | `client.web.screenshot`  |
+| Parse PDFs and documents                             | `client.parse.handle`    |
+| Run thousands of URLs as a batch                     | `client.batch.submit`    |
+| Watch a page for changes                             | `client.monitors.create` |
+| Look up a company's logo, colors and brand data      | `client.brand.retrieve`  |
 
 ## Use it from an AI agent
 
