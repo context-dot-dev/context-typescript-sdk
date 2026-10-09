@@ -3476,7 +3476,7 @@ export namespace WebSearchParams {
    */
   export interface MarkdownOptions {
     /**
-     * Scrape each result to Markdown. Adds 1 credit per 10 results.
+     * Scrape each result to Markdown. Adds 1 credit per result with Markdown.
      */
     enabled?: boolean;
 
