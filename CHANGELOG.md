@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.6.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.5.0...v3.6.0) (2026-10-09)
+
+
+### Features
+
+* **web-search:** charge markdown per delivered page ([#1729](https://github.com/context-dot-dev/context-typescript-sdk/issues/1729)) ([7969bc9](https://github.com/context-dot-dev/context-typescript-sdk/commit/7969bc95e11a7e77645b7ad3af097c406f9a7e12))
+
+
+### Documentation
+
+* demonstrate scraping formats throughout README ([e9b2400](https://github.com/context-dot-dev/context-typescript-sdk/commit/e9b2400177404d9ff436ab86c75135d29c046568))
+* format capability table ([dadbc3a](https://github.com/context-dot-dev/context-typescript-sdk/commit/dadbc3a86d3e4edbafb725a2b56191c23871d096))
+* lead README with Context.dev capabilities ([ea754f3](https://github.com/context-dot-dev/context-typescript-sdk/commit/ea754f3369c731dd8ba95d89ba065efa798dc27e))
+* reconcile custom scraping README with generated examples ([085efb2](https://github.com/context-dot-dev/context-typescript-sdk/commit/085efb2b0b7501f2cf3cc176e4de2e621a46474b))
+* remove Stainless README attribution ([2628c22](https://github.com/context-dot-dev/context-typescript-sdk/commit/2628c22cdc48e011546ba0e0ef45d2e3f7fe8b53))
+
 ## [3.5.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.4.0...v3.5.0) (2026-10-07)
 
 
