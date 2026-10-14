@@ -3506,7 +3506,7 @@ export interface WebSearchParams {
   markdownOptions?: WebSearchParams.MarkdownOptions | null;
 
   /**
-   * Number of results to request and return (10–100). Defaults to 10.
+   * Number of results to request and return (1–100). Defaults to 10.
    */
   numResults?: number;
 
