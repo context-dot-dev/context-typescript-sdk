@@ -192,6 +192,7 @@ describe('resource web', () => {
             startPage: 1,
           },
         },
+        profile: { profileId: 'prof_210b9798eb53baa4e69d31c1071cf03d', type: 'existing' },
         settleAnimations: true,
         theme: 'light',
         viewport: { height: 240, width: 240 },

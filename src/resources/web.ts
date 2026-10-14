@@ -961,6 +961,12 @@ export interface WebScrapeResponse {
   product: WebScrapeResponse.Product;
 
   /**
+   * Authenticated browser profile used for this scrape, or null when no profile was
+   * requested. New and existing profile requests both return the profile ID.
+   */
+  profile: WebScrapeResponse.Profile | null;
+
+  /**
    * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
    * support.
    */
@@ -1512,6 +1518,18 @@ export namespace WebScrapeResponse {
         }
       }
     }
+  }
+
+  /**
+   * Authenticated browser profile used for this scrape, or null when no profile was
+   * requested. New and existing profile requests both return the profile ID.
+   */
+  export interface Profile {
+    /**
+     * Save this ID after creating a profile, then reuse it as
+     * sharedParams.profile.profileId with type "existing".
+     */
+    id: string;
   }
 
   /**
@@ -2634,6 +2652,13 @@ export namespace WebScrapeParams {
     parsers?: SharedParams.Parsers;
 
     /**
+     * Create or reuse an authenticated browser profile. Requires a paid plan and an
+     * HTTPS target. Profiles persist session state, bypass shared caches, and cannot
+     * be combined with ZDR, custom headers, or raw bytes.
+     */
+    profile?: SharedParams.Existing | SharedParams.New;
+
+    /**
      * Wait for CSS animations to finish before capture. Defaults to `true` when
      * `screenshot` is requested.
      */
@@ -2751,6 +2776,35 @@ export namespace WebScrapeParams {
          */
         startPage?: number;
       }
+    }
+
+    export interface Existing {
+      /**
+       * The ID returned in profile.id by an earlier scrape.
+       */
+      profileId: string;
+
+      /**
+       * Reuse a saved browser profile.
+       */
+      type: 'existing';
+    }
+
+    export interface New {
+      /**
+       * Username or email for the target website.
+       */
+      identifier: string;
+
+      /**
+       * Password used to sign in. It is never stored in the profile.
+       */
+      password: string;
+
+      /**
+       * Sign in and create a browser profile.
+       */
+      type: 'new';
     }
 
     /**
