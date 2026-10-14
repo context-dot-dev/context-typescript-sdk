@@ -172,6 +172,7 @@ describe('resource web', () => {
             type: 'list',
           },
         },
+        type: 'custom',
       },
       productParams: { dedupeImages: true },
       screenshotParams: { area: 'viewport', format: 'png' },

@@ -950,8 +950,9 @@ export interface WebScrapeResponse {
   metadata: WebScrapeResponse.Metadata;
 
   /**
-   * Fields from `parseParams.rules`, after content filters. Unmatched fields are
-   * `null` (`[]` for lists).
+   * Custom rules return fields after content filters; unmatched fields are null ([]
+   * for lists). The google-maps parser returns business records in data.results and
+   * reads Maps data directly, independently of DOM filters and other outputs.
    */
   parsed: WebScrapeResponse.Parsed;
 
@@ -1339,8 +1340,9 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Fields from `parseParams.rules`, after content filters. Unmatched fields are
-   * `null` (`[]` for lists).
+   * Custom rules return fields after content filters; unmatched fields are null ([]
+   * for lists). The google-maps parser returns business records in data.results and
+   * reads Maps data directly, independently of DOM filters and other outputs.
    */
   export interface Parsed {
     data: { [key: string]: unknown } | null;
@@ -1351,6 +1353,12 @@ export namespace WebScrapeResponse {
      * `true` if returned, `false` if it failed, `null` if not requested.
      */
     success: boolean | null;
+
+    /**
+     * The selected prebuilt parser name, or custom when type is omitted, custom rules
+     * are used, or parsing is not requested.
+     */
+    type: 'custom' | 'google-maps';
 
     /**
      * Why the output failed. Present only when `success` is `false`.
@@ -2352,7 +2360,7 @@ export interface WebScrapeParams {
   /**
    * Requires `formats.parse: true`; required when it is set.
    */
-  parseParams?: WebScrapeParams.ParseParams;
+  parseParams?: WebScrapeParams.CustomParser | WebScrapeParams.PrebuiltParser;
 
   /**
    * Product options. Requires formats.product: true.
@@ -2422,7 +2430,7 @@ export namespace WebScrapeParams {
     markdown?: boolean;
 
     /**
-     * Fields extracted with `parseParams.rules`, returned as `parsed`.
+     * Fields extracted with custom rules or a prebuilt parser, returned as `parsed`.
      */
     parse?: boolean;
 
@@ -2504,18 +2512,20 @@ export namespace WebScrapeParams {
     inlineImages?: 'placeholder' | 'preserve';
   }
 
-  /**
-   * Requires `formats.parse: true`; required when it is set.
-   */
-  export interface ParseParams {
+  export interface CustomParser {
     /**
      * Field names mapped to CSS selectors (`h1`, `a@href`) or rule objects. Max 100
      * fields, 5 levels.
      */
-    rules: { [key: string]: string | ParseParams.UnionMember1 };
+    rules: { [key: string]: string | CustomParser.UnionMember1 };
+
+    /**
+     * Extract fields using custom CSS rules. This is the default when type is omitted.
+     */
+    type?: 'custom';
   }
 
-  export namespace ParseParams {
+  export namespace CustomParser {
     export interface UnionMember1 {
       /**
        * CSS selector to match within the current page or parent rule.
@@ -2533,6 +2543,20 @@ export namespace WebScrapeParams {
        */
       type?: 'item' | 'list';
     }
+  }
+
+  export interface PrebuiltParser {
+    /**
+     * Parse Google Maps business data into data.results. Accepts Maps place, search,
+     * and internal data URLs. Uses a US exit and English labels regardless of hl or
+     * Accept-Language, and reads Maps data independently of DOM filters.
+     */
+    parser: 'google-maps';
+
+    /**
+     * Use a prebuilt parser instead of custom rules.
+     */
+    type: 'prebuilt';
   }
 
   /**
@@ -2654,7 +2678,7 @@ export namespace WebScrapeParams {
     /**
      * Create or reuse an authenticated browser profile. Requires a paid plan and an
      * HTTPS target. Profiles persist session state, bypass shared caches, and cannot
-     * be combined with ZDR, custom headers, or raw bytes.
+     * be combined with ZDR, custom headers, raw bytes, or prebuilt parsers.
      */
     profile?: SharedParams.Existing | SharedParams.New;
 
