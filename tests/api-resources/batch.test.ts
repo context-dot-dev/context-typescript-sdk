@@ -42,6 +42,7 @@ describe('resource batch', () => {
           limit: 1,
           q: 'batch_1a2b',
           search_type: 'exact',
+          shouldIncludeUnified: true,
           status: 'queued',
           tags: 'docs,competitor',
         },
@@ -103,7 +104,7 @@ describe('resource batch', () => {
     const responsePromise = client.batch.submit({
       input: {
         data: {
-          format: 'markdown',
+          formats: {},
           urls: [
             { url: 'https://example.com/products/anvil' },
             { url: 'https://example.com/products/hammer' },
@@ -126,7 +127,17 @@ describe('resource batch', () => {
     const response = await client.batch.submit({
       input: {
         data: {
-          format: 'markdown',
+          formats: {
+            bytes: true,
+            highlights: true,
+            html: true,
+            images: true,
+            json: true,
+            markdown: true,
+            parse: true,
+            product: true,
+            screenshot: true,
+          },
           urls: [
             {
               url: 'https://example.com/products/anvil',
@@ -139,25 +150,62 @@ describe('resource batch', () => {
               meta: { foo: 'bar' },
             },
           ],
-          options: {
-            country: 'de',
-            excludeSelectors: ['x'],
-            includeHTML: true,
+          highlightsParams: { query: 'x', maxCharacters: 100 },
+          imageParams: { dedupe: 'none', enrich: ['dimensions'] },
+          jsonParams: {
+            schema: {
+              type: 'bar',
+              properties: 'bar',
+              required: 'bar',
+              additionalProperties: 'bar',
+            },
+            instructions: 'instructions',
+          },
+          markdownParams: {
             includeImages: true,
             includeLinks: true,
-            includeSelectors: ['x'],
-            maxAgeMs: 0,
-            pdf: {
-              end: 1,
-              ocr: true,
-              shouldParse: true,
-              start: 1,
-            },
-            settleAnimations: true,
-            shortenBase64Images: true,
-            useMainContentOnly: true,
-            waitForMs: 0,
+            inlineImages: 'placeholder',
           },
+          maxAgeMs: 0,
+          parseParams: {
+            rules: {
+              title: 'h1',
+              links: {
+                selector: 'a',
+                output: '@href',
+                type: 'list',
+              },
+            },
+            type: 'custom',
+          },
+          productParams: { dedupeImages: true },
+          screenshotParams: { area: 'viewport', format: 'png' },
+          sharedParams: {
+            actions: [{ action: 'Click the product details tab', type: 'perform' }],
+            country: 'US',
+            dismissCookies: true,
+            dismissPopups: true,
+            excludeSelectors: ['P'],
+            headers: { 'Accept-Language': 'en-US' },
+            includeFrames: true,
+            includeSelectors: ['P'],
+            mainContentOnly: true,
+            parsers: {
+              pdf: {
+                endPage: 1,
+                ocr: 'off',
+                startPage: 1,
+              },
+            },
+            profile: { profileId: 'prof_210b9798eb53baa4e69d31c1071cf03d', type: 'existing' },
+            settleAnimations: true,
+            theme: 'light',
+            viewport: { height: 240, width: 240 },
+            waitFor: 500,
+          },
+          tags: ['production', 'team-alpha'],
+          timeoutOpts: { milliseconds: 1, behavior: 'fail' },
+          zdr: 'disabled',
         },
         mode: 'scrape',
       },

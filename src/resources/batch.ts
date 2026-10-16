@@ -67,8 +67,9 @@ export class Batch extends APIResource {
   }
 
   /**
-   * Page through a finished batch’s results as JSON. Results remain available for
-   * 180 days.
+   * Page through a finished batch’s results as JSON. Each record contains result
+   * with the same outputs and per-format errors as POST /web/scrape. Results remain
+   * available for 180 days.
    *
    * @example
    * ```ts
@@ -86,8 +87,10 @@ export class Batch extends APIResource {
   }
 
   /**
-   * Scrape up to 25,000 URLs, or crawl a site, asynchronously. Poll the batch ID or
-   * receive a webhook when it finishes.
+   * Scrape up to 100,000 URLs, or crawl a site, asynchronously using the same
+   * formats and scrape parameters as POST /web/scrape. Choose Markdown, HTML,
+   * screenshots, images, bytes, parsed fields, products, highlights, and JSON. Poll
+   * the batch ID or receive a webhook when it finishes.
    *
    * @example
    * ```ts
@@ -95,7 +98,6 @@ export class Batch extends APIResource {
    *   input: {
    *     mode: 'scrape',
    *     data: {
-   *       format: 'markdown',
    *       urls: [
    *         {
    *           url: 'https://example.com/products/anvil',
@@ -107,7 +109,8 @@ export class Batch extends APIResource {
    *           itemId: 'sku-2',
    *         },
    *       ],
-   *       options: { useMainContentOnly: true },
+   *       formats: { markdown: true, html: true },
+   *       sharedParams: { mainContentOnly: true },
    *     },
    *   },
    * });
@@ -271,10 +274,9 @@ export interface BatchRetrieveResponse {
   failure: Failure | null;
 
   /**
-   * What each page is returned as. Matches `input.data.format` on the submit
-   * request.
+   * Outputs requested for each page. Matches input.data.formats on submission.
    */
-  format: 'markdown' | 'html';
+  formats: BatchRetrieveResponse.Formats;
 
   /**
    * What the submission accepted.
@@ -361,6 +363,56 @@ export namespace BatchRetrieveResponse {
      * Credits held when the batch was accepted.
      */
     reserved: number;
+  }
+
+  /**
+   * Outputs requested for each page. Matches input.data.formats on submission.
+   */
+  export interface Formats {
+    /**
+     * The original HTTP response body.
+     */
+    bytes?: boolean;
+
+    /**
+     * Markdown excerpts relevant to `highlightsParams.query`.
+     */
+    highlights?: boolean;
+
+    /**
+     * Rendered HTML.
+     */
+    html?: boolean;
+
+    /**
+     * Images found on the page.
+     */
+    images?: boolean;
+
+    /**
+     * An object matching `jsonParams.schema`, extracted from the page.
+     */
+    json?: boolean;
+
+    /**
+     * Page content as Markdown.
+     */
+    markdown?: boolean;
+
+    /**
+     * Fields extracted with custom rules or a prebuilt parser, returned as `parsed`.
+     */
+    parse?: boolean;
+
+    /**
+     * Product details such as name, price, and availability.
+     */
+    product?: boolean;
+
+    /**
+     * A screenshot of the page.
+     */
+    screenshot?: boolean;
   }
 
   export interface InvalidURL {
@@ -519,10 +571,9 @@ export namespace BatchListResponse {
     failure: BatchAPI.Failure | null;
 
     /**
-     * What each page is returned as. Matches `input.data.format` on the submit
-     * request.
+     * Outputs requested for each page. Matches input.data.formats on submission.
      */
-    format: 'markdown' | 'html';
+    formats: Data.Formats;
 
     /**
      * What the submission accepted.
@@ -588,6 +639,56 @@ export namespace BatchListResponse {
        * Credits held when the batch was accepted.
        */
       reserved: number;
+    }
+
+    /**
+     * Outputs requested for each page. Matches input.data.formats on submission.
+     */
+    export interface Formats {
+      /**
+       * The original HTTP response body.
+       */
+      bytes?: boolean;
+
+      /**
+       * Markdown excerpts relevant to `highlightsParams.query`.
+       */
+      highlights?: boolean;
+
+      /**
+       * Rendered HTML.
+       */
+      html?: boolean;
+
+      /**
+       * Images found on the page.
+       */
+      images?: boolean;
+
+      /**
+       * An object matching `jsonParams.schema`, extracted from the page.
+       */
+      json?: boolean;
+
+      /**
+       * Page content as Markdown.
+       */
+      markdown?: boolean;
+
+      /**
+       * Fields extracted with custom rules or a prebuilt parser, returned as `parsed`.
+       */
+      parse?: boolean;
+
+      /**
+       * Product details such as name, price, and availability.
+       */
+      product?: boolean;
+
+      /**
+       * A screenshot of the page.
+       */
+      screenshot?: boolean;
     }
 
     /**
@@ -737,9 +838,9 @@ export interface BatchCancelResponse {
   credits: BatchCancelResponse.Credits;
 
   /**
-   * What each page is returned as.
+   * Outputs requested for each page. Matches input.data.formats on submission.
    */
-  format: 'markdown' | 'html';
+  formats: BatchCancelResponse.Formats;
 
   /**
    * What the submission accepted.
@@ -798,6 +899,56 @@ export namespace BatchCancelResponse {
      * Credits held at submission; unused credits are refunded when the batch settles.
      */
     reserved: number;
+  }
+
+  /**
+   * Outputs requested for each page. Matches input.data.formats on submission.
+   */
+  export interface Formats {
+    /**
+     * The original HTTP response body.
+     */
+    bytes?: boolean;
+
+    /**
+     * Markdown excerpts relevant to `highlightsParams.query`.
+     */
+    highlights?: boolean;
+
+    /**
+     * Rendered HTML.
+     */
+    html?: boolean;
+
+    /**
+     * Images found on the page.
+     */
+    images?: boolean;
+
+    /**
+     * An object matching `jsonParams.schema`, extracted from the page.
+     */
+    json?: boolean;
+
+    /**
+     * Page content as Markdown.
+     */
+    markdown?: boolean;
+
+    /**
+     * Fields extracted with custom rules or a prebuilt parser, returned as `parsed`.
+     */
+    parse?: boolean;
+
+    /**
+     * Product details such as name, price, and availability.
+     */
+    product?: boolean;
+
+    /**
+     * A screenshot of the page.
+     */
+    screenshot?: boolean;
   }
 
   /**
@@ -881,32 +1032,22 @@ export interface BatchGetResultsResponse {
 
 export namespace BatchGetResultsResponse {
   /**
-   * A page the batch fetched successfully.
+   * At least one requested output succeeded. Check result.isPartial and each output
+   * success for incomplete results.
    */
   export interface Ok {
     /**
-     * Whether this response came from cache.
+     * Credits charged for this page, including OCR. Cached outputs use the same
+     * pricing as POST /web/scrape.
      */
-    cache_metadata: Ok.CacheMetadata;
+    credits_used: number;
 
     /**
-     * URL the content was read from, after redirects.
+     * The same response as POST /web/scrape, including per-format success, failure,
+     * and partial results.
      */
-    final_url: string;
+    result: Ok.Result;
 
-    /**
-     * HTTP status of the final response, when known.
-     */
-    http_status: number | null;
-
-    /**
-     * Metadata extracted from the scraped page HTML.
-     */
-    metadata: Ok.Metadata;
-
-    /**
-     * The page was scraped.
-     */
     status: 'ok';
 
     /**
@@ -915,20 +1056,9 @@ export namespace BatchGetResultsResponse {
     url: string;
 
     /**
-     * Page HTML. Present on html batches, and on markdown batches submitted with
-     * `options.includeHTML`.
-     */
-    html?: string;
-
-    /**
      * Your `itemId` from submission.
      */
     itemId?: string;
-
-    /**
-     * Page content as Markdown. Present on markdown batches.
-     */
-    markdown?: string;
 
     /**
      * Caller-supplied metadata echoed from submission.
@@ -936,168 +1066,703 @@ export namespace BatchGetResultsResponse {
     meta?: { [key: string]: unknown };
 
     /**
-     * Number of PDF pages recovered by OCR. Omitted when OCR did not run.
+     * PDF pages recovered by OCR. Omitted when OCR did not run.
      */
     ocr_pages?: number;
   }
 
   export namespace Ok {
     /**
-     * Whether this response came from cache.
+     * The same response as POST /web/scrape, including per-format success, failure,
+     * and partial results.
      */
-    export interface CacheMetadata {
+    export interface Result {
       /**
-       * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+       * The original HTTP response body, unchanged by waits, actions, and filters.
        */
-      age_ms: number;
+      bytes: Result.Bytes;
 
       /**
-       * Whether the response was served from cache, required fresh work, or honored
-       * zero-data-retention cache bypass.
+       * Whether this response came from cache.
        */
-      status: 'hit' | 'miss' | 'zdr';
+      cache_metadata: Result.CacheMetadata;
+
+      /**
+       * Relevant Markdown excerpts in page order. `[Heading]` adds context; `…` marks
+       * omitted text.
+       */
+      highlights: Result.Highlights;
+
+      /**
+       * Rendered HTML after content filters.
+       */
+      html: Result.HTML;
+
+      /**
+       * Images after content filters. `[]` when none are found.
+       */
+      images: Result.Images;
+
+      /**
+       * Object matching `jsonParams.schema`.
+       */
+      json: Result.Json;
+
+      /**
+       * Markdown after content filters.
+       */
+      markdown: Result.Markdown;
+
+      /**
+       * Page metadata. Fields are omitted when not found.
+       */
+      metadata: Result.Metadata;
+
+      /**
+       * Custom rules return fields after content filters; unmatched fields are null ([]
+       * for lists). The google-maps parser returns business records in data.results, and
+       * the google-play parser returns one app record as data, google-play-reviews
+       * returns data.reviews, app-store and app-store-reviews do the same for the App
+       * Store, emails, phone-numbers, and links return data.emails, data.phone_numbers,
+       * and data.links from the rendered page; the store and Maps parsers read their
+       * data directly, independently of DOM filters and other outputs.
+       */
+      parsed: Result.Parsed;
+
+      /**
+       * Product details found on the page.
+       */
+      product: Result.Product;
+
+      /**
+       * Authenticated browser profile used for this scrape, or null when no profile was
+       * requested. New and existing profile requests both return the profile ID.
+       */
+      profile: Result.Profile | null;
+
+      /**
+       * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+       * support.
+       */
+      request_id: string;
+
+      /**
+       * Screenshot as a base64 image data URL.
+       */
+      screenshot: Result.Screenshot;
+
+      /**
+       * Final URL after redirects and browser actions.
+       */
+      url: string;
+
+      /**
+       * True when at least one requested output succeeds but the response has failed or
+       * incomplete outputs. Absent when all requested outputs fail.
+       */
+      isPartial?: true;
+
+      /**
+       * Credits this request used and your remaining balance.
+       */
+      key_metadata?: Result.KeyMetadata;
     }
 
-    /**
-     * Metadata extracted from the scraped page HTML.
-     */
-    export interface Metadata {
+    export namespace Result {
       /**
-       * Final URL scraped after redirects or scraper fallback, when known. Falls back to
-       * sourceUrl when unavailable.
+       * The original HTTP response body, unchanged by waits, actions, and filters.
        */
-      finalUrl: string;
+      export interface Bytes {
+        data: Bytes.Data | null;
 
-      /**
-       * Original URL requested by the caller.
-       */
-      sourceUrl: string;
+        requested: boolean;
 
-      /**
-       * Additional non-social meta tags not promoted to top-level metadata fields.
-       */
-      additionalMeta?: { [key: string]: string | Array<string> };
-
-      /**
-       * Resolved alternate links from link rel=alternate tags.
-       */
-      alternates?: Array<Metadata.Alternate>;
-
-      /**
-       * Author metadata, when present.
-       */
-      author?: string;
-
-      /**
-       * Resolved canonical URL, when present.
-       */
-      canonicalUrl?: string;
-
-      /**
-       * Best description extracted from standard, Open Graph, or Twitter metadata.
-       */
-      description?: string;
-
-      /**
-       * Resolved favicon URL, when present.
-       */
-      favicon?: string;
-
-      /**
-       * Page headings (h1–h6) in document order, extracted from the unfiltered document.
-       * Capped at the first 500 headings. Omitted when the page has none.
-       */
-      headings?: Array<Metadata.Heading>;
-
-      /**
-       * Primary resolved preview image from Open Graph, Twitter, or image metadata.
-       */
-      image?: string;
-
-      /**
-       * JSON-LD structured data blocks parsed from the page.
-       */
-      jsonLd?: Array<{ [key: string]: unknown }>;
-
-      /**
-       * Keywords extracted from the page's keywords meta tag.
-       */
-      keywords?: Array<string>;
-
-      /**
-       * Language extracted from html lang or language meta tags.
-       */
-      language?: string;
-
-      /**
-       * Modified timestamp/date from page metadata, when present.
-       */
-      modifiedTime?: string;
-
-      /**
-       * Open Graph metadata with the og: prefix removed and keys camel-cased.
-       */
-      openGraph?: { [key: string]: string | Array<string> };
-
-      /**
-       * Published timestamp/date from page metadata, when present.
-       */
-      publishedTime?: string;
-
-      /**
-       * Robots meta directive, when present.
-       */
-      robots?: string;
-
-      /**
-       * Site or application name from page metadata.
-       */
-      siteName?: string;
-
-      /**
-       * Best title extracted from the page.
-       */
-      title?: string;
-
-      /**
-       * Twitter card metadata with the twitter: prefix removed and keys camel-cased.
-       */
-      twitter?: { [key: string]: string | Array<string> };
-    }
-
-    export namespace Metadata {
-      export interface Alternate {
         /**
-         * Resolved alternate URL.
+         * `true` if returned, `false` if it failed, `null` if not requested.
          */
-        href: string;
+        success: boolean | null;
 
         /**
-         * Language or locale for the alternate URL, when present.
+         * Why the output failed. Present only when `success` is `false`.
          */
-        hreflang?: string;
+        error_code?: string;
 
         /**
-         * Alternate resource title, when present.
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      export namespace Bytes {
+        export interface Data {
+          /**
+           * Body as base64, after HTTP decompression. Up to 50 MiB decoded.
+           */
+          base64: string;
+
+          contentType: string;
+        }
+      }
+
+      /**
+       * Whether this response came from cache.
+       */
+      export interface CacheMetadata {
+        /**
+         * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+         */
+        age_ms: number;
+
+        /**
+         * Whether the response was served from cache, required fresh work, or honored
+         * zero-data-retention cache bypass.
+         */
+        status: 'hit' | 'miss' | 'zdr';
+      }
+
+      /**
+       * Relevant Markdown excerpts in page order. `[Heading]` adds context; `…` marks
+       * omitted text.
+       */
+      export interface Highlights {
+        data: Array<string> | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Rendered HTML after content filters.
+       */
+      export interface HTML {
+        data: string | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Images after content filters. `[]` when none are found.
+       */
+      export interface Images {
+        data: Array<Images.Data> | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      export namespace Images {
+        export interface Data {
+          /**
+           * Alt text, if present.
+           */
+          alt: string | null;
+
+          /**
+           * Image URL, or a data URI for inline images.
+           */
+          url: string;
+
+          classification?:
+            | 'photography'
+            | 'illustration'
+            | 'logo'
+            | 'wordmark'
+            | 'icon'
+            | 'pattern'
+            | 'graphic'
+            | 'other';
+
+          /**
+           * Hosted image URL, valid for 24 hours after capture. Requires `file` enrichment
+           * and ZDR disabled.
+           */
+          fileUrl?: string;
+
+          height?: number;
+
+          width?: number;
+        }
+      }
+
+      /**
+       * Object matching `jsonParams.schema`.
+       */
+      export interface Json {
+        data: { [key: string]: unknown } | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * True when the page was too long to read in full, so values found only in the
+         * unread parts may be missing.
+         */
+        isTruncated?: true;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Markdown after content filters.
+       */
+      export interface Markdown {
+        data: string | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Page metadata. Fields are omitted when not found.
+       */
+      export interface Metadata {
+        /**
+         * Additional non-social meta tags not promoted to top-level metadata fields.
+         */
+        additionalMeta?: { [key: string]: string | Array<string> };
+
+        /**
+         * Resolved alternate links from link rel=alternate tags.
+         */
+        alternates?: Array<Metadata.Alternate>;
+
+        /**
+         * Author metadata, when present.
+         */
+        author?: string;
+
+        /**
+         * Resolved canonical URL, when present.
+         */
+        canonicalUrl?: string;
+
+        /**
+         * Best description extracted from standard, Open Graph, or Twitter metadata.
+         */
+        description?: string;
+
+        /**
+         * Resolved favicon URL, when present.
+         */
+        favicon?: string;
+
+        /**
+         * Up to 500 h1–h6 headings in document order, before content filtering.
+         */
+        headings?: Array<Metadata.Heading>;
+
+        /**
+         * Primary resolved preview image from Open Graph, Twitter, or image metadata.
+         */
+        image?: string;
+
+        /**
+         * JSON-LD structured data blocks parsed from the page.
+         */
+        jsonLd?: Array<{ [key: string]: unknown }>;
+
+        /**
+         * Keywords extracted from the page's keywords meta tag.
+         */
+        keywords?: Array<string>;
+
+        /**
+         * Language extracted from html lang or language meta tags.
+         */
+        language?: string;
+
+        /**
+         * Modified timestamp/date from page metadata, when present.
+         */
+        modifiedTime?: string;
+
+        /**
+         * Open Graph metadata with the og: prefix removed and keys camel-cased.
+         */
+        openGraph?: { [key: string]: string | Array<string> };
+
+        /**
+         * Published timestamp/date from page metadata, when present.
+         */
+        publishedTime?: string;
+
+        /**
+         * Robots meta directive, when present.
+         */
+        robots?: string;
+
+        /**
+         * Site or application name from page metadata.
+         */
+        siteName?: string;
+
+        /**
+         * Best title extracted from the page.
          */
         title?: string;
 
         /**
-         * Alternate resource MIME type, when present.
+         * Twitter card metadata with the twitter: prefix removed and keys camel-cased.
          */
-        type?: string;
+        twitter?: { [key: string]: string | Array<string> };
       }
 
-      export interface Heading {
-        /**
-         * Heading level, 1–6 (from h1–h6).
-         */
-        level: number;
+      export namespace Metadata {
+        export interface Alternate {
+          /**
+           * Resolved alternate URL.
+           */
+          href: string;
+
+          /**
+           * Language or locale for the alternate URL, when present.
+           */
+          hreflang?: string;
+
+          /**
+           * Alternate resource title, when present.
+           */
+          title?: string;
+
+          /**
+           * Alternate resource MIME type, when present.
+           */
+          type?: string;
+        }
+
+        export interface Heading {
+          /**
+           * Heading level, 1–6 (from h1–h6).
+           */
+          level: number;
+
+          /**
+           * Heading text with whitespace collapsed, truncated to 1000 characters.
+           */
+          text: string;
+        }
+      }
+
+      /**
+       * Custom rules return fields after content filters; unmatched fields are null ([]
+       * for lists). The google-maps parser returns business records in data.results, and
+       * the google-play parser returns one app record as data, google-play-reviews
+       * returns data.reviews, app-store and app-store-reviews do the same for the App
+       * Store, emails, phone-numbers, and links return data.emails, data.phone_numbers,
+       * and data.links from the rendered page; the store and Maps parsers read their
+       * data directly, independently of DOM filters and other outputs.
+       */
+      export interface Parsed {
+        data: { [key: string]: unknown } | null;
+
+        requested: boolean;
 
         /**
-         * Heading text with whitespace collapsed, truncated to 1000 characters.
+         * `true` if returned, `false` if it failed, `null` if not requested.
          */
-        text: string;
+        success: boolean | null;
+
+        /**
+         * The selected prebuilt parser name, or custom when type is omitted, custom rules
+         * are used, or parsing is not requested.
+         */
+        type:
+          | 'custom'
+          | 'google-maps'
+          | 'google-play'
+          | 'google-play-reviews'
+          | 'app-store'
+          | 'app-store-reviews'
+          | 'emails'
+          | 'phone-numbers'
+          | 'links';
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Product details found on the page.
+       */
+      export interface Product {
+        data: Product.Data | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      export namespace Product {
+        export interface Data {
+          /**
+           * Whether the page is a product detail page.
+           */
+          isProductPage: boolean;
+
+          /**
+           * The extracted product, or null when the page is not a product detail page.
+           */
+          product: Data.Product | null;
+        }
+
+        export namespace Data {
+          /**
+           * The extracted product, or null when the page is not a product detail page.
+           */
+          export interface Product {
+            /**
+             * Stock or ordering availability.
+             */
+            availability:
+              | 'in_stock'
+              | 'out_of_stock'
+              | 'limited_availability'
+              | 'preorder'
+              | 'backorder'
+              | 'made_to_order'
+              | 'discontinued'
+              | null;
+
+            /**
+             * Brand or vendor.
+             */
+            brand: string | null;
+
+            /**
+             * Product category.
+             */
+            category: string | null;
+
+            /**
+             * ISO 4217 currency code.
+             */
+            currency: string | null;
+
+            /**
+             * Product description.
+             */
+            description: string | null;
+
+            /**
+             * Product dimensions as shown on the page.
+             */
+            dimensions: Array<string>;
+
+            /**
+             * Key features and specifications.
+             */
+            features: Array<string>;
+
+            /**
+             * Product image URLs, main image first.
+             */
+            images: Array<string>;
+
+            /**
+             * Main product image URL.
+             */
+            imageUrl: string | null;
+
+            /**
+             * Product name.
+             */
+            name: string;
+
+            /**
+             * Current price.
+             */
+            price: number | null;
+
+            /**
+             * List price before any discount.
+             */
+            regularPrice: number | null;
+
+            /**
+             * Product identifier such as a SKU or model number.
+             */
+            sku: string | null;
+
+            /**
+             * Product tags.
+             */
+            tags: Array<string>;
+
+            /**
+             * Intended audience.
+             */
+            targetAudience: Array<string>;
+
+            /**
+             * Product variations, such as different colors or sizes, with their attributes and
+             * images. Empty if none are found. May not include every variation offered by the
+             * store.
+             */
+            variants: Array<Product.Variant>;
+          }
+
+          export namespace Product {
+            export interface Variant {
+              /**
+               * Explicit variant attributes such as color, size, material, pattern and
+               * properties declared by page.
+               */
+              attributes: { [key: string]: string };
+
+              /**
+               * Original source image URLs explicitly attached to this variant.
+               */
+              images: Array<string>;
+
+              sku: string | null;
+
+              /**
+               * Variant or offer URL when provided by the source. May be shared by variants.
+               */
+              url: string | null;
+            }
+          }
+        }
+      }
+
+      /**
+       * Authenticated browser profile used for this scrape, or null when no profile was
+       * requested. New and existing profile requests both return the profile ID.
+       */
+      export interface Profile {
+        /**
+         * Save this ID after creating a profile, then reuse it as
+         * sharedParams.profile.profileId with type "existing".
+         */
+        id: string;
+      }
+
+      /**
+       * Screenshot as a base64 image data URL.
+       */
+      export interface Screenshot {
+        data: string | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Credits this request used and your remaining balance.
+       */
+      export interface KeyMetadata {
+        /**
+         * Credits charged for this request.
+         */
+        credits_consumed: number;
+
+        /**
+         * Credits remaining for your organization.
+         */
+        credits_remaining: number;
       }
     }
   }
@@ -1127,6 +1792,12 @@ export namespace BatchGetResultsResponse {
     url: string;
 
     /**
+     * Credits charged for this page, including OCR. Cached outputs use the same
+     * pricing as POST /web/scrape.
+     */
+    credits_used?: number;
+
+    /**
      * Your `itemId` from submission.
      */
     itemId?: string;
@@ -1135,6 +1806,713 @@ export namespace BatchGetResultsResponse {
      * Caller-supplied metadata echoed from submission.
      */
     meta?: { [key: string]: unknown };
+
+    /**
+     * PDF pages recovered by OCR. Omitted when OCR did not run.
+     */
+    ocr_pages?: number;
+
+    /**
+     * Per-format failures when scraping returned a structured response. Omitted for
+     * errors that prevent scraping.
+     */
+    result?: Error.Result;
+  }
+
+  export namespace Error {
+    /**
+     * Per-format failures when scraping returned a structured response. Omitted for
+     * errors that prevent scraping.
+     */
+    export interface Result {
+      /**
+       * The original HTTP response body, unchanged by waits, actions, and filters.
+       */
+      bytes: Result.Bytes;
+
+      /**
+       * Whether this response came from cache.
+       */
+      cache_metadata: Result.CacheMetadata;
+
+      /**
+       * Relevant Markdown excerpts in page order. `[Heading]` adds context; `…` marks
+       * omitted text.
+       */
+      highlights: Result.Highlights;
+
+      /**
+       * Rendered HTML after content filters.
+       */
+      html: Result.HTML;
+
+      /**
+       * Images after content filters. `[]` when none are found.
+       */
+      images: Result.Images;
+
+      /**
+       * Object matching `jsonParams.schema`.
+       */
+      json: Result.Json;
+
+      /**
+       * Markdown after content filters.
+       */
+      markdown: Result.Markdown;
+
+      /**
+       * Page metadata. Fields are omitted when not found.
+       */
+      metadata: Result.Metadata;
+
+      /**
+       * Custom rules return fields after content filters; unmatched fields are null ([]
+       * for lists). The google-maps parser returns business records in data.results, and
+       * the google-play parser returns one app record as data, google-play-reviews
+       * returns data.reviews, app-store and app-store-reviews do the same for the App
+       * Store, emails, phone-numbers, and links return data.emails, data.phone_numbers,
+       * and data.links from the rendered page; the store and Maps parsers read their
+       * data directly, independently of DOM filters and other outputs.
+       */
+      parsed: Result.Parsed;
+
+      /**
+       * Product details found on the page.
+       */
+      product: Result.Product;
+
+      /**
+       * Authenticated browser profile used for this scrape, or null when no profile was
+       * requested. New and existing profile requests both return the profile ID.
+       */
+      profile: Result.Profile | null;
+
+      /**
+       * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+       * support.
+       */
+      request_id: string;
+
+      /**
+       * Screenshot as a base64 image data URL.
+       */
+      screenshot: Result.Screenshot;
+
+      /**
+       * Final URL after redirects and browser actions.
+       */
+      url: string;
+
+      /**
+       * True when at least one requested output succeeds but the response has failed or
+       * incomplete outputs. Absent when all requested outputs fail.
+       */
+      isPartial?: true;
+
+      /**
+       * Credits this request used and your remaining balance.
+       */
+      key_metadata?: Result.KeyMetadata;
+    }
+
+    export namespace Result {
+      /**
+       * The original HTTP response body, unchanged by waits, actions, and filters.
+       */
+      export interface Bytes {
+        data: Bytes.Data | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      export namespace Bytes {
+        export interface Data {
+          /**
+           * Body as base64, after HTTP decompression. Up to 50 MiB decoded.
+           */
+          base64: string;
+
+          contentType: string;
+        }
+      }
+
+      /**
+       * Whether this response came from cache.
+       */
+      export interface CacheMetadata {
+        /**
+         * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+         */
+        age_ms: number;
+
+        /**
+         * Whether the response was served from cache, required fresh work, or honored
+         * zero-data-retention cache bypass.
+         */
+        status: 'hit' | 'miss' | 'zdr';
+      }
+
+      /**
+       * Relevant Markdown excerpts in page order. `[Heading]` adds context; `…` marks
+       * omitted text.
+       */
+      export interface Highlights {
+        data: Array<string> | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Rendered HTML after content filters.
+       */
+      export interface HTML {
+        data: string | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Images after content filters. `[]` when none are found.
+       */
+      export interface Images {
+        data: Array<Images.Data> | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      export namespace Images {
+        export interface Data {
+          /**
+           * Alt text, if present.
+           */
+          alt: string | null;
+
+          /**
+           * Image URL, or a data URI for inline images.
+           */
+          url: string;
+
+          classification?:
+            | 'photography'
+            | 'illustration'
+            | 'logo'
+            | 'wordmark'
+            | 'icon'
+            | 'pattern'
+            | 'graphic'
+            | 'other';
+
+          /**
+           * Hosted image URL, valid for 24 hours after capture. Requires `file` enrichment
+           * and ZDR disabled.
+           */
+          fileUrl?: string;
+
+          height?: number;
+
+          width?: number;
+        }
+      }
+
+      /**
+       * Object matching `jsonParams.schema`.
+       */
+      export interface Json {
+        data: { [key: string]: unknown } | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * True when the page was too long to read in full, so values found only in the
+         * unread parts may be missing.
+         */
+        isTruncated?: true;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Markdown after content filters.
+       */
+      export interface Markdown {
+        data: string | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Page metadata. Fields are omitted when not found.
+       */
+      export interface Metadata {
+        /**
+         * Additional non-social meta tags not promoted to top-level metadata fields.
+         */
+        additionalMeta?: { [key: string]: string | Array<string> };
+
+        /**
+         * Resolved alternate links from link rel=alternate tags.
+         */
+        alternates?: Array<Metadata.Alternate>;
+
+        /**
+         * Author metadata, when present.
+         */
+        author?: string;
+
+        /**
+         * Resolved canonical URL, when present.
+         */
+        canonicalUrl?: string;
+
+        /**
+         * Best description extracted from standard, Open Graph, or Twitter metadata.
+         */
+        description?: string;
+
+        /**
+         * Resolved favicon URL, when present.
+         */
+        favicon?: string;
+
+        /**
+         * Up to 500 h1–h6 headings in document order, before content filtering.
+         */
+        headings?: Array<Metadata.Heading>;
+
+        /**
+         * Primary resolved preview image from Open Graph, Twitter, or image metadata.
+         */
+        image?: string;
+
+        /**
+         * JSON-LD structured data blocks parsed from the page.
+         */
+        jsonLd?: Array<{ [key: string]: unknown }>;
+
+        /**
+         * Keywords extracted from the page's keywords meta tag.
+         */
+        keywords?: Array<string>;
+
+        /**
+         * Language extracted from html lang or language meta tags.
+         */
+        language?: string;
+
+        /**
+         * Modified timestamp/date from page metadata, when present.
+         */
+        modifiedTime?: string;
+
+        /**
+         * Open Graph metadata with the og: prefix removed and keys camel-cased.
+         */
+        openGraph?: { [key: string]: string | Array<string> };
+
+        /**
+         * Published timestamp/date from page metadata, when present.
+         */
+        publishedTime?: string;
+
+        /**
+         * Robots meta directive, when present.
+         */
+        robots?: string;
+
+        /**
+         * Site or application name from page metadata.
+         */
+        siteName?: string;
+
+        /**
+         * Best title extracted from the page.
+         */
+        title?: string;
+
+        /**
+         * Twitter card metadata with the twitter: prefix removed and keys camel-cased.
+         */
+        twitter?: { [key: string]: string | Array<string> };
+      }
+
+      export namespace Metadata {
+        export interface Alternate {
+          /**
+           * Resolved alternate URL.
+           */
+          href: string;
+
+          /**
+           * Language or locale for the alternate URL, when present.
+           */
+          hreflang?: string;
+
+          /**
+           * Alternate resource title, when present.
+           */
+          title?: string;
+
+          /**
+           * Alternate resource MIME type, when present.
+           */
+          type?: string;
+        }
+
+        export interface Heading {
+          /**
+           * Heading level, 1–6 (from h1–h6).
+           */
+          level: number;
+
+          /**
+           * Heading text with whitespace collapsed, truncated to 1000 characters.
+           */
+          text: string;
+        }
+      }
+
+      /**
+       * Custom rules return fields after content filters; unmatched fields are null ([]
+       * for lists). The google-maps parser returns business records in data.results, and
+       * the google-play parser returns one app record as data, google-play-reviews
+       * returns data.reviews, app-store and app-store-reviews do the same for the App
+       * Store, emails, phone-numbers, and links return data.emails, data.phone_numbers,
+       * and data.links from the rendered page; the store and Maps parsers read their
+       * data directly, independently of DOM filters and other outputs.
+       */
+      export interface Parsed {
+        data: { [key: string]: unknown } | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * The selected prebuilt parser name, or custom when type is omitted, custom rules
+         * are used, or parsing is not requested.
+         */
+        type:
+          | 'custom'
+          | 'google-maps'
+          | 'google-play'
+          | 'google-play-reviews'
+          | 'app-store'
+          | 'app-store-reviews'
+          | 'emails'
+          | 'phone-numbers'
+          | 'links';
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Product details found on the page.
+       */
+      export interface Product {
+        data: Product.Data | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      export namespace Product {
+        export interface Data {
+          /**
+           * Whether the page is a product detail page.
+           */
+          isProductPage: boolean;
+
+          /**
+           * The extracted product, or null when the page is not a product detail page.
+           */
+          product: Data.Product | null;
+        }
+
+        export namespace Data {
+          /**
+           * The extracted product, or null when the page is not a product detail page.
+           */
+          export interface Product {
+            /**
+             * Stock or ordering availability.
+             */
+            availability:
+              | 'in_stock'
+              | 'out_of_stock'
+              | 'limited_availability'
+              | 'preorder'
+              | 'backorder'
+              | 'made_to_order'
+              | 'discontinued'
+              | null;
+
+            /**
+             * Brand or vendor.
+             */
+            brand: string | null;
+
+            /**
+             * Product category.
+             */
+            category: string | null;
+
+            /**
+             * ISO 4217 currency code.
+             */
+            currency: string | null;
+
+            /**
+             * Product description.
+             */
+            description: string | null;
+
+            /**
+             * Product dimensions as shown on the page.
+             */
+            dimensions: Array<string>;
+
+            /**
+             * Key features and specifications.
+             */
+            features: Array<string>;
+
+            /**
+             * Product image URLs, main image first.
+             */
+            images: Array<string>;
+
+            /**
+             * Main product image URL.
+             */
+            imageUrl: string | null;
+
+            /**
+             * Product name.
+             */
+            name: string;
+
+            /**
+             * Current price.
+             */
+            price: number | null;
+
+            /**
+             * List price before any discount.
+             */
+            regularPrice: number | null;
+
+            /**
+             * Product identifier such as a SKU or model number.
+             */
+            sku: string | null;
+
+            /**
+             * Product tags.
+             */
+            tags: Array<string>;
+
+            /**
+             * Intended audience.
+             */
+            targetAudience: Array<string>;
+
+            /**
+             * Product variations, such as different colors or sizes, with their attributes and
+             * images. Empty if none are found. May not include every variation offered by the
+             * store.
+             */
+            variants: Array<Product.Variant>;
+          }
+
+          export namespace Product {
+            export interface Variant {
+              /**
+               * Explicit variant attributes such as color, size, material, pattern and
+               * properties declared by page.
+               */
+              attributes: { [key: string]: string };
+
+              /**
+               * Original source image URLs explicitly attached to this variant.
+               */
+              images: Array<string>;
+
+              sku: string | null;
+
+              /**
+               * Variant or offer URL when provided by the source. May be shared by variants.
+               */
+              url: string | null;
+            }
+          }
+        }
+      }
+
+      /**
+       * Authenticated browser profile used for this scrape, or null when no profile was
+       * requested. New and existing profile requests both return the profile ID.
+       */
+      export interface Profile {
+        /**
+         * Save this ID after creating a profile, then reuse it as
+         * sharedParams.profile.profileId with type "existing".
+         */
+        id: string;
+      }
+
+      /**
+       * Screenshot as a base64 image data URL.
+       */
+      export interface Screenshot {
+        data: string | null;
+
+        requested: boolean;
+
+        /**
+         * `true` if returned, `false` if it failed, `null` if not requested.
+         */
+        success: boolean | null;
+
+        /**
+         * Why the output failed. Present only when `success` is `false`.
+         */
+        error_code?: string;
+
+        /**
+         * Explanation of the failure and possible next steps.
+         */
+        message?: string;
+      }
+
+      /**
+       * Credits this request used and your remaining balance.
+       */
+      export interface KeyMetadata {
+        /**
+         * Credits charged for this request.
+         */
+        credits_consumed: number;
+
+        /**
+         * Credits remaining for your organization.
+         */
+        credits_remaining: number;
+      }
+    }
   }
 
   /**
@@ -1180,9 +2558,9 @@ export interface BatchSubmitResponse {
   credits: BatchSubmitResponse.Credits;
 
   /**
-   * What each page will be returned as.
+   * Outputs requested for each page. Matches input.data.formats on submission.
    */
-  format: 'markdown' | 'html';
+  formats: BatchSubmitResponse.Formats;
 
   /**
    * What the submission accepted.
@@ -1253,6 +2631,56 @@ export namespace BatchSubmitResponse {
     reserved: number;
   }
 
+  /**
+   * Outputs requested for each page. Matches input.data.formats on submission.
+   */
+  export interface Formats {
+    /**
+     * The original HTTP response body.
+     */
+    bytes?: boolean;
+
+    /**
+     * Markdown excerpts relevant to `highlightsParams.query`.
+     */
+    highlights?: boolean;
+
+    /**
+     * Rendered HTML.
+     */
+    html?: boolean;
+
+    /**
+     * Images found on the page.
+     */
+    images?: boolean;
+
+    /**
+     * An object matching `jsonParams.schema`, extracted from the page.
+     */
+    json?: boolean;
+
+    /**
+     * Page content as Markdown.
+     */
+    markdown?: boolean;
+
+    /**
+     * Fields extracted with custom rules or a prebuilt parser, returned as `parsed`.
+     */
+    parse?: boolean;
+
+    /**
+     * Product details such as name, price, and availability.
+     */
+    product?: boolean;
+
+    /**
+     * A screenshot of the page.
+     */
+    screenshot?: boolean;
+  }
+
   export interface InvalidURL {
     /**
      * Why it was rejected.
@@ -1303,6 +2731,11 @@ export interface BatchListParams {
    * matching.
    */
   search_type?: 'exact' | 'prefix';
+
+  /**
+   * Include batches submitted with Scrape Anything formats. Defaults to false.
+   */
+  shouldIncludeUnified?: boolean;
 
   /**
    * Filter by status.
@@ -1361,13 +2794,14 @@ export interface BatchSubmitParams {
 
 export namespace BatchSubmitParams {
   /**
-   * Scrape a list of up to 25,000 URLs.
+   * Scrape a list of up to 100,000 URLs.
    */
   export interface Scrape {
     /**
-     * Pages to scrape and their output format.
+     * Use the same formats and parameters as POST /web/scrape, replacing url with
+     * urls. Options apply to every page.
      */
-    data: Scrape.Markdown | Scrape.HTML;
+    data: Scrape.Data;
 
     /**
      * Scrape the pages in `data.urls`.
@@ -1377,26 +2811,135 @@ export namespace BatchSubmitParams {
 
   export namespace Scrape {
     /**
-     * Scrape the listed pages as Markdown.
+     * Use the same formats and parameters as POST /web/scrape, replacing url with
+     * urls. Options apply to every page.
      */
-    export interface Markdown {
+    export interface Data {
       /**
-       * Return page content as Markdown.
+       * Outputs to return. Set at least one to `true`.
        */
-      format: 'markdown';
+      formats: Data.Formats;
 
       /**
-       * Pages to scrape. Maximum 25000.
+       * Pages to scrape. Maximum 100000.
        */
-      urls: Array<Markdown.URL>;
+      urls: Array<Data.URL>;
 
       /**
-       * Options for Markdown output.
+       * Requires `formats.highlights: true`; required when it is set.
        */
-      options?: Markdown.Options;
+      highlightsParams?: Data.HighlightsParams;
+
+      /**
+       * Image options. Requires formats.images: true.
+       */
+      imageParams?: Data.ImageParams;
+
+      /**
+       * Requires `formats.json: true`; required when it is set.
+       */
+      jsonParams?: Data.JsonParams;
+
+      /**
+       * Markdown options. Requires `formats.markdown`.
+       */
+      markdownParams?: Data.MarkdownParams;
+
+      /**
+       * Maximum age of a cached output, in milliseconds. `0` fetches fresh. Defaults to
+       * 3 days (259200000 ms). Maximum: 1 year (31536000000 ms).
+       */
+      maxAgeMs?: number;
+
+      /**
+       * Requires `formats.parse: true`; required when it is set.
+       */
+      parseParams?: Data.CustomParser | Data.PrebuiltParser;
+
+      /**
+       * Product options. Requires formats.product: true.
+       */
+      productParams?: Data.ProductParams;
+
+      /**
+       * Screenshot options. Requires formats.screenshot: true.
+       */
+      screenshotParams?: Data.ScreenshotParams;
+
+      /**
+       * Browser and content settings shared by all outputs.
+       */
+      sharedParams?: Data.SharedParams;
+
+      /**
+       * Labels for tracking request usage. Not retained when zdr is enabled.
+       */
+      tags?: Array<string>;
+
+      /**
+       * Deadline for each page, using the same behavior and defaults as POST
+       * /web/scrape.
+       */
+      timeoutOpts?: Data.TimeoutOpts;
+
+      /**
+       * Batches persist their results. Only disabled is supported; enabled returns
+       * ZDR_NOT_SUPPORTED.
+       */
+      zdr?: 'disabled';
     }
 
-    export namespace Markdown {
+    export namespace Data {
+      /**
+       * Outputs to return. Set at least one to `true`.
+       */
+      export interface Formats {
+        /**
+         * The original HTTP response body.
+         */
+        bytes?: boolean;
+
+        /**
+         * Markdown excerpts relevant to `highlightsParams.query`.
+         */
+        highlights?: boolean;
+
+        /**
+         * Rendered HTML.
+         */
+        html?: boolean;
+
+        /**
+         * Images found on the page.
+         */
+        images?: boolean;
+
+        /**
+         * An object matching `jsonParams.schema`, extracted from the page.
+         */
+        json?: boolean;
+
+        /**
+         * Page content as Markdown.
+         */
+        markdown?: boolean;
+
+        /**
+         * Fields extracted with custom rules or a prebuilt parser, returned as `parsed`.
+         */
+        parse?: boolean;
+
+        /**
+         * Product details such as name, price, and availability.
+         */
+        product?: boolean;
+
+        /**
+         * A screenshot of the page.
+         */
+        screenshot?: boolean;
+      }
+
       /**
        * A page to scrape, with optional data for matching results.
        */
@@ -1419,626 +2962,457 @@ export namespace BatchSubmitParams {
       }
 
       /**
-       * Options for Markdown output.
+       * Requires `formats.highlights: true`; required when it is set.
        */
-      export interface Options {
+      export interface HighlightsParams {
         /**
-         * Fetch from this country (ISO 3166-1 alpha-2).
+         * The question or topic to find passages for.
          */
-        country?:
-          | 'ad'
-          | 'ae'
-          | 'af'
-          | 'ag'
-          | 'ai'
-          | 'al'
-          | 'am'
-          | 'ao'
-          | 'ar'
-          | 'at'
-          | 'au'
-          | 'aw'
-          | 'az'
-          | 'ba'
-          | 'bb'
-          | 'bd'
-          | 'be'
-          | 'bf'
-          | 'bg'
-          | 'bh'
-          | 'bi'
-          | 'bj'
-          | 'bm'
-          | 'bn'
-          | 'bo'
-          | 'bq'
-          | 'br'
-          | 'bs'
-          | 'bw'
-          | 'by'
-          | 'bz'
-          | 'ca'
-          | 'cd'
-          | 'cf'
-          | 'cg'
-          | 'ch'
-          | 'ci'
-          | 'cl'
-          | 'cm'
-          | 'cn'
-          | 'co'
-          | 'cr'
-          | 'cv'
-          | 'cw'
-          | 'cy'
-          | 'cz'
-          | 'de'
-          | 'dj'
-          | 'dk'
-          | 'dm'
-          | 'do'
-          | 'dz'
-          | 'ec'
-          | 'ee'
-          | 'eg'
-          | 'es'
-          | 'et'
-          | 'fi'
-          | 'fj'
-          | 'fr'
-          | 'ga'
-          | 'gb'
-          | 'gd'
-          | 'ge'
-          | 'gf'
-          | 'gg'
-          | 'gh'
-          | 'gm'
-          | 'gn'
-          | 'gp'
-          | 'gq'
-          | 'gr'
-          | 'gt'
-          | 'gu'
-          | 'gw'
-          | 'gy'
-          | 'hk'
-          | 'hn'
-          | 'hr'
-          | 'ht'
-          | 'hu'
-          | 'id'
-          | 'ie'
-          | 'il'
-          | 'im'
-          | 'in'
-          | 'iq'
-          | 'ir'
-          | 'is'
-          | 'it'
-          | 'je'
-          | 'jm'
-          | 'jo'
-          | 'jp'
-          | 'ke'
-          | 'kg'
-          | 'kh'
-          | 'kn'
-          | 'kr'
-          | 'kw'
-          | 'ky'
-          | 'kz'
-          | 'la'
-          | 'lb'
-          | 'lc'
-          | 'lk'
-          | 'lr'
-          | 'ls'
-          | 'lt'
-          | 'lu'
-          | 'lv'
-          | 'ly'
-          | 'ma'
-          | 'mc'
-          | 'md'
-          | 'me'
-          | 'mf'
-          | 'mg'
-          | 'mk'
-          | 'ml'
-          | 'mm'
-          | 'mn'
-          | 'mo'
-          | 'mq'
-          | 'mr'
-          | 'mt'
-          | 'mu'
-          | 'mv'
-          | 'mw'
-          | 'mx'
-          | 'my'
-          | 'mz'
-          | 'na'
-          | 'nc'
-          | 'ne'
-          | 'ng'
-          | 'ni'
-          | 'nl'
-          | 'no'
-          | 'np'
-          | 'nz'
-          | 'om'
-          | 'pa'
-          | 'pe'
-          | 'pf'
-          | 'pg'
-          | 'ph'
-          | 'pk'
-          | 'pl'
-          | 'pr'
-          | 'ps'
-          | 'pt'
-          | 'py'
-          | 'qa'
-          | 're'
-          | 'ro'
-          | 'rs'
-          | 'ru'
-          | 'rw'
-          | 'sa'
-          | 'sc'
-          | 'sd'
-          | 'se'
-          | 'sg'
-          | 'si'
-          | 'sk'
-          | 'sl'
-          | 'sm'
-          | 'sn'
-          | 'so'
-          | 'sr'
-          | 'ss'
-          | 'st'
-          | 'sv'
-          | 'sx'
-          | 'sy'
-          | 'sz'
-          | 'tc'
-          | 'td'
-          | 'tg'
-          | 'th'
-          | 'tj'
-          | 'tl'
-          | 'tm'
-          | 'tn'
-          | 'tr'
-          | 'tt'
-          | 'tw'
-          | 'tz'
-          | 'ua'
-          | 'ug'
-          | 'us'
-          | 'uy'
-          | 'uz'
-          | 'vc'
-          | 've'
-          | 'vg'
-          | 'vi'
-          | 'vn'
-          | 'ye'
-          | 'yt'
-          | 'za'
-          | 'zm'
-          | 'zw';
+        query: string;
 
         /**
-         * Remove elements matching these CSS selectors. Applied after `includeSelectors`,
-         * so an element matching both is removed.
+         * Maximum combined length of returned passages.
          */
-        excludeSelectors?: Array<string> | null;
+        maxCharacters?: number;
+      }
+
+      /**
+       * Image options. Requires formats.images: true.
+       */
+      export interface ImageParams {
+        /**
+         * Set `visual` to drop visual duplicates, keeping the largest copy.
+         */
+        dedupe?: 'none' | 'visual';
 
         /**
-         * Also return each page's HTML in `html`.
+         * Extra data per image: `dimensions`, `classification`, or a hosted `file` URL.
          */
-        includeHTML?: boolean;
+        enrich?: Array<'dimensions' | 'classification' | 'file'>;
+      }
+
+      /**
+       * Requires `formats.json: true`; required when it is set.
+       */
+      export interface JsonParams {
+        /**
+         * JSON Schema (not an example object) for a top-level object, up to 50 KB. Use
+         * optional or nullable fields for missing facts.
+         */
+        schema: { [key: string]: unknown };
 
         /**
-         * Include image references in the Markdown.
+         * Extra guidance, such as which facts to prefer or how to read a field.
+         */
+        instructions?: string;
+      }
+
+      /**
+       * Markdown options. Requires `formats.markdown`.
+       */
+      export interface MarkdownParams {
+        /**
+         * Include images in the Markdown using image syntax with URLs and alt text.
          */
         includeImages?: boolean;
 
         /**
-         * Include links in the Markdown.
+         * Keep link URLs in the Markdown. Set false to return link text without URLs.
          */
         includeLinks?: boolean;
 
         /**
-         * Keep only elements matching these CSS selectors. Filtered pages ignore
-         * `maxAgeMs`.
+         * How base64 images appear: `placeholder` (default) or `preserve`. Requires
+         * `includeImages`.
          */
-        includeSelectors?: Array<string> | null;
+        inlineImages?: 'placeholder' | 'preserve';
+      }
+
+      export interface CustomParser {
+        /**
+         * Field names mapped to CSS selectors (`h1`, `a@href`) or rule objects. Max 100
+         * fields, 5 levels.
+         */
+        rules: { [key: string]: string | CustomParser.UnionMember1 };
 
         /**
-         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
-         * year (31536000000 ms). `0` fetches fresh.
+         * Extract fields using custom CSS rules. This is the default when type is omitted.
          */
-        maxAgeMs?: number | null;
+        type?: 'custom';
+      }
+
+      export namespace CustomParser {
+        export interface UnionMember1 {
+          /**
+           * CSS selector to match within the current page or parent rule.
+           */
+          selector: string;
+
+          /**
+           * Return text, HTML, an attribute such as `@href`, or nested field rules. Defaults
+           * to text.
+           */
+          output?: 'text' | 'html' | string | unknown;
+
+          /**
+           * Return the first match with `item` or all matches with `list`.
+           */
+          type?: 'item' | 'list';
+        }
+      }
+
+      export interface PrebuiltParser {
+        /**
+         * google-maps parses Google Maps business data into data.results. Accepts Maps
+         * place, search, and internal data URLs. Uses a US exit and English labels
+         * regardless of hl or Accept-Language. google-play parses a Play Store app into
+         * data: details, developer contact, ratings, price, permissions, and data safety.
+         * google-play-reviews returns the 200 newest reviews of the app, with developer
+         * replies, in data.reviews. Both Play parsers accept app details URLs
+         * (play.google.com/store/apps/details?id=…); hl and gl set the language and
+         * storefront, defaulting to en and us. app-store parses an App Store app into
+         * data: details, developer, ratings, price, version, and screenshots.
+         * app-store-reviews returns up to the 500 newest reviews in data.reviews. Both App
+         * Store parsers accept app URLs (apps.apple.com/us/app/…/id…); the country in the
+         * path sets the storefront, defaulting to us. emails accepts any page and returns
+         * its email addresses as data.emails ([{ email }]), read from mailto links,
+         * Cloudflare-protected addresses, and visible text. phone-numbers accepts any page
+         * and returns its valid phone numbers in E.164 as data.phone_numbers ([{ phone
+         * }]), read from tel links and visible text; numbers without a country code are
+         * read for the country of the site TLD, defaulting to US. links accepts any page
+         * and returns its unique http(s) links as data.links ([{ url, text }]), with
+         * absolute URLs; text falls back to aria-label or image alt and is null when a
+         * link has none. The emails parser reads the rendered page and respects content
+         * filters; the other prebuilt parsers read their data independently of DOM
+         * filters.
+         */
+        parser:
+          | 'google-maps'
+          | 'google-play'
+          | 'google-play-reviews'
+          | 'app-store'
+          | 'app-store-reviews'
+          | 'emails'
+          | 'phone-numbers'
+          | 'links';
 
         /**
-         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         * Use a prebuilt parser instead of custom rules.
          */
-        pdf?: Options.Pdf;
+        type: 'prebuilt';
+      }
+
+      /**
+       * Product options. Requires formats.product: true.
+       */
+      export interface ProductParams {
+        /**
+         * Drop visually duplicate product images, keeping the largest copy.
+         */
+        dedupeImages?: boolean;
+      }
+
+      /**
+       * Screenshot options. Requires formats.screenshot: true.
+       */
+      export interface ScreenshotParams {
+        /**
+         * What to capture: `viewport`, `fullPage`, one element, or a rectangle. Max 40
+         * megapixels.
+         */
+        area?: 'viewport' | 'fullPage' | ScreenshotParams.Element | ScreenshotParams.Rectangle;
 
         /**
-         * Wait for CSS animations to finish before extracting, on browser-rendered pages.
+         * Image format for the screenshot.
+         */
+        format?: 'png' | 'jpeg' | 'webp';
+      }
+
+      export namespace ScreenshotParams {
+        export interface Element {
+          /**
+           * CSS selector matching exactly one visible element.
+           */
+          selector: string;
+        }
+
+        /**
+         * Pixels from the document origin.
+         */
+        export interface Rectangle {
+          /**
+           * Height of the capture in pixels.
+           */
+          height: number;
+
+          /**
+           * Width of the capture in pixels.
+           */
+          width: number;
+
+          /**
+           * Left edge of the capture, in pixels from the document origin.
+           */
+          x: number;
+
+          /**
+           * Top edge of the capture, in pixels from the document origin.
+           */
+          y: number;
+        }
+      }
+
+      /**
+       * Browser and content settings shared by all outputs.
+       */
+      export interface SharedParams {
+        /**
+         * Browser steps run in order before capture. Requires a paid plan. Skips the
+         * cache.
+         */
+        actions?: Array<
+          SharedParams.Perform | SharedParams.Scroll | SharedParams.Wait | SharedParams.WaitFor
+        >;
+
+        /**
+         * Proxy country as a two-letter code, such as `US`. Case-insensitive.
+         */
+        country?: string;
+
+        /**
+         * Accept cookie banners before actions and capture.
+         */
+        dismissCookies?: boolean;
+
+        /**
+         * Close other popups before actions and capture.
+         */
+        dismissPopups?: boolean;
+
+        /**
+         * Remove elements matching these CSS selectors. Overrides `includeSelectors`.
+         */
+        excludeSelectors?: Array<string>;
+
+        /**
+         * HTTP headers to send to the target site. Requests with headers skip the cache.
+         */
+        headers?: { [key: string]: string };
+
+        /**
+         * Include iframe content in HTML and text outputs. Screenshots always show visible
+         * frames.
+         */
+        includeFrames?: boolean;
+
+        /**
+         * Keep only elements matching these CSS selectors.
+         */
+        includeSelectors?: Array<string>;
+
+        /**
+         * Keep only the main content. Doesn't affect `screenshot`, `bytes`, or `product`.
+         */
+        mainContentOnly?: boolean;
+
+        /**
+         * Document parsing options.
+         */
+        parsers?: SharedParams.Parsers;
+
+        /**
+         * Create or reuse an authenticated browser profile. Requires a paid plan and an
+         * HTTPS target. Profiles persist session state, bypass shared caches, and cannot
+         * be combined with ZDR, custom headers, raw bytes, or prebuilt parsers.
+         */
+        profile?: SharedParams.Existing | SharedParams.New;
+
+        /**
+         * Wait for CSS animations to finish before capture. Defaults to `true` when
+         * `screenshot` is requested.
          */
         settleAnimations?: boolean;
 
         /**
-         * Shorten inline base64 image data.
+         * Emulate a light or dark color scheme.
          */
-        shortenBase64Images?: boolean;
+        theme?: 'light' | 'dark';
 
         /**
-         * Return the main content without navigation or footers.
+         * Browser size in pixels. Omit for 1920 × 1080. When provided, missing dimensions
+         * default to 1440 × 900.
          */
-        useMainContentOnly?: boolean;
+        viewport?: SharedParams.Viewport;
 
         /**
-         * How long to wait after initial page load, in milliseconds. `0` waits 500 ms.
+         * Milliseconds, or a CSS selector to wait for, after actions. Defaults to 500
+         * (2000 with frames or XML).
          */
-        waitForMs?: number;
+        waitFor?: number | string;
       }
 
-      export namespace Options {
+      export namespace SharedParams {
+        export interface Perform {
+          /**
+           * One browser instruction, such as clicking a button or entering text.
+           */
+          action: string;
+
+          /**
+           * Use `perform` for a plain-language browser instruction.
+           */
+          type: 'perform';
+        }
+
+        export interface Scroll {
+          /**
+           * Use `scroll` to move through the page or a container.
+           */
+          type: 'scroll';
+
+          /**
+           * Distance per scroll: pixels, one `viewport`, or `max` to reach the end.
+           */
+          amount?: number | 'viewport' | 'max';
+
+          /**
+           * Direction to scroll.
+           */
+          direction?: 'down' | 'up' | 'left' | 'right';
+
+          /**
+           * Maximum number of scroll steps for this action.
+           */
+          maxScrolls?: number;
+
+          /**
+           * Scroll this container. Omit to scroll the page.
+           */
+          selector?: string;
+        }
+
+        export interface Wait {
+          /**
+           * Time to pause in milliseconds before the next action.
+           */
+          milliseconds: number;
+
+          /**
+           * Use `wait` to pause for a fixed duration.
+           */
+          type: 'wait';
+        }
+
+        export interface WaitFor {
+          /**
+           * CSS selector to wait for before continuing.
+           */
+          selector: string;
+
+          /**
+           * Use `waitFor` to wait for a matching element.
+           */
+          type: 'waitFor';
+        }
+
         /**
-         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         * Document parsing options.
          */
-        export interface Pdf {
+        export interface Parsers {
           /**
-           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
-           * be >= start.
+           * PDF page range and OCR.
            */
-          end?: number;
+          pdf?: Parsers.Pdf;
+        }
+
+        export namespace Parsers {
+          /**
+           * PDF page range and OCR.
+           */
+          export interface Pdf {
+            /**
+             * Last page to parse. Must be at least `startPage`.
+             */
+            endPage?: number;
+
+            /**
+             * Set `auto` to read scanned pages with OCR.
+             */
+            ocr?: 'off' | 'auto';
+
+            /**
+             * First page to parse, starting at 1.
+             */
+            startPage?: number;
+          }
+        }
+
+        export interface Existing {
+          /**
+           * The ID returned in profile.id by an earlier scrape.
+           */
+          profileId: string;
 
           /**
-           * Read scanned PDF pages with OCR; preserve pages that already have text.
+           * Reuse a saved browser profile.
            */
-          ocr?: boolean;
+          type: 'existing';
+        }
+
+        export interface New {
+          /**
+           * Username or email for the target website.
+           */
+          identifier: string;
 
           /**
-           * Parse PDF URLs. When false, PDFs fail with `PDF_SKIPPED`.
+           * Password used to sign in. It is never stored in the profile.
            */
-          shouldParse?: boolean;
+          password: string;
 
           /**
-           * First 1-based PDF page to parse.
+           * Sign in and create a browser profile.
            */
-          start?: number;
+          type: 'new';
+
+          /**
+           * Optional label shown when listing profiles with `GET /org/browser/profiles`.
+           */
+          description?: string;
+        }
+
+        /**
+         * Browser size in pixels. Omit for 1920 × 1080. When provided, missing dimensions
+         * default to 1440 × 900.
+         */
+        export interface Viewport {
+          /**
+           * Browser viewport height in pixels.
+           */
+          height?: number;
+
+          /**
+           * Browser viewport width in pixels.
+           */
+          width?: number;
         }
       }
-    }
-
-    /**
-     * Scrape the listed pages as HTML.
-     */
-    export interface HTML {
-      /**
-       * Return page content as HTML.
-       */
-      format: 'html';
 
       /**
-       * Pages to scrape. Maximum 25000.
+       * Deadline for each page, using the same behavior and defaults as POST
+       * /web/scrape.
        */
-      urls: Array<HTML.URL>;
-
-      /**
-       * Options for HTML output.
-       */
-      options?: HTML.Options;
-    }
-
-    export namespace HTML {
-      /**
-       * A page to scrape, with optional data for matching results.
-       */
-      export interface URL {
+      export interface TimeoutOpts {
         /**
-         * Page URL to scrape.
+         * Deadline in milliseconds.
          */
-        url: string;
+        milliseconds: number;
 
         /**
-         * Your ID for this page, returned with its result. The same URL can use different
-         * IDs.
+         * "fail" returns 408 at the deadline. "return-partial" returns available results;
+         * inspect the response’s partial flag. "return-partial" requires at least 5000 ms.
          */
-        itemId?: string;
-
-        /**
-         * Custom JSON returned unchanged with this page result.
-         */
-        meta?: { [key: string]: unknown };
-      }
-
-      /**
-       * Options for HTML output.
-       */
-      export interface Options {
-        /**
-         * Fetch from this country (ISO 3166-1 alpha-2).
-         */
-        country?:
-          | 'ad'
-          | 'ae'
-          | 'af'
-          | 'ag'
-          | 'ai'
-          | 'al'
-          | 'am'
-          | 'ao'
-          | 'ar'
-          | 'at'
-          | 'au'
-          | 'aw'
-          | 'az'
-          | 'ba'
-          | 'bb'
-          | 'bd'
-          | 'be'
-          | 'bf'
-          | 'bg'
-          | 'bh'
-          | 'bi'
-          | 'bj'
-          | 'bm'
-          | 'bn'
-          | 'bo'
-          | 'bq'
-          | 'br'
-          | 'bs'
-          | 'bw'
-          | 'by'
-          | 'bz'
-          | 'ca'
-          | 'cd'
-          | 'cf'
-          | 'cg'
-          | 'ch'
-          | 'ci'
-          | 'cl'
-          | 'cm'
-          | 'cn'
-          | 'co'
-          | 'cr'
-          | 'cv'
-          | 'cw'
-          | 'cy'
-          | 'cz'
-          | 'de'
-          | 'dj'
-          | 'dk'
-          | 'dm'
-          | 'do'
-          | 'dz'
-          | 'ec'
-          | 'ee'
-          | 'eg'
-          | 'es'
-          | 'et'
-          | 'fi'
-          | 'fj'
-          | 'fr'
-          | 'ga'
-          | 'gb'
-          | 'gd'
-          | 'ge'
-          | 'gf'
-          | 'gg'
-          | 'gh'
-          | 'gm'
-          | 'gn'
-          | 'gp'
-          | 'gq'
-          | 'gr'
-          | 'gt'
-          | 'gu'
-          | 'gw'
-          | 'gy'
-          | 'hk'
-          | 'hn'
-          | 'hr'
-          | 'ht'
-          | 'hu'
-          | 'id'
-          | 'ie'
-          | 'il'
-          | 'im'
-          | 'in'
-          | 'iq'
-          | 'ir'
-          | 'is'
-          | 'it'
-          | 'je'
-          | 'jm'
-          | 'jo'
-          | 'jp'
-          | 'ke'
-          | 'kg'
-          | 'kh'
-          | 'kn'
-          | 'kr'
-          | 'kw'
-          | 'ky'
-          | 'kz'
-          | 'la'
-          | 'lb'
-          | 'lc'
-          | 'lk'
-          | 'lr'
-          | 'ls'
-          | 'lt'
-          | 'lu'
-          | 'lv'
-          | 'ly'
-          | 'ma'
-          | 'mc'
-          | 'md'
-          | 'me'
-          | 'mf'
-          | 'mg'
-          | 'mk'
-          | 'ml'
-          | 'mm'
-          | 'mn'
-          | 'mo'
-          | 'mq'
-          | 'mr'
-          | 'mt'
-          | 'mu'
-          | 'mv'
-          | 'mw'
-          | 'mx'
-          | 'my'
-          | 'mz'
-          | 'na'
-          | 'nc'
-          | 'ne'
-          | 'ng'
-          | 'ni'
-          | 'nl'
-          | 'no'
-          | 'np'
-          | 'nz'
-          | 'om'
-          | 'pa'
-          | 'pe'
-          | 'pf'
-          | 'pg'
-          | 'ph'
-          | 'pk'
-          | 'pl'
-          | 'pr'
-          | 'ps'
-          | 'pt'
-          | 'py'
-          | 'qa'
-          | 're'
-          | 'ro'
-          | 'rs'
-          | 'ru'
-          | 'rw'
-          | 'sa'
-          | 'sc'
-          | 'sd'
-          | 'se'
-          | 'sg'
-          | 'si'
-          | 'sk'
-          | 'sl'
-          | 'sm'
-          | 'sn'
-          | 'so'
-          | 'sr'
-          | 'ss'
-          | 'st'
-          | 'sv'
-          | 'sx'
-          | 'sy'
-          | 'sz'
-          | 'tc'
-          | 'td'
-          | 'tg'
-          | 'th'
-          | 'tj'
-          | 'tl'
-          | 'tm'
-          | 'tn'
-          | 'tr'
-          | 'tt'
-          | 'tw'
-          | 'tz'
-          | 'ua'
-          | 'ug'
-          | 'us'
-          | 'uy'
-          | 'uz'
-          | 'vc'
-          | 've'
-          | 'vg'
-          | 'vi'
-          | 'vn'
-          | 'ye'
-          | 'yt'
-          | 'za'
-          | 'zm'
-          | 'zw';
-
-        /**
-         * Remove elements matching these CSS selectors. Applied after `includeSelectors`,
-         * so an element matching both is removed.
-         */
-        excludeSelectors?: Array<string> | null;
-
-        /**
-         * Keep only elements matching these CSS selectors. Filtered pages ignore
-         * `maxAgeMs`.
-         */
-        includeSelectors?: Array<string> | null;
-
-        /**
-         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
-         * year (31536000000 ms). `0` fetches fresh.
-         */
-        maxAgeMs?: number | null;
-
-        /**
-         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
-         */
-        pdf?: Options.Pdf;
-
-        /**
-         * Wait for CSS animations to finish before extracting, on browser-rendered pages.
-         */
-        settleAnimations?: boolean;
-
-        /**
-         * Return the main content without navigation or footers.
-         */
-        useMainContentOnly?: boolean;
-
-        /**
-         * How long to wait after initial page load, in milliseconds. `0` waits 500 ms.
-         */
-        waitForMs?: number;
-      }
-
-      export namespace Options {
-        /**
-         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
-         */
-        export interface Pdf {
-          /**
-           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
-           * be >= start.
-           */
-          end?: number;
-
-          /**
-           * Read scanned PDF pages with OCR; preserve pages that already have text.
-           */
-          ocr?: boolean;
-
-          /**
-           * Parse PDF URLs. When false, PDFs fail with `PDF_SKIPPED`.
-           */
-          shouldParse?: boolean;
-
-          /**
-           * First 1-based PDF page to parse.
-           */
-          start?: number;
-        }
+        behavior?: 'fail' | 'return-partial';
       }
     }
   }
@@ -2048,9 +3422,10 @@ export namespace BatchSubmitParams {
    */
   export interface Crawl {
     /**
-     * Crawl source and output format.
+     * Use the same formats and parameters as POST /web/scrape, replacing url with
+     * source. Options apply to every page.
      */
-    data: Crawl.Markdown | Crawl.HTML;
+    data: Crawl.Data;
 
     /**
      * Discover and scrape pages from `data.source`.
@@ -2060,26 +3435,135 @@ export namespace BatchSubmitParams {
 
   export namespace Crawl {
     /**
-     * Crawl pages and return Markdown.
+     * Use the same formats and parameters as POST /web/scrape, replacing url with
+     * source. Options apply to every page.
      */
-    export interface Markdown {
+    export interface Data {
       /**
-       * Return page content as Markdown.
+       * Outputs to return. Set at least one to `true`.
        */
-      format: 'markdown';
+      formats: Data.Formats;
 
       /**
        * How to find pages to crawl.
        */
-      source: Markdown.StartURL | Markdown.Sitemap;
+      source: Data.StartURL | Data.Sitemap;
 
       /**
-       * Options for Markdown output.
+       * Requires `formats.highlights: true`; required when it is set.
        */
-      options?: Markdown.Options;
+      highlightsParams?: Data.HighlightsParams;
+
+      /**
+       * Image options. Requires formats.images: true.
+       */
+      imageParams?: Data.ImageParams;
+
+      /**
+       * Requires `formats.json: true`; required when it is set.
+       */
+      jsonParams?: Data.JsonParams;
+
+      /**
+       * Markdown options. Requires `formats.markdown`.
+       */
+      markdownParams?: Data.MarkdownParams;
+
+      /**
+       * Maximum age of a cached output, in milliseconds. `0` fetches fresh. Defaults to
+       * 3 days (259200000 ms). Maximum: 1 year (31536000000 ms).
+       */
+      maxAgeMs?: number;
+
+      /**
+       * Requires `formats.parse: true`; required when it is set.
+       */
+      parseParams?: Data.CustomParser | Data.PrebuiltParser;
+
+      /**
+       * Product options. Requires formats.product: true.
+       */
+      productParams?: Data.ProductParams;
+
+      /**
+       * Screenshot options. Requires formats.screenshot: true.
+       */
+      screenshotParams?: Data.ScreenshotParams;
+
+      /**
+       * Browser and content settings shared by all outputs.
+       */
+      sharedParams?: Data.SharedParams;
+
+      /**
+       * Labels for tracking request usage. Not retained when zdr is enabled.
+       */
+      tags?: Array<string>;
+
+      /**
+       * Deadline for each page, using the same behavior and defaults as POST
+       * /web/scrape.
+       */
+      timeoutOpts?: Data.TimeoutOpts;
+
+      /**
+       * Batches persist their results. Only disabled is supported; enabled returns
+       * ZDR_NOT_SUPPORTED.
+       */
+      zdr?: 'disabled';
     }
 
-    export namespace Markdown {
+    export namespace Data {
+      /**
+       * Outputs to return. Set at least one to `true`.
+       */
+      export interface Formats {
+        /**
+         * The original HTTP response body.
+         */
+        bytes?: boolean;
+
+        /**
+         * Markdown excerpts relevant to `highlightsParams.query`.
+         */
+        highlights?: boolean;
+
+        /**
+         * Rendered HTML.
+         */
+        html?: boolean;
+
+        /**
+         * Images found on the page.
+         */
+        images?: boolean;
+
+        /**
+         * An object matching `jsonParams.schema`, extracted from the page.
+         */
+        json?: boolean;
+
+        /**
+         * Page content as Markdown.
+         */
+        markdown?: boolean;
+
+        /**
+         * Fields extracted with custom rules or a prebuilt parser, returned as `parsed`.
+         */
+        parse?: boolean;
+
+        /**
+         * Product details such as name, price, and availability.
+         */
+        product?: boolean;
+
+        /**
+         * A screenshot of the page.
+         */
+        screenshot?: boolean;
+      }
+
       /**
        * Discover pages by following links from one URL.
        */
@@ -2116,7 +3600,7 @@ export namespace BatchSubmitParams {
           maxDepth?: number;
 
           /**
-           * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 25000.
+           * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 100000.
            */
           maxUrls?: number;
 
@@ -2157,7 +3641,7 @@ export namespace BatchSubmitParams {
          */
         export interface Controls {
           /**
-           * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 25000.
+           * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 100000.
            */
           maxUrls?: number;
 
@@ -2169,693 +3653,457 @@ export namespace BatchSubmitParams {
       }
 
       /**
-       * Options for Markdown output.
+       * Requires `formats.highlights: true`; required when it is set.
        */
-      export interface Options {
+      export interface HighlightsParams {
         /**
-         * Fetch from this country (ISO 3166-1 alpha-2).
+         * The question or topic to find passages for.
          */
-        country?:
-          | 'ad'
-          | 'ae'
-          | 'af'
-          | 'ag'
-          | 'ai'
-          | 'al'
-          | 'am'
-          | 'ao'
-          | 'ar'
-          | 'at'
-          | 'au'
-          | 'aw'
-          | 'az'
-          | 'ba'
-          | 'bb'
-          | 'bd'
-          | 'be'
-          | 'bf'
-          | 'bg'
-          | 'bh'
-          | 'bi'
-          | 'bj'
-          | 'bm'
-          | 'bn'
-          | 'bo'
-          | 'bq'
-          | 'br'
-          | 'bs'
-          | 'bw'
-          | 'by'
-          | 'bz'
-          | 'ca'
-          | 'cd'
-          | 'cf'
-          | 'cg'
-          | 'ch'
-          | 'ci'
-          | 'cl'
-          | 'cm'
-          | 'cn'
-          | 'co'
-          | 'cr'
-          | 'cv'
-          | 'cw'
-          | 'cy'
-          | 'cz'
-          | 'de'
-          | 'dj'
-          | 'dk'
-          | 'dm'
-          | 'do'
-          | 'dz'
-          | 'ec'
-          | 'ee'
-          | 'eg'
-          | 'es'
-          | 'et'
-          | 'fi'
-          | 'fj'
-          | 'fr'
-          | 'ga'
-          | 'gb'
-          | 'gd'
-          | 'ge'
-          | 'gf'
-          | 'gg'
-          | 'gh'
-          | 'gm'
-          | 'gn'
-          | 'gp'
-          | 'gq'
-          | 'gr'
-          | 'gt'
-          | 'gu'
-          | 'gw'
-          | 'gy'
-          | 'hk'
-          | 'hn'
-          | 'hr'
-          | 'ht'
-          | 'hu'
-          | 'id'
-          | 'ie'
-          | 'il'
-          | 'im'
-          | 'in'
-          | 'iq'
-          | 'ir'
-          | 'is'
-          | 'it'
-          | 'je'
-          | 'jm'
-          | 'jo'
-          | 'jp'
-          | 'ke'
-          | 'kg'
-          | 'kh'
-          | 'kn'
-          | 'kr'
-          | 'kw'
-          | 'ky'
-          | 'kz'
-          | 'la'
-          | 'lb'
-          | 'lc'
-          | 'lk'
-          | 'lr'
-          | 'ls'
-          | 'lt'
-          | 'lu'
-          | 'lv'
-          | 'ly'
-          | 'ma'
-          | 'mc'
-          | 'md'
-          | 'me'
-          | 'mf'
-          | 'mg'
-          | 'mk'
-          | 'ml'
-          | 'mm'
-          | 'mn'
-          | 'mo'
-          | 'mq'
-          | 'mr'
-          | 'mt'
-          | 'mu'
-          | 'mv'
-          | 'mw'
-          | 'mx'
-          | 'my'
-          | 'mz'
-          | 'na'
-          | 'nc'
-          | 'ne'
-          | 'ng'
-          | 'ni'
-          | 'nl'
-          | 'no'
-          | 'np'
-          | 'nz'
-          | 'om'
-          | 'pa'
-          | 'pe'
-          | 'pf'
-          | 'pg'
-          | 'ph'
-          | 'pk'
-          | 'pl'
-          | 'pr'
-          | 'ps'
-          | 'pt'
-          | 'py'
-          | 'qa'
-          | 're'
-          | 'ro'
-          | 'rs'
-          | 'ru'
-          | 'rw'
-          | 'sa'
-          | 'sc'
-          | 'sd'
-          | 'se'
-          | 'sg'
-          | 'si'
-          | 'sk'
-          | 'sl'
-          | 'sm'
-          | 'sn'
-          | 'so'
-          | 'sr'
-          | 'ss'
-          | 'st'
-          | 'sv'
-          | 'sx'
-          | 'sy'
-          | 'sz'
-          | 'tc'
-          | 'td'
-          | 'tg'
-          | 'th'
-          | 'tj'
-          | 'tl'
-          | 'tm'
-          | 'tn'
-          | 'tr'
-          | 'tt'
-          | 'tw'
-          | 'tz'
-          | 'ua'
-          | 'ug'
-          | 'us'
-          | 'uy'
-          | 'uz'
-          | 'vc'
-          | 've'
-          | 'vg'
-          | 'vi'
-          | 'vn'
-          | 'ye'
-          | 'yt'
-          | 'za'
-          | 'zm'
-          | 'zw';
+        query: string;
 
         /**
-         * Remove elements matching these CSS selectors. Applied after `includeSelectors`,
-         * so an element matching both is removed.
+         * Maximum combined length of returned passages.
          */
-        excludeSelectors?: Array<string> | null;
+        maxCharacters?: number;
+      }
+
+      /**
+       * Image options. Requires formats.images: true.
+       */
+      export interface ImageParams {
+        /**
+         * Set `visual` to drop visual duplicates, keeping the largest copy.
+         */
+        dedupe?: 'none' | 'visual';
 
         /**
-         * Also return each page's HTML in `html`.
+         * Extra data per image: `dimensions`, `classification`, or a hosted `file` URL.
          */
-        includeHTML?: boolean;
+        enrich?: Array<'dimensions' | 'classification' | 'file'>;
+      }
+
+      /**
+       * Requires `formats.json: true`; required when it is set.
+       */
+      export interface JsonParams {
+        /**
+         * JSON Schema (not an example object) for a top-level object, up to 50 KB. Use
+         * optional or nullable fields for missing facts.
+         */
+        schema: { [key: string]: unknown };
 
         /**
-         * Include image references in the Markdown.
+         * Extra guidance, such as which facts to prefer or how to read a field.
+         */
+        instructions?: string;
+      }
+
+      /**
+       * Markdown options. Requires `formats.markdown`.
+       */
+      export interface MarkdownParams {
+        /**
+         * Include images in the Markdown using image syntax with URLs and alt text.
          */
         includeImages?: boolean;
 
         /**
-         * Include links in the Markdown.
+         * Keep link URLs in the Markdown. Set false to return link text without URLs.
          */
         includeLinks?: boolean;
 
         /**
-         * Keep only elements matching these CSS selectors. Filtered pages ignore
-         * `maxAgeMs`.
+         * How base64 images appear: `placeholder` (default) or `preserve`. Requires
+         * `includeImages`.
          */
-        includeSelectors?: Array<string> | null;
+        inlineImages?: 'placeholder' | 'preserve';
+      }
+
+      export interface CustomParser {
+        /**
+         * Field names mapped to CSS selectors (`h1`, `a@href`) or rule objects. Max 100
+         * fields, 5 levels.
+         */
+        rules: { [key: string]: string | CustomParser.UnionMember1 };
 
         /**
-         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
-         * year (31536000000 ms). `0` fetches fresh.
+         * Extract fields using custom CSS rules. This is the default when type is omitted.
          */
-        maxAgeMs?: number | null;
+        type?: 'custom';
+      }
+
+      export namespace CustomParser {
+        export interface UnionMember1 {
+          /**
+           * CSS selector to match within the current page or parent rule.
+           */
+          selector: string;
+
+          /**
+           * Return text, HTML, an attribute such as `@href`, or nested field rules. Defaults
+           * to text.
+           */
+          output?: 'text' | 'html' | string | unknown;
+
+          /**
+           * Return the first match with `item` or all matches with `list`.
+           */
+          type?: 'item' | 'list';
+        }
+      }
+
+      export interface PrebuiltParser {
+        /**
+         * google-maps parses Google Maps business data into data.results. Accepts Maps
+         * place, search, and internal data URLs. Uses a US exit and English labels
+         * regardless of hl or Accept-Language. google-play parses a Play Store app into
+         * data: details, developer contact, ratings, price, permissions, and data safety.
+         * google-play-reviews returns the 200 newest reviews of the app, with developer
+         * replies, in data.reviews. Both Play parsers accept app details URLs
+         * (play.google.com/store/apps/details?id=…); hl and gl set the language and
+         * storefront, defaulting to en and us. app-store parses an App Store app into
+         * data: details, developer, ratings, price, version, and screenshots.
+         * app-store-reviews returns up to the 500 newest reviews in data.reviews. Both App
+         * Store parsers accept app URLs (apps.apple.com/us/app/…/id…); the country in the
+         * path sets the storefront, defaulting to us. emails accepts any page and returns
+         * its email addresses as data.emails ([{ email }]), read from mailto links,
+         * Cloudflare-protected addresses, and visible text. phone-numbers accepts any page
+         * and returns its valid phone numbers in E.164 as data.phone_numbers ([{ phone
+         * }]), read from tel links and visible text; numbers without a country code are
+         * read for the country of the site TLD, defaulting to US. links accepts any page
+         * and returns its unique http(s) links as data.links ([{ url, text }]), with
+         * absolute URLs; text falls back to aria-label or image alt and is null when a
+         * link has none. The emails parser reads the rendered page and respects content
+         * filters; the other prebuilt parsers read their data independently of DOM
+         * filters.
+         */
+        parser:
+          | 'google-maps'
+          | 'google-play'
+          | 'google-play-reviews'
+          | 'app-store'
+          | 'app-store-reviews'
+          | 'emails'
+          | 'phone-numbers'
+          | 'links';
 
         /**
-         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         * Use a prebuilt parser instead of custom rules.
          */
-        pdf?: Options.Pdf;
+        type: 'prebuilt';
+      }
+
+      /**
+       * Product options. Requires formats.product: true.
+       */
+      export interface ProductParams {
+        /**
+         * Drop visually duplicate product images, keeping the largest copy.
+         */
+        dedupeImages?: boolean;
+      }
+
+      /**
+       * Screenshot options. Requires formats.screenshot: true.
+       */
+      export interface ScreenshotParams {
+        /**
+         * What to capture: `viewport`, `fullPage`, one element, or a rectangle. Max 40
+         * megapixels.
+         */
+        area?: 'viewport' | 'fullPage' | ScreenshotParams.Element | ScreenshotParams.Rectangle;
 
         /**
-         * Wait for CSS animations to finish before extracting, on browser-rendered pages.
+         * Image format for the screenshot.
+         */
+        format?: 'png' | 'jpeg' | 'webp';
+      }
+
+      export namespace ScreenshotParams {
+        export interface Element {
+          /**
+           * CSS selector matching exactly one visible element.
+           */
+          selector: string;
+        }
+
+        /**
+         * Pixels from the document origin.
+         */
+        export interface Rectangle {
+          /**
+           * Height of the capture in pixels.
+           */
+          height: number;
+
+          /**
+           * Width of the capture in pixels.
+           */
+          width: number;
+
+          /**
+           * Left edge of the capture, in pixels from the document origin.
+           */
+          x: number;
+
+          /**
+           * Top edge of the capture, in pixels from the document origin.
+           */
+          y: number;
+        }
+      }
+
+      /**
+       * Browser and content settings shared by all outputs.
+       */
+      export interface SharedParams {
+        /**
+         * Browser steps run in order before capture. Requires a paid plan. Skips the
+         * cache.
+         */
+        actions?: Array<
+          SharedParams.Perform | SharedParams.Scroll | SharedParams.Wait | SharedParams.WaitFor
+        >;
+
+        /**
+         * Proxy country as a two-letter code, such as `US`. Case-insensitive.
+         */
+        country?: string;
+
+        /**
+         * Accept cookie banners before actions and capture.
+         */
+        dismissCookies?: boolean;
+
+        /**
+         * Close other popups before actions and capture.
+         */
+        dismissPopups?: boolean;
+
+        /**
+         * Remove elements matching these CSS selectors. Overrides `includeSelectors`.
+         */
+        excludeSelectors?: Array<string>;
+
+        /**
+         * HTTP headers to send to the target site. Requests with headers skip the cache.
+         */
+        headers?: { [key: string]: string };
+
+        /**
+         * Include iframe content in HTML and text outputs. Screenshots always show visible
+         * frames.
+         */
+        includeFrames?: boolean;
+
+        /**
+         * Keep only elements matching these CSS selectors.
+         */
+        includeSelectors?: Array<string>;
+
+        /**
+         * Keep only the main content. Doesn't affect `screenshot`, `bytes`, or `product`.
+         */
+        mainContentOnly?: boolean;
+
+        /**
+         * Document parsing options.
+         */
+        parsers?: SharedParams.Parsers;
+
+        /**
+         * Create or reuse an authenticated browser profile. Requires a paid plan and an
+         * HTTPS target. Profiles persist session state, bypass shared caches, and cannot
+         * be combined with ZDR, custom headers, raw bytes, or prebuilt parsers.
+         */
+        profile?: SharedParams.Existing | SharedParams.New;
+
+        /**
+         * Wait for CSS animations to finish before capture. Defaults to `true` when
+         * `screenshot` is requested.
          */
         settleAnimations?: boolean;
 
         /**
-         * Shorten inline base64 image data.
+         * Emulate a light or dark color scheme.
          */
-        shortenBase64Images?: boolean;
+        theme?: 'light' | 'dark';
 
         /**
-         * Return the main content without navigation or footers.
+         * Browser size in pixels. Omit for 1920 × 1080. When provided, missing dimensions
+         * default to 1440 × 900.
          */
-        useMainContentOnly?: boolean;
+        viewport?: SharedParams.Viewport;
 
         /**
-         * How long to wait after initial page load, in milliseconds. `0` waits 500 ms.
+         * Milliseconds, or a CSS selector to wait for, after actions. Defaults to 500
+         * (2000 with frames or XML).
          */
-        waitForMs?: number;
+        waitFor?: number | string;
       }
 
-      export namespace Options {
+      export namespace SharedParams {
+        export interface Perform {
+          /**
+           * One browser instruction, such as clicking a button or entering text.
+           */
+          action: string;
+
+          /**
+           * Use `perform` for a plain-language browser instruction.
+           */
+          type: 'perform';
+        }
+
+        export interface Scroll {
+          /**
+           * Use `scroll` to move through the page or a container.
+           */
+          type: 'scroll';
+
+          /**
+           * Distance per scroll: pixels, one `viewport`, or `max` to reach the end.
+           */
+          amount?: number | 'viewport' | 'max';
+
+          /**
+           * Direction to scroll.
+           */
+          direction?: 'down' | 'up' | 'left' | 'right';
+
+          /**
+           * Maximum number of scroll steps for this action.
+           */
+          maxScrolls?: number;
+
+          /**
+           * Scroll this container. Omit to scroll the page.
+           */
+          selector?: string;
+        }
+
+        export interface Wait {
+          /**
+           * Time to pause in milliseconds before the next action.
+           */
+          milliseconds: number;
+
+          /**
+           * Use `wait` to pause for a fixed duration.
+           */
+          type: 'wait';
+        }
+
+        export interface WaitFor {
+          /**
+           * CSS selector to wait for before continuing.
+           */
+          selector: string;
+
+          /**
+           * Use `waitFor` to wait for a matching element.
+           */
+          type: 'waitFor';
+        }
+
         /**
-         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         * Document parsing options.
          */
-        export interface Pdf {
+        export interface Parsers {
           /**
-           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
-           * be >= start.
+           * PDF page range and OCR.
            */
-          end?: number;
+          pdf?: Parsers.Pdf;
+        }
+
+        export namespace Parsers {
+          /**
+           * PDF page range and OCR.
+           */
+          export interface Pdf {
+            /**
+             * Last page to parse. Must be at least `startPage`.
+             */
+            endPage?: number;
+
+            /**
+             * Set `auto` to read scanned pages with OCR.
+             */
+            ocr?: 'off' | 'auto';
+
+            /**
+             * First page to parse, starting at 1.
+             */
+            startPage?: number;
+          }
+        }
+
+        export interface Existing {
+          /**
+           * The ID returned in profile.id by an earlier scrape.
+           */
+          profileId: string;
 
           /**
-           * Read scanned PDF pages with OCR; preserve pages that already have text.
+           * Reuse a saved browser profile.
            */
-          ocr?: boolean;
+          type: 'existing';
+        }
+
+        export interface New {
+          /**
+           * Username or email for the target website.
+           */
+          identifier: string;
 
           /**
-           * Parse PDF URLs. When false, PDFs fail with `PDF_SKIPPED`.
+           * Password used to sign in. It is never stored in the profile.
            */
-          shouldParse?: boolean;
+          password: string;
 
           /**
-           * First 1-based PDF page to parse.
+           * Sign in and create a browser profile.
            */
-          start?: number;
+          type: 'new';
+
+          /**
+           * Optional label shown when listing profiles with `GET /org/browser/profiles`.
+           */
+          description?: string;
+        }
+
+        /**
+         * Browser size in pixels. Omit for 1920 × 1080. When provided, missing dimensions
+         * default to 1440 × 900.
+         */
+        export interface Viewport {
+          /**
+           * Browser viewport height in pixels.
+           */
+          height?: number;
+
+          /**
+           * Browser viewport width in pixels.
+           */
+          width?: number;
         }
       }
-    }
-
-    /**
-     * Crawl pages and return HTML.
-     */
-    export interface HTML {
-      /**
-       * Return page content as HTML.
-       */
-      format: 'html';
 
       /**
-       * How to find pages to crawl.
+       * Deadline for each page, using the same behavior and defaults as POST
+       * /web/scrape.
        */
-      source: HTML.StartURL | HTML.Sitemap;
-
-      /**
-       * Options for HTML output.
-       */
-      options?: HTML.Options;
-    }
-
-    export namespace HTML {
-      /**
-       * Discover pages by following links from one URL.
-       */
-      export interface StartURL {
+      export interface TimeoutOpts {
         /**
-         * Start from one page.
+         * Deadline in milliseconds.
          */
-        type: 'start_url';
+        milliseconds: number;
 
         /**
-         * Page where crawling begins. A URL without a scheme is read as https://.
+         * "fail" returns 408 at the deadline. "return-partial" returns available results;
+         * inspect the response’s partial flag. "return-partial" requires at least 5000 ms.
          */
-        url: string;
-
-        /**
-         * Limits and filters for page discovery.
-         */
-        controls?: StartURL.Controls;
-      }
-
-      export namespace StartURL {
-        /**
-         * Limits and filters for page discovery.
-         */
-        export interface Controls {
-          /**
-           * Follow links to subdomains.
-           */
-          followSubdomains?: boolean;
-
-          /**
-           * Maximum link depth. Source pages are depth 0. No limit when omitted.
-           */
-          maxDepth?: number;
-
-          /**
-           * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 25000.
-           */
-          maxUrls?: number;
-
-          /**
-           * RE2 pattern for URLs to include. The `start_url` itself is always included.
-           */
-          regex?: string;
-        }
-      }
-
-      /**
-       * Scrape the pages listed in a domain's sitemap. Links on those pages are not
-       * followed.
-       */
-      export interface Sitemap {
-        /**
-         * Domain whose sitemap lists the pages to scrape. A full URL is reduced to its
-         * domain.
-         */
-        domain: string;
-
-        /**
-         * Scrape the URLs in the domain's sitemap.
-         */
-        type: 'sitemap';
-
-        /**
-         * Limits and filters for the sitemap URLs. A sitemap batch scrapes exactly those
-         * URLs and never follows links off them, so there is no crawl depth here.
-         */
-        controls?: Sitemap.Controls;
-      }
-
-      export namespace Sitemap {
-        /**
-         * Limits and filters for the sitemap URLs. A sitemap batch scrapes exactly those
-         * URLs and never follows links off them, so there is no crawl depth here.
-         */
-        export interface Controls {
-          /**
-           * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 25000.
-           */
-          maxUrls?: number;
-
-          /**
-           * RE2 pattern; only sitemap URLs matching it are scraped.
-           */
-          regex?: string;
-        }
-      }
-
-      /**
-       * Options for HTML output.
-       */
-      export interface Options {
-        /**
-         * Fetch from this country (ISO 3166-1 alpha-2).
-         */
-        country?:
-          | 'ad'
-          | 'ae'
-          | 'af'
-          | 'ag'
-          | 'ai'
-          | 'al'
-          | 'am'
-          | 'ao'
-          | 'ar'
-          | 'at'
-          | 'au'
-          | 'aw'
-          | 'az'
-          | 'ba'
-          | 'bb'
-          | 'bd'
-          | 'be'
-          | 'bf'
-          | 'bg'
-          | 'bh'
-          | 'bi'
-          | 'bj'
-          | 'bm'
-          | 'bn'
-          | 'bo'
-          | 'bq'
-          | 'br'
-          | 'bs'
-          | 'bw'
-          | 'by'
-          | 'bz'
-          | 'ca'
-          | 'cd'
-          | 'cf'
-          | 'cg'
-          | 'ch'
-          | 'ci'
-          | 'cl'
-          | 'cm'
-          | 'cn'
-          | 'co'
-          | 'cr'
-          | 'cv'
-          | 'cw'
-          | 'cy'
-          | 'cz'
-          | 'de'
-          | 'dj'
-          | 'dk'
-          | 'dm'
-          | 'do'
-          | 'dz'
-          | 'ec'
-          | 'ee'
-          | 'eg'
-          | 'es'
-          | 'et'
-          | 'fi'
-          | 'fj'
-          | 'fr'
-          | 'ga'
-          | 'gb'
-          | 'gd'
-          | 'ge'
-          | 'gf'
-          | 'gg'
-          | 'gh'
-          | 'gm'
-          | 'gn'
-          | 'gp'
-          | 'gq'
-          | 'gr'
-          | 'gt'
-          | 'gu'
-          | 'gw'
-          | 'gy'
-          | 'hk'
-          | 'hn'
-          | 'hr'
-          | 'ht'
-          | 'hu'
-          | 'id'
-          | 'ie'
-          | 'il'
-          | 'im'
-          | 'in'
-          | 'iq'
-          | 'ir'
-          | 'is'
-          | 'it'
-          | 'je'
-          | 'jm'
-          | 'jo'
-          | 'jp'
-          | 'ke'
-          | 'kg'
-          | 'kh'
-          | 'kn'
-          | 'kr'
-          | 'kw'
-          | 'ky'
-          | 'kz'
-          | 'la'
-          | 'lb'
-          | 'lc'
-          | 'lk'
-          | 'lr'
-          | 'ls'
-          | 'lt'
-          | 'lu'
-          | 'lv'
-          | 'ly'
-          | 'ma'
-          | 'mc'
-          | 'md'
-          | 'me'
-          | 'mf'
-          | 'mg'
-          | 'mk'
-          | 'ml'
-          | 'mm'
-          | 'mn'
-          | 'mo'
-          | 'mq'
-          | 'mr'
-          | 'mt'
-          | 'mu'
-          | 'mv'
-          | 'mw'
-          | 'mx'
-          | 'my'
-          | 'mz'
-          | 'na'
-          | 'nc'
-          | 'ne'
-          | 'ng'
-          | 'ni'
-          | 'nl'
-          | 'no'
-          | 'np'
-          | 'nz'
-          | 'om'
-          | 'pa'
-          | 'pe'
-          | 'pf'
-          | 'pg'
-          | 'ph'
-          | 'pk'
-          | 'pl'
-          | 'pr'
-          | 'ps'
-          | 'pt'
-          | 'py'
-          | 'qa'
-          | 're'
-          | 'ro'
-          | 'rs'
-          | 'ru'
-          | 'rw'
-          | 'sa'
-          | 'sc'
-          | 'sd'
-          | 'se'
-          | 'sg'
-          | 'si'
-          | 'sk'
-          | 'sl'
-          | 'sm'
-          | 'sn'
-          | 'so'
-          | 'sr'
-          | 'ss'
-          | 'st'
-          | 'sv'
-          | 'sx'
-          | 'sy'
-          | 'sz'
-          | 'tc'
-          | 'td'
-          | 'tg'
-          | 'th'
-          | 'tj'
-          | 'tl'
-          | 'tm'
-          | 'tn'
-          | 'tr'
-          | 'tt'
-          | 'tw'
-          | 'tz'
-          | 'ua'
-          | 'ug'
-          | 'us'
-          | 'uy'
-          | 'uz'
-          | 'vc'
-          | 've'
-          | 'vg'
-          | 'vi'
-          | 'vn'
-          | 'ye'
-          | 'yt'
-          | 'za'
-          | 'zm'
-          | 'zw';
-
-        /**
-         * Remove elements matching these CSS selectors. Applied after `includeSelectors`,
-         * so an element matching both is removed.
-         */
-        excludeSelectors?: Array<string> | null;
-
-        /**
-         * Keep only elements matching these CSS selectors. Filtered pages ignore
-         * `maxAgeMs`.
-         */
-        includeSelectors?: Array<string> | null;
-
-        /**
-         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
-         * year (31536000000 ms). `0` fetches fresh.
-         */
-        maxAgeMs?: number | null;
-
-        /**
-         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
-         */
-        pdf?: Options.Pdf;
-
-        /**
-         * Wait for CSS animations to finish before extracting, on browser-rendered pages.
-         */
-        settleAnimations?: boolean;
-
-        /**
-         * Return the main content without navigation or footers.
-         */
-        useMainContentOnly?: boolean;
-
-        /**
-         * How long to wait after initial page load, in milliseconds. `0` waits 500 ms.
-         */
-        waitForMs?: number;
-      }
-
-      export namespace Options {
-        /**
-         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
-         */
-        export interface Pdf {
-          /**
-           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
-           * be >= start.
-           */
-          end?: number;
-
-          /**
-           * Read scanned PDF pages with OCR; preserve pages that already have text.
-           */
-          ocr?: boolean;
-
-          /**
-           * Parse PDF URLs. When false, PDFs fail with `PDF_SKIPPED`.
-           */
-          shouldParse?: boolean;
-
-          /**
-           * First 1-based PDF page to parse.
-           */
-          start?: number;
-        }
+        behavior?: 'fail' | 'return-partial';
       }
     }
   }
