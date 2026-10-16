@@ -34,7 +34,7 @@ describe('resource news', () => {
       },
       cursor: 'cursor',
       filterBy: {
-        articleLanguage: ['ar'],
+        articleLanguage: ['am'],
         articleType: ['editorial'],
         date: { from: 0, to: 0 },
         sourceCountry: ['ae'],
