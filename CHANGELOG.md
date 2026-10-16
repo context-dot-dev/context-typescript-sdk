@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.7.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.6.0...v3.7.0) (2026-10-16)
+
+
+### Features
+
+* **batch:** support Scrape Anything batches up to 100k URLs ([#1883](https://github.com/context-dot-dev/context-typescript-sdk/issues/1883)) ([c447e68](https://github.com/context-dot-dev/context-typescript-sdk/commit/c447e68b5d39b322d2c159a46938cce67e4c8a16))
+* **scrape:** add App Store app and reviews prebuilt parsers ([#1859](https://github.com/context-dot-dev/context-typescript-sdk/issues/1859)) ([9ea0075](https://github.com/context-dot-dev/context-typescript-sdk/commit/9ea0075732b70dcc403ae6479cd453835471d369))
+* **scrape:** add emails prebuilt parser ([#1862](https://github.com/context-dot-dev/context-typescript-sdk/issues/1862)) ([9ea0075](https://github.com/context-dot-dev/context-typescript-sdk/commit/9ea0075732b70dcc403ae6479cd453835471d369))
+* **scrape:** add Google Play app and reviews prebuilt parsers ([#1857](https://github.com/context-dot-dev/context-typescript-sdk/issues/1857)) ([9ea0075](https://github.com/context-dot-dev/context-typescript-sdk/commit/9ea0075732b70dcc403ae6479cd453835471d369))
+* **scrape:** add links prebuilt parser ([#1865](https://github.com/context-dot-dev/context-typescript-sdk/issues/1865)) ([9ea0075](https://github.com/context-dot-dev/context-typescript-sdk/commit/9ea0075732b70dcc403ae6479cd453835471d369))
+* **scrape:** add phone-numbers prebuilt parser ([#1863](https://github.com/context-dot-dev/context-typescript-sdk/issues/1863)) ([9ea0075](https://github.com/context-dot-dev/context-typescript-sdk/commit/9ea0075732b70dcc403ae6479cd453835471d369))
+* **scrape:** list browser profiles and label them with descriptions ([#1914](https://github.com/context-dot-dev/context-typescript-sdk/issues/1914)) ([9cc6cfc](https://github.com/context-dot-dev/context-typescript-sdk/commit/9cc6cfceebd5ec12c4ee6dccceb2628a8574625a))
+* **search:** allow requesting a single result ([#1880](https://github.com/context-dot-dev/context-typescript-sdk/issues/1880)) ([06afee3](https://github.com/context-dot-dev/context-typescript-sdk/commit/06afee30979ed4ce08b6e2eb9062a06d916296c9))
+* **search:** order company search results by headcount, traffic, funding or founding year ([#1916](https://github.com/context-dot-dev/context-typescript-sdk/issues/1916)) ([9cc6cfc](https://github.com/context-dot-dev/context-typescript-sdk/commit/9cc6cfceebd5ec12c4ee6dccceb2628a8574625a))
+
 ## [3.6.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.5.0...v3.6.0) (2026-10-14)
 
 
