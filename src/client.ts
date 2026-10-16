@@ -100,6 +100,7 @@ import {
   WebWebCrawlMdParams,
   WebWebCrawlMdResponse,
 } from './resources/web';
+import { Browser } from './resources/browser/browser';
 import { RetryConfig, Webhooks } from './resources/webhooks/webhooks';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
@@ -841,6 +842,7 @@ export class ContextDev {
    * Read your organization's API request logs.
    */
   logs: API.Logs = new API.Logs(this);
+  browser: API.Browser = new API.Browser(this);
   /**
    * Report API issues and documentation mismatches.
    */
@@ -858,6 +860,7 @@ ContextDev.Webhooks = Webhooks;
 ContextDev.People = People;
 ContextDev.News = News;
 ContextDev.Logs = Logs;
+ContextDev.Browser = Browser;
 ContextDev.Feedback = Feedback;
 
 export declare namespace ContextDev {
@@ -977,6 +980,8 @@ export declare namespace ContextDev {
     type LogListResponse as LogListResponse,
     type LogListParams as LogListParams,
   };
+
+  export { Browser as Browser };
 
   export {
     Feedback as Feedback,

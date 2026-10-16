@@ -186,6 +186,18 @@ Methods:
 - <code title="get /org/logs/{request_id}">client.logs.<a href="./src/resources/logs.ts">retrieve</a>(requestID) -> LogRetrieveResponse</code>
 - <code title="get /org/logs">client.logs.<a href="./src/resources/logs.ts">list</a>({ ...params }) -> LogListResponse</code>
 
+# Browser
+
+## Profiles
+
+Types:
+
+- <code><a href="./src/resources/browser/profiles.ts">ProfileListResponse</a></code>
+
+Methods:
+
+- <code title="get /org/browser/profiles">client.browser.profiles.<a href="./src/resources/browser/profiles.ts">list</a>({ ...params }) -> ProfileListResponse</code>
+
 # Feedback
 
 Types:

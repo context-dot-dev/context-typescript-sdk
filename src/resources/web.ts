@@ -2873,6 +2873,11 @@ export namespace WebScrapeParams {
        * Sign in and create a browser profile.
        */
       type: 'new';
+
+      /**
+       * Optional label shown when listing profiles with `GET /org/browser/profiles`.
+       */
+      description?: string;
     }
 
     /**
