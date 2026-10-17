@@ -50,6 +50,8 @@ describe('resource brand', () => {
     const response = await client.brand.search({
       query: 'x',
       autocomplete: true,
+      country: 'US',
+      language: 'afrikaans',
       queryBy: ['name'],
       tags: ['production', 'team-alpha'],
       typoTolerance: 0,
