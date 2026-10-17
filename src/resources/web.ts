@@ -951,12 +951,13 @@ export interface WebScrapeResponse {
 
   /**
    * Custom rules return fields after content filters; unmatched fields are null ([]
-   * for lists). The google-maps parser returns business records in data.results, and
-   * the google-play parser returns one app record as data, google-play-reviews
-   * returns data.reviews, app-store and app-store-reviews do the same for the App
-   * Store, emails, phone-numbers, and links return data.emails, data.phone_numbers,
-   * and data.links from the rendered page; the store and Maps parsers read their
-   * data directly, independently of DOM filters and other outputs.
+   * for lists). The google-maps parser returns business records in data.results,
+   * google-maps-reviews returns data.reviews, and the google-play parser returns one
+   * app record as data, google-play-reviews returns data.reviews, app-store and
+   * app-store-reviews do the same for the App Store, emails, phone-numbers, and
+   * links return data.emails, data.phone_numbers, and data.links from the rendered
+   * page; the store and Maps parsers read their data directly, independently of DOM
+   * filters and other outputs.
    */
   parsed: WebScrapeResponse.Parsed;
 
@@ -1345,12 +1346,13 @@ export namespace WebScrapeResponse {
 
   /**
    * Custom rules return fields after content filters; unmatched fields are null ([]
-   * for lists). The google-maps parser returns business records in data.results, and
-   * the google-play parser returns one app record as data, google-play-reviews
-   * returns data.reviews, app-store and app-store-reviews do the same for the App
-   * Store, emails, phone-numbers, and links return data.emails, data.phone_numbers,
-   * and data.links from the rendered page; the store and Maps parsers read their
-   * data directly, independently of DOM filters and other outputs.
+   * for lists). The google-maps parser returns business records in data.results,
+   * google-maps-reviews returns data.reviews, and the google-play parser returns one
+   * app record as data, google-play-reviews returns data.reviews, app-store and
+   * app-store-reviews do the same for the App Store, emails, phone-numbers, and
+   * links return data.emails, data.phone_numbers, and data.links from the rendered
+   * page; the store and Maps parsers read their data directly, independently of DOM
+   * filters and other outputs.
    */
   export interface Parsed {
     data: { [key: string]: unknown } | null;
@@ -1369,6 +1371,7 @@ export namespace WebScrapeResponse {
     type:
       | 'custom'
       | 'google-maps'
+      | 'google-maps-reviews'
       | 'google-play'
       | 'google-play-reviews'
       | 'app-store'
@@ -2566,8 +2569,16 @@ export namespace WebScrapeParams {
     /**
      * google-maps parses Google Maps business data into data.results. Accepts Maps
      * place, search, and internal data URLs. Uses a US exit and English labels
-     * regardless of hl or Accept-Language. google-play parses a Play Store app into
-     * data: details, developer contact, ratings, price, permissions, and data safety.
+     * regardless of hl or Accept-Language. google-maps-reviews returns the reviews of
+     * a place in data.reviews, in the same shape as the Serper reviews API (rating,
+     * date, isoDate, snippet, translatedSnippet, likes, user, media, response, link,
+     * id), plus language, guided ratings in details, and user.isLocalGuide; data also
+     * carries the place featureId, cid, and sort. sort and limit pick the order and
+     * count, and oldest is exact. It accepts Maps place, search, and ?cid= URLs, plus
+     * search.google.com/local/reviews URLs, so the google_maps_url and
+     * google_reviews_url fields of google-maps results work as input. An unknown place
+     * returns no reviews. google-play parses a Play Store app into data: details,
+     * developer contact, ratings, price, permissions, and data safety.
      * google-play-reviews returns the 200 newest reviews of the app, with developer
      * replies, in data.reviews. Both Play parsers accept app details URLs
      * (play.google.com/store/apps/details?id=…); hl and gl set the language and
@@ -2589,6 +2600,7 @@ export namespace WebScrapeParams {
      */
     parser:
       | 'google-maps'
+      | 'google-maps-reviews'
       | 'google-play'
       | 'google-play-reviews'
       | 'app-store'
@@ -2601,6 +2613,19 @@ export namespace WebScrapeParams {
      * Use a prebuilt parser instead of custom rules.
      */
     type: 'prebuilt';
+
+    /**
+     * google-maps-reviews only. Maximum number of reviews to return. Defaults to 100;
+     * maximum 1000.
+     */
+    limit?: number;
+
+    /**
+     * google-maps-reviews only. Order of data.reviews. newest, relevant, highest, and
+     * lowest follow Google; oldest returns the earliest reviews first, which Google
+     * itself does not offer.
+     */
+    sort?: 'newest' | 'oldest' | 'relevant' | 'highest' | 'lowest';
   }
 
   /**
