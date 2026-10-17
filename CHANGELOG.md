@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.8.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.7.0...v3.8.0) (2026-10-17)
+
+
+### Features
+
+* **brand:** add search metadata and country and language filters ([#1945](https://github.com/context-dot-dev/context-typescript-sdk/issues/1945)) ([8782f4e](https://github.com/context-dot-dev/context-typescript-sdk/commit/8782f4e71a5f391b1f414fcf587d41219b26a746))
+* **scrape:** add g2-reviews prebuilt parser ([#1933](https://github.com/context-dot-dev/context-typescript-sdk/issues/1933)) ([8d2fa9e](https://github.com/context-dot-dev/context-typescript-sdk/commit/8d2fa9efc4d8925f09c51194f305e32818f0ca3e))
+* **scrape:** add google-maps-reviews prebuilt parser with oldest-first sort ([#1928](https://github.com/context-dot-dev/context-typescript-sdk/issues/1928)) ([30315d0](https://github.com/context-dot-dev/context-typescript-sdk/commit/30315d037ab9024b2efea6e9b8d3337da8afcb03))
+* **scrape:** add Instagram profile, post, and feed prebuilt parsers ([#1905](https://github.com/context-dot-dev/context-typescript-sdk/issues/1905)) ([ae45c50](https://github.com/context-dot-dev/context-typescript-sdk/commit/ae45c503c70bc4903562e7324acc4c76554e7a7f))
+* **search:** add languages filter to web search ([#1833](https://github.com/context-dot-dev/context-typescript-sdk/issues/1833)) ([e07f6c3](https://github.com/context-dot-dev/context-typescript-sdk/commit/e07f6c3c09327a969ca5641cb1eca1cc8cfbaa64))
+
 ## [3.7.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.6.0...v3.7.0) (2026-10-16)
 
 
