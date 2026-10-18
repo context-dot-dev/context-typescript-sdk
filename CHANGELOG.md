@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.10.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.9.0...v3.10.0) (2026-10-18)
+
+
+### Features
+
+* **scrape:** add TikTok profile and video prebuilt parsers ([#1956](https://github.com/context-dot-dev/context-typescript-sdk/issues/1956)) ([2b7a922](https://github.com/context-dot-dev/context-typescript-sdk/commit/2b7a9223088c1aa018205300fa489d4877dd981b))
+
 ## [3.9.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.8.0...v3.9.0) (2026-10-18)
 
 
