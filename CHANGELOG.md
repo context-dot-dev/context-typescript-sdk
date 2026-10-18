@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.9.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.8.0...v3.9.0) (2026-10-18)
+
+
+### Features
+
+* **people:** allow enrichment on free plans ([#1961](https://github.com/context-dot-dev/context-typescript-sdk/issues/1961)) ([355cd7d](https://github.com/context-dot-dev/context-typescript-sdk/commit/355cd7dc5b406402127c657a81d799ff9915f8e4))
+
 ## [3.8.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.7.0...v3.8.0) (2026-10-17)
 
 
