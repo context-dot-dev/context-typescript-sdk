@@ -9,8 +9,9 @@ import { RequestOptions } from '../internal/request-options';
  */
 export class News extends APIResource {
   /**
-   * Find company news by name, domain, ticker, or ISIN. Filter articles and continue
-   * through results with a cursor.
+   * Find news about a company by name, domain, ticker, or ISIN, or search all news
+   * with a natural-language query. Filter articles and continue through results with
+   * a cursor.
    *
    * @example
    * ```ts
@@ -91,9 +92,10 @@ export namespace NewsSearchResponse {
     language: string | null;
 
     /**
-     * How the article relates to the company you searched for.
+     * How the article relates to the company you searched for. Null for
+     * natural-language searches.
      */
-    match: Data.Match;
+    match: Data.Match | null;
 
     /**
      * When the article was published, as an ISO 8601 timestamp. Null when the
@@ -131,7 +133,8 @@ export namespace NewsSearchResponse {
 
   export namespace Data {
     /**
-     * How the article relates to the company you searched for.
+     * How the article relates to the company you searched for. Null for
+     * natural-language searches.
      */
     export interface Match {
       /**
@@ -195,9 +198,10 @@ export namespace NewsSearchResponse {
 
 export interface NewsSearchParams {
   /**
-   * What to search for.
+   * What to search for: a specific company, or a natural-language query across all
+   * news.
    */
-  searchBy: NewsSearchParams.SearchBy;
+  searchBy: NewsSearchParams.NewsSearchByNaturalLanguage | NewsSearchParams.NewsSearchByEntity;
 
   /**
    * Opaque next_cursor from the previous response, or null for the first page.
@@ -217,7 +221,8 @@ export interface NewsSearchParams {
   limit?: number;
 
   /**
-   * Result ordering. Defaults to newest.
+   * Result ordering. Defaults to newest for entity searches. Natural-language
+   * searches are always ordered by relevance.
    */
   sortBy?: NewsSearchParams.SortBy;
 
@@ -229,25 +234,42 @@ export interface NewsSearchParams {
 
 export namespace NewsSearchParams {
   /**
-   * What to search for.
+   * Search all news with a plain-language query. Returns up to 100 matches, ordered
+   * by relevance.
    */
-  export interface SearchBy {
+  export interface NewsSearchByNaturalLanguage {
+    /**
+     * What to search for, in plain language, such as "chip export restrictions to
+     * China".
+     */
+    query: string;
+
+    /**
+     * Use `natural_language` to search all news with a plain-language query.
+     */
+    type: 'natural_language';
+  }
+
+  /**
+   * Find news about a specific company.
+   */
+  export interface NewsSearchByEntity {
     /**
      * The company to search news for, identified by name, domain, ticker, or ISIN.
      */
     entity:
-      | SearchBy.NewsSearchEntityByName
-      | SearchBy.NewsSearchEntityByDomain
-      | SearchBy.NewsSearchEntityByTicker
-      | SearchBy.NewsSearchEntityByIsin;
+      | NewsSearchByEntity.NewsSearchEntityByName
+      | NewsSearchByEntity.NewsSearchEntityByDomain
+      | NewsSearchByEntity.NewsSearchEntityByTicker
+      | NewsSearchByEntity.NewsSearchEntityByIsin;
 
     /**
-     * How to search. Only entity search is supported.
+     * Use `entity` to find news about a specific company.
      */
     type: 'entity';
   }
 
-  export namespace SearchBy {
+  export namespace NewsSearchByEntity {
     /**
      * Identify the company by name.
      */
@@ -540,7 +562,8 @@ export namespace NewsSearchParams {
   }
 
   /**
-   * Result ordering. Defaults to newest.
+   * Result ordering. Defaults to newest for entity searches. Natural-language
+   * searches are always ordered by relevance.
    */
   export interface SortBy {
     /**
