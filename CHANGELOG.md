@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.12.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.11.0...v3.12.0) (2026-10-19)
+
+
+### Features
+
+* **crawl:** add exclude URL regex to crawl and sitemap endpoints ([#1982](https://github.com/context-dot-dev/context-typescript-sdk/issues/1982)) ([892d6fb](https://github.com/context-dot-dev/context-typescript-sdk/commit/892d6fb350603d4e620c07daef9cd5442f279a94))
+
 ## [3.11.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.10.0...v3.11.0) (2026-10-19)
 
 
