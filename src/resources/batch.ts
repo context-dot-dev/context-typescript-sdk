@@ -165,6 +165,11 @@ export interface Failure {
  */
 export interface CrawlControls {
   /**
+   * RE2 pattern URLs must not match to be crawled. Null when the crawl set none.
+   */
+  exclude_url_pattern: string | null;
+
+  /**
    * Whether links to subdomains were followed. Always false for a sitemap crawl.
    */
   follow_subdomains: boolean;
@@ -3706,6 +3711,12 @@ export namespace BatchSubmitParams {
          */
         export interface Controls {
           /**
+           * RE2 pattern for URLs to exclude, even when they match `regex`. The `start_url`
+           * itself is always included.
+           */
+          excludeRegex?: string;
+
+          /**
            * Follow links to subdomains.
            */
           followSubdomains?: boolean;
@@ -3756,6 +3767,12 @@ export namespace BatchSubmitParams {
          * URLs and never follows links off them, so there is no crawl depth here.
          */
         export interface Controls {
+          /**
+           * RE2 pattern; sitemap URLs matching it are not scraped, even when they match
+           * `regex`.
+           */
+          excludeRegex?: string;
+
           /**
            * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 100000.
            */

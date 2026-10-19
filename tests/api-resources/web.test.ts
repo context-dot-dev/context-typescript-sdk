@@ -104,6 +104,7 @@ describe('resource web', () => {
   test.skip('mapUrls: required and optional params', async () => {
     const response = await client.web.mapUrls({
       domain: 'stripe.com',
+      excludeUrlRegex: '/tag/|/author/',
       headers: { foo: 'J!' },
       includeSubdomains: true,
       maxLinks: 1,
@@ -310,6 +311,7 @@ describe('resource web', () => {
       url: 'https://example.com',
       country: 'de',
       excludeSelectors: ['x'],
+      excludeUrlRegex: '/tag/|/author/',
       followSubdomains: true,
       includeFrames: true,
       includeImages: true,

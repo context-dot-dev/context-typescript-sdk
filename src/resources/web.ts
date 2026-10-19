@@ -1924,8 +1924,8 @@ export namespace WebWebCrawlMdResponse {
     numFailed: number;
 
     /**
-     * Number of URLs skipped (PDFs when pdf.shouldParse=false, or URLs not matching
-     * urlRegex)
+     * Number of URLs skipped (PDFs when pdf.shouldParse=false, URLs not matching
+     * urlRegex, or URLs matching excludeUrlRegex)
      */
     numSkipped: number;
 
@@ -2293,6 +2293,12 @@ export interface WebMapURLsParams {
    * Domain to map, e.g. `stripe.com`.
    */
   domain: string;
+
+  /**
+   * Optional RE2-compatible regex pattern. URLs matching this pattern are not
+   * returned, even when they match urlRegex.
+   */
+  excludeUrlRegex?: string;
 
   /**
    * HTTP headers for the target origin. Non-empty headers bypass caching.
@@ -4107,6 +4113,12 @@ export interface WebWebCrawlMdParams {
    * Remove matching elements after inclusions. Exclusions take precedence.
    */
   excludeSelectors?: Array<string> | null;
+
+  /**
+   * RE2 regex pattern. URLs matching this pattern are never followed or scraped,
+   * even when they match urlRegex. The starting URL is always scraped.
+   */
+  excludeUrlRegex?: string;
 
   /**
    * When true, follow links on subdomains of the starting URL's domain (e.g.
