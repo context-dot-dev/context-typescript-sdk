@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.11.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.10.0...v3.11.0) (2026-10-19)
+
+
+### Features
+
+* **news:** add natural-language search to POST /news/search ([#1975](https://github.com/context-dot-dev/context-typescript-sdk/issues/1975)) ([d2afbbe](https://github.com/context-dot-dev/context-typescript-sdk/commit/d2afbbee526024e7e5b497474dbcccd0a668c4a3))
+
 ## [3.10.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.9.0...v3.10.0) (2026-10-18)
 
 
