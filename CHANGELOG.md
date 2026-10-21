@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.14.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.13.0...v3.14.0) (2026-10-21)
+
+
+### Features
+
+* **scrape:** add sourcePreference to choose between HTML conversion and published Markdown ([#2010](https://github.com/context-dot-dev/context-typescript-sdk/issues/2010)) ([d2084ac](https://github.com/context-dot-dev/context-typescript-sdk/commit/d2084ac777f950c1b3b92c7bc6a17d012759425a))
+
 ## [3.13.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.12.3...v3.13.0) (2026-10-21)
 
 
