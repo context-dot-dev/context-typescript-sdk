@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.12.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.12.0...v3.12.1) (2026-10-21)
+
+
+### Bug Fixes
+
+* **news:** return extended descriptions for index search ([#2019](https://github.com/context-dot-dev/context-typescript-sdk/issues/2019)) ([99f1f90](https://github.com/context-dot-dev/context-typescript-sdk/commit/99f1f90fd28d2e9b6c39efd7a2c9024f37206bb0))
+
 ## [3.12.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.11.0...v3.12.0) (2026-10-19)
 
 
