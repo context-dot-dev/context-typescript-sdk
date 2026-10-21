@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.14.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.14.0...v3.14.1) (2026-10-21)
+
+
+### Documentation
+
+* **openapi:** unify regex wording and shorten sourcePreference descriptions ([#2051](https://github.com/context-dot-dev/context-typescript-sdk/issues/2051)) ([28f76b7](https://github.com/context-dot-dev/context-typescript-sdk/commit/28f76b70ff490c29e44c80ce078cd026f0256998))
+
 ## [3.14.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.13.0...v3.14.0) (2026-10-21)
 
 
