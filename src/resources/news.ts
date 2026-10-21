@@ -76,7 +76,8 @@ export namespace NewsSearchResponse {
     authors: Array<string>;
 
     /**
-     * Short summary or excerpt of the article, when the publisher provides one.
+     * Article summary or excerpt. Natural-language search descriptions include
+     * matching passages and are capped at 2,000 characters.
      */
     description: string | null;
 
