@@ -162,6 +162,7 @@ describe('resource web', () => {
         includeImages: true,
         includeLinks: true,
         inlineImages: 'placeholder',
+        sourcePreference: ['html-conversion'],
       },
       maxAgeMs: 0,
       parseParams: {
@@ -328,6 +329,7 @@ describe('resource web', () => {
       },
       settleAnimations: true,
       shortenBase64Images: true,
+      sourcePreference: ['html-conversion'],
       stopAfterMs: 10000,
       tags: ['production', 'team-alpha'],
       timeoutOpts: { milliseconds: 1000, behavior: 'fail' },

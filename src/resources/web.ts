@@ -2549,20 +2549,35 @@ export namespace WebScrapeParams {
    */
   export interface MarkdownParams {
     /**
-     * Include images in the Markdown using image syntax with URLs and alt text.
+     * Include images in the Markdown using image syntax with URLs and alt text. Only
+     * applies to `html-conversion` extractions.
      */
     includeImages?: boolean;
 
     /**
-     * Keep link URLs in the Markdown. Set false to return link text without URLs.
+     * Keep link URLs in the Markdown. Set false to return link text without URLs. Only
+     * applies to `html-conversion` extractions.
      */
     includeLinks?: boolean;
 
     /**
      * How base64 images appear: `placeholder` (default) or `preserve`. Requires
-     * `includeImages`.
+     * `includeImages`. Only applies to `html-conversion` extractions.
      */
     inlineImages?: 'placeholder' | 'preserve';
+
+    /**
+     * Where the Markdown should come from, in order of preference; the first usable
+     * source wins. `html-conversion` converts the page HTML, and counts as unusable
+     * when the conversion has almost no content (under 200 characters).
+     * `markdown-direct` uses the official Markdown version the page publishes through,
+     * returned as the site serves it. Defaults to
+     * `["html-conversion", "markdown-direct"]`. With only `markdown-direct`, a page
+     * that publishes no Markdown fails with `NO_PUBLISHED_MARKDOWN` and is not billed.
+     * Requests with include or exclude selectors never use `markdown-direct`, so they
+     * must include `html-conversion`.
+     */
+    sourcePreference?: Array<'html-conversion' | 'markdown-direct'>;
   }
 
   export interface CustomParser {
@@ -4140,12 +4155,14 @@ export interface WebWebCrawlMdParams {
   includeFrames?: boolean;
 
   /**
-   * Include image references in the Markdown output
+   * Include image references in the Markdown output Only applies to
+   * `html-conversion` extractions.
    */
   includeImages?: boolean;
 
   /**
-   * Preserve hyperlinks in the Markdown output
+   * Preserve hyperlinks in the Markdown output Only applies to `html-conversion`
+   * extractions.
    */
   includeLinks?: boolean;
 
@@ -4181,9 +4198,23 @@ export interface WebWebCrawlMdParams {
   settleAnimations?: boolean;
 
   /**
-   * Truncate base64-encoded image data in the Markdown output
+   * Truncate base64-encoded image data in the Markdown output Only applies to
+   * `html-conversion` extractions.
    */
   shortenBase64Images?: boolean;
+
+  /**
+   * Where the Markdown should come from, in order of preference; the first usable
+   * source wins. `html-conversion` converts the page HTML, and counts as unusable
+   * when the conversion has almost no content (under 200 characters).
+   * `markdown-direct` uses the official Markdown version the page publishes through,
+   * returned as the site serves it. Defaults to
+   * `["html-conversion", "markdown-direct"]`. With only `markdown-direct`, a page
+   * that publishes no Markdown fails with `NO_PUBLISHED_MARKDOWN` and is not billed.
+   * Requests with include or exclude selectors never use `markdown-direct`, so they
+   * must include `html-conversion`.
+   */
+  sourcePreference?: Array<'html-conversion' | 'markdown-direct'>;
 
   /**
    * Soft crawl deadline in milliseconds. Returns pages collected before the next
