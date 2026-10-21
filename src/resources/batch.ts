@@ -165,7 +165,7 @@ export interface Failure {
  */
 export interface CrawlControls {
   /**
-   * RE2 pattern URLs must not match to be crawled. Null when the crawl set none.
+   * Regex pattern URLs must not match to be crawled. Null when the crawl set none.
    */
   exclude_url_pattern: string | null;
 
@@ -175,9 +175,7 @@ export interface CrawlControls {
   follow_subdomains: boolean;
 
   /**
-   * Languages whose pages were followed: `same_as_start_url` or a list of language
-   * codes. Null when every language was followed, which is always the case for a
-   * sitemap crawl.
+   * Languages whose pages were followed; null when all languages were.
    */
   languages:
     | 'same_as_start_url'
@@ -277,7 +275,7 @@ export interface CrawlControls {
   source: CrawlControls.StartURL | CrawlControls.Sitemap;
 
   /**
-   * RE2 pattern URLs had to match to be crawled. Null when the crawl set none.
+   * Regex pattern URLs had to match to be crawled. Null when the crawl set none.
    */
   url_pattern: string | null;
 }
@@ -3150,33 +3148,23 @@ export namespace BatchSubmitParams {
        */
       export interface MarkdownParams {
         /**
-         * Include images in the Markdown using image syntax with URLs and alt text. Only
-         * applies to `html-conversion` extractions.
+         * Include images in the Markdown (`html-conversion` only).
          */
         includeImages?: boolean;
 
         /**
-         * Keep link URLs in the Markdown. Set false to return link text without URLs. Only
-         * applies to `html-conversion` extractions.
+         * Keep link URLs in the Markdown (`html-conversion` only).
          */
         includeLinks?: boolean;
 
         /**
-         * How base64 images appear: `placeholder` (default) or `preserve`. Requires
-         * `includeImages`. Only applies to `html-conversion` extractions.
+         * How base64 images appear when `includeImages` is set (`html-conversion` only).
          */
         inlineImages?: 'placeholder' | 'preserve';
 
         /**
-         * Where the Markdown should come from, in order of preference; the first usable
-         * source wins. `html-conversion` converts the page HTML, and counts as unusable
-         * when the conversion has almost no content (under 200 characters).
-         * `markdown-direct` uses the official Markdown version the page publishes through,
-         * returned as the site serves it. Defaults to
-         * `["html-conversion", "markdown-direct"]`. With only `markdown-direct`, a page
-         * that publishes no Markdown fails with `NO_PUBLISHED_MARKDOWN` and is not billed.
-         * Requests with include or exclude selectors never use `markdown-direct`, so they
-         * must include `html-conversion`.
+         * Markdown sources in order of preference: `html-conversion` converts the page
+         * HTML, `markdown-direct` uses Markdown the site publishes.
          */
         sourcePreference?: Array<'html-conversion' | 'markdown-direct'>;
       }
@@ -3811,7 +3799,7 @@ export namespace BatchSubmitParams {
          */
         export interface Controls {
           /**
-           * RE2 pattern for URLs to exclude, even when they match `regex`. The `start_url`
+           * Regex pattern for URLs to exclude, even when they match `regex`. The `start_url`
            * itself is always included.
            */
           excludeRegex?: string;
@@ -3822,10 +3810,8 @@ export namespace BatchSubmitParams {
           followSubdomains?: boolean;
 
           /**
-           * Languages whose pages are followed. `same_as_start_url` follows only the start
-           * page's language; a list of language codes such as `["en"]` follows those
-           * languages. Links whose language cannot be determined are followed. When omitted
-           * all urls are crawled.
+           * Only follow pages in these languages, or `same_as_start_url`; all languages when
+           * omitted.
            */
           languages?:
             | 'same_as_start_url'
@@ -3917,7 +3903,7 @@ export namespace BatchSubmitParams {
           maxUrls?: number;
 
           /**
-           * RE2 pattern for URLs to include. The `start_url` itself is always included.
+           * Regex pattern for URLs to include. The `start_url` itself is always included.
            */
           regex?: string;
         }
@@ -3953,7 +3939,7 @@ export namespace BatchSubmitParams {
          */
         export interface Controls {
           /**
-           * RE2 pattern; sitemap URLs matching it are not scraped, even when they match
+           * Regex pattern; sitemap URLs matching it are not scraped, even when they match
            * `regex`.
            */
           excludeRegex?: string;
@@ -3964,7 +3950,7 @@ export namespace BatchSubmitParams {
           maxUrls?: number;
 
           /**
-           * RE2 pattern; only sitemap URLs matching it are scraped.
+           * Regex pattern; only sitemap URLs matching it are scraped.
            */
           regex?: string;
         }
@@ -4021,33 +4007,23 @@ export namespace BatchSubmitParams {
        */
       export interface MarkdownParams {
         /**
-         * Include images in the Markdown using image syntax with URLs and alt text. Only
-         * applies to `html-conversion` extractions.
+         * Include images in the Markdown (`html-conversion` only).
          */
         includeImages?: boolean;
 
         /**
-         * Keep link URLs in the Markdown. Set false to return link text without URLs. Only
-         * applies to `html-conversion` extractions.
+         * Keep link URLs in the Markdown (`html-conversion` only).
          */
         includeLinks?: boolean;
 
         /**
-         * How base64 images appear: `placeholder` (default) or `preserve`. Requires
-         * `includeImages`. Only applies to `html-conversion` extractions.
+         * How base64 images appear when `includeImages` is set (`html-conversion` only).
          */
         inlineImages?: 'placeholder' | 'preserve';
 
         /**
-         * Where the Markdown should come from, in order of preference; the first usable
-         * source wins. `html-conversion` converts the page HTML, and counts as unusable
-         * when the conversion has almost no content (under 200 characters).
-         * `markdown-direct` uses the official Markdown version the page publishes through,
-         * returned as the site serves it. Defaults to
-         * `["html-conversion", "markdown-direct"]`. With only `markdown-direct`, a page
-         * that publishes no Markdown fails with `NO_PUBLISHED_MARKDOWN` and is not billed.
-         * Requests with include or exclude selectors never use `markdown-direct`, so they
-         * must include `html-conversion`.
+         * Markdown sources in order of preference: `html-conversion` converts the page
+         * HTML, `markdown-direct` uses Markdown the site publishes.
          */
         sourcePreference?: Array<'html-conversion' | 'markdown-direct'>;
       }
