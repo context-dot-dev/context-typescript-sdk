@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.13.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.12.3...v3.13.0) (2026-10-21)
+
+
+### Features
+
+* **batch:** follow only chosen languages in start_url crawls ([#2003](https://github.com/context-dot-dev/context-typescript-sdk/issues/2003)) ([86dfa4d](https://github.com/context-dot-dev/context-typescript-sdk/commit/86dfa4d3ca8490c221f380de480f400a987f1b4c))
+
 ## [3.12.3](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.12.2...v3.12.3) (2026-10-21)
 
 
