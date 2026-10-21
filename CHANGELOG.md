@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.12.3](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.12.2...v3.12.3) (2026-10-21)
+
+
+### Bug Fixes
+
+* **openapi:** document request_id and key_metadata on every response in one place ([#2042](https://github.com/context-dot-dev/context-typescript-sdk/issues/2042)) ([867de4d](https://github.com/context-dot-dev/context-typescript-sdk/commit/867de4d4e66c5bbe8e7be5ba28537bd42e5a1518))
+
 ## [3.12.2](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.12.1...v3.12.2) (2026-10-21)
 
 
