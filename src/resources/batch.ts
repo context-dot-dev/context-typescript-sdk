@@ -334,7 +334,7 @@ export interface BatchRetrieveResponse {
   timing: BatchRetrieveResponse.Timing;
 
   /**
-   * API key usage for this request.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: BatchRetrieveResponse.KeyMetadata;
 
@@ -506,7 +506,7 @@ export namespace BatchRetrieveResponse {
   }
 
   /**
-   * API key usage for this request.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
@@ -890,7 +890,7 @@ export interface BatchCancelResponse {
   timing: BatchCancelResponse.Timing;
 
   /**
-   * API key usage for this request.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: BatchCancelResponse.KeyMetadata;
 }
@@ -992,7 +992,7 @@ export namespace BatchCancelResponse {
   }
 
   /**
-   * API key usage for this request.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
@@ -2647,7 +2647,7 @@ export interface BatchSubmitResponse {
   tags: Array<string>;
 
   /**
-   * API key usage for this request.
+   * Credits this request used and your remaining balance.
    */
   key_metadata?: BatchSubmitResponse.KeyMetadata;
 
@@ -2747,7 +2747,7 @@ export namespace BatchSubmitResponse {
   }
 
   /**
-   * API key usage for this request.
+   * Credits this request used and your remaining balance.
    */
   export interface KeyMetadata {
     /**
