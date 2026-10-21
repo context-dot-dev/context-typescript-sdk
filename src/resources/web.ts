@@ -144,6 +144,12 @@ export interface WebAnswersResponse {
   json_content: { [key: string]: unknown };
 
   /**
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
    * URLs of the pages and company/profile records read for the answer, followed by
    * URLs cited in json_content.
    */
