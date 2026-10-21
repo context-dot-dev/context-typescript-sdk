@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.12.2](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.12.1...v3.12.2) (2026-10-21)
+
+
+### Bug Fixes
+
+* **answers:** document request_id in the /web/answers response ([#2040](https://github.com/context-dot-dev/context-typescript-sdk/issues/2040)) ([3181430](https://github.com/context-dot-dev/context-typescript-sdk/commit/31814309db43f2f76876a13cb46823a247663ff0))
+
 ## [3.12.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.12.0...v3.12.1) (2026-10-21)
 
 
