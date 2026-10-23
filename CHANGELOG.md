@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.15.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.14.1...v3.15.0) (2026-10-23)
+
+
+### Features
+
+* **people:** publish people search in the API specification ([#2094](https://github.com/context-dot-dev/context-typescript-sdk/issues/2094)) ([0228537](https://github.com/context-dot-dev/context-typescript-sdk/commit/02285374860c2548591d3fe0abd76c2033671aca))
+
 ## [3.14.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.14.0...v3.14.1) (2026-10-21)
 
 
