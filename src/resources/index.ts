@@ -63,7 +63,13 @@ export {
 } from './monitors';
 export { News, type NewsSearchResponse, type NewsSearchParams } from './news';
 export { Parse, type ParseHandleResponse, type ParseHandleParams } from './parse';
-export { People, type PersonEnrichResponse, type PersonEnrichParams } from './people';
+export {
+  People,
+  type PersonEnrichResponse,
+  type PersonSearchResponse,
+  type PersonEnrichParams,
+  type PersonSearchParams,
+} from './people';
 export { Utility, type UtilityPrefetchResponse, type UtilityPrefetchParams } from './utility';
 export {
   Web,

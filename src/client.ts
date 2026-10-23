@@ -79,7 +79,13 @@ import {
 } from './resources/monitors';
 import { News, NewsSearchParams, NewsSearchResponse } from './resources/news';
 import { Parse, ParseHandleParams, ParseHandleResponse } from './resources/parse';
-import { People, PersonEnrichParams, PersonEnrichResponse } from './resources/people';
+import {
+  People,
+  PersonEnrichParams,
+  PersonEnrichResponse,
+  PersonSearchParams,
+  PersonSearchResponse,
+} from './resources/people';
 import { Utility, UtilityPrefetchParams, UtilityPrefetchResponse } from './resources/utility';
 import {
   Web,
@@ -965,7 +971,9 @@ export declare namespace ContextDev {
   export {
     People as People,
     type PersonEnrichResponse as PersonEnrichResponse,
+    type PersonSearchResponse as PersonSearchResponse,
     type PersonEnrichParams as PersonEnrichParams,
+    type PersonSearchParams as PersonSearchParams,
   };
 
   export {

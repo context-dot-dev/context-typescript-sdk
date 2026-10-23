@@ -26,6 +26,20 @@ export class People extends APIResource {
   enrich(body: PersonEnrichParams, options?: RequestOptions): APIPromise<PersonEnrichResponse> {
     return this._client.post('/people/enrich', { body, ...options });
   }
+
+  /**
+   * Find people with a natural-language query.
+   *
+   * @example
+   * ```ts
+   * const response = await client.people.search({
+   *   query: 'VPs of sales at solar companies in California',
+   * });
+   * ```
+   */
+  search(body: PersonSearchParams, options?: RequestOptions): APIPromise<PersonSearchResponse> {
+    return this._client.post('/people/search', { body, ...options });
+  }
 }
 
 export interface PersonEnrichResponse {
@@ -278,6 +292,165 @@ export namespace PersonEnrichResponse {
   }
 }
 
+export interface PersonSearchResponse {
+  /**
+   * Unique ID of this request, also in `X-Request-Id`. Include it when contacting
+   * support.
+   */
+  request_id: string;
+
+  /**
+   * Up to 10 matching people, most relevant first.
+   */
+  results: Array<PersonSearchResponse.Result>;
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  key_metadata?: PersonSearchResponse.KeyMetadata;
+
+  /**
+   * Pass as cursor to fetch the next page; null when there are no more results.
+   */
+  next_cursor?: string | null;
+}
+
+export namespace PersonSearchResponse {
+  /**
+   * A person matching your search; unavailable details are null or empty lists.
+   */
+  export interface Result {
+    /**
+     * What the person does.
+     */
+    description: string | null;
+
+    /**
+     * Whether the person is currently a founder or co-founder.
+     */
+    is_founder: boolean | null;
+
+    /**
+     * Where the person lives.
+     */
+    location: Result.Location;
+
+    /**
+     * Full name.
+     */
+    name: string | null;
+
+    /**
+     * Public professional profile URLs.
+     */
+    profiles: Array<string>;
+
+    /**
+     * The person’s current role.
+     */
+    role: Result.Role;
+
+    /**
+     * Schools attended.
+     */
+    schools: Array<string>;
+
+    /**
+     * Professional skills.
+     */
+    skills: Array<string>;
+
+    /**
+     * Years of professional experience.
+     */
+    years_of_experience: number | null;
+  }
+
+  export namespace Result {
+    /**
+     * Where the person lives.
+     */
+    export interface Location {
+      /**
+       * City.
+       */
+      city: string | null;
+
+      /**
+       * Country as a two-letter code, such as US or GB.
+       */
+      country_code: string | null;
+
+      /**
+       * State or region.
+       */
+      region: string | null;
+    }
+
+    /**
+     * The person’s current role.
+     */
+    export interface Role {
+      /**
+       * Current employer, when known.
+       */
+      company: Role.Company | null;
+
+      /**
+       * Areas of responsibility.
+       */
+      functions: Array<string>;
+
+      /**
+       * Seniority level.
+       */
+      seniority: string | null;
+
+      /**
+       * Role start date (YYYY-MM-DD).
+       */
+      started_on: string | null;
+
+      /**
+       * Job title.
+       */
+      title: string | null;
+    }
+
+    export namespace Role {
+      /**
+       * Current employer, when known.
+       */
+      export interface Company {
+        /**
+         * The company’s website domain.
+         */
+        domain: string | null;
+
+        /**
+         * Company name.
+         */
+        name: string | null;
+      }
+    }
+  }
+
+  /**
+   * Credits this request used and your remaining balance.
+   */
+  export interface KeyMetadata {
+    /**
+     * Credits charged for this request.
+     */
+    credits_consumed: number;
+
+    /**
+     * Credits remaining for your organization.
+     */
+    credits_remaining: number;
+  }
+}
+
 export interface PersonEnrichParams {
   /**
    * Company context to help identify the person. Provide a name or domain.
@@ -438,6 +611,55 @@ export namespace PersonEnrichParams {
   }
 }
 
+export interface PersonSearchParams {
+  /**
+   * Describe the people to find.
+   */
+  query: string;
+
+  /**
+   * Use next_cursor with the same query and filters to fetch the next page.
+   */
+  cursor?: string;
+
+  /**
+   * Additional constraints every result must match.
+   */
+  filters?: PersonSearchParams.Filters;
+
+  /**
+   * Labels for filtering usage in the dashboard.
+   */
+  tags?: Array<string>;
+}
+
+export namespace PersonSearchParams {
+  /**
+   * Additional constraints every result must match.
+   */
+  export interface Filters {
+    /**
+     * Countries people live in as two-letter codes, such as US or GB.
+     */
+    countries?: Array<string>;
+
+    /**
+     * Maximum years of professional experience.
+     */
+    years_of_experience_max?: number;
+
+    /**
+     * Minimum years of professional experience.
+     */
+    years_of_experience_min?: number;
+  }
+}
+
 export declare namespace People {
-  export { type PersonEnrichResponse as PersonEnrichResponse, type PersonEnrichParams as PersonEnrichParams };
+  export {
+    type PersonEnrichResponse as PersonEnrichResponse,
+    type PersonSearchResponse as PersonSearchResponse,
+    type PersonEnrichParams as PersonEnrichParams,
+    type PersonSearchParams as PersonSearchParams,
+  };
 }
