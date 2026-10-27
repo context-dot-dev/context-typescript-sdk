@@ -194,6 +194,7 @@ describe('resource batch', () => {
             parsers: {
               pdf: {
                 endPage: 1,
+                includeNumberedPages: true,
                 ocr: 'off',
                 startPage: 1,
               },

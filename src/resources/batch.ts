@@ -3545,6 +3545,12 @@ export namespace BatchSubmitParams {
             endPage?: number;
 
             /**
+             * Start each page in the Markdown with a `<!-- page N -->` line using its original
+             * 1-based page number; these responses are never served from cache.
+             */
+            includeNumberedPages?: boolean;
+
+            /**
              * Set `auto` to read scanned pages with OCR.
              */
             ocr?: 'off' | 'auto';
@@ -4402,6 +4408,12 @@ export namespace BatchSubmitParams {
              * Last page to parse. Must be at least `startPage`.
              */
             endPage?: number;
+
+            /**
+             * Start each page in the Markdown with a `<!-- page N -->` line using its original
+             * 1-based page number; these responses are never served from cache.
+             */
+            includeNumberedPages?: boolean;
 
             /**
              * Set `auto` to read scanned pages with OCR.

@@ -20,6 +20,7 @@ export class Parse extends APIResource {
       extension,
       includeImages,
       includeLinks,
+      includeNumberedPages,
       ocr,
       pdf,
       shortenBase64Images,
@@ -34,6 +35,7 @@ export class Parse extends APIResource {
         extension,
         includeImages,
         includeLinks,
+        includeNumberedPages,
         ocr,
         pdf,
         shortenBase64Images,
@@ -224,6 +226,12 @@ export interface ParseHandleParams {
    * Query param: Preserve hyperlinks in Markdown output
    */
   includeLinks?: boolean;
+
+  /**
+   * Query param: Start each PDF page in the Markdown with a `<!-- page N -->` line,
+   * where N is the original 1-based page number.
+   */
+  includeNumberedPages?: boolean;
 
   /**
    * Query param: Read text from images and scanned PDF pages. PDF page ranges still
