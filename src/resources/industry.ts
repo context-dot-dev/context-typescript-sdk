@@ -7,6 +7,8 @@ import { RequestOptions } from '../internal/request-options';
 export class Industry extends APIResource {
   /**
    * Classify a company into NAICS industry codes.
+   *
+   * @deprecated
    */
   retrieveNaics(
     query: IndustryRetrieveNaicsParams,
@@ -17,6 +19,8 @@ export class Industry extends APIResource {
 
   /**
    * Classify a company into SIC industry codes.
+   *
+   * @deprecated
    */
   retrieveSic(
     query: IndustryRetrieveSicParams,
