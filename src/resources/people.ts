@@ -364,6 +364,11 @@ export namespace PersonSearchResponse {
      * Years of professional experience.
      */
     years_of_experience: number | null;
+
+    /**
+     * How well the person matches the query. Only returned in `ultra` mode.
+     */
+    match?: Result.Match;
   }
 
   export namespace Result {
@@ -432,6 +437,16 @@ export namespace PersonSearchResponse {
          */
         name: string | null;
       }
+    }
+
+    /**
+     * How well the person matches the query. Only returned in `ultra` mode.
+     */
+    export interface Match {
+      /**
+       * How well the person matches the query, from 0 to 1.
+       */
+      confidence: number;
     }
   }
 
@@ -613,12 +628,13 @@ export namespace PersonEnrichParams {
 
 export interface PersonSearchParams {
   /**
-   * Describe the people to find.
+   * Describe the people to find. Up to 500 characters in `fast` mode and 5000 in
+   * `ultra` mode.
    */
   query: string;
 
   /**
-   * Use next_cursor with the same query and filters to fetch the next page.
+   * Use next_cursor with the same query, mode and filters to fetch the next page.
    */
   cursor?: string;
 
@@ -626,6 +642,13 @@ export interface PersonSearchParams {
    * Additional constraints every result must match.
    */
   filters?: PersonSearchParams.Filters;
+
+  /**
+   * `fast` matches people on basic criteria (e.g. their role, location or
+   * background); `ultra` plans a deeper search, judges each candidate against every
+   * criterion in the query and explains each match.
+   */
+  mode?: 'fast' | 'ultra';
 
   /**
    * Labels for filtering usage in the dashboard.

@@ -42,6 +42,7 @@ describe('resource people', () => {
         years_of_experience_max: 0,
         years_of_experience_min: 0,
       },
+      mode: 'fast',
       tags: ['production', 'team-alpha'],
     });
   });
