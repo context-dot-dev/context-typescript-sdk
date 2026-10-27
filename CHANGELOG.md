@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.17.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.16.0...v3.17.0) (2026-10-27)
+
+
+### Features
+
+* **people:** add ultra mode to people search ([#2149](https://github.com/context-dot-dev/context-typescript-sdk/issues/2149)) ([cca0757](https://github.com/context-dot-dev/context-typescript-sdk/commit/cca07576fc137e45bf0ccfd638479dcb4f251cb4))
+
 ## [3.16.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.15.0...v3.16.0) (2026-10-27)
 
 
