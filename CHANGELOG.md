@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.16.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.15.0...v3.16.0) (2026-10-27)
+
+
+### Features
+
+* **api:** serve a public OpenAPI spec and generate the SDKs from it ([#2075](https://github.com/context-dot-dev/context-typescript-sdk/issues/2075)) ([87349d2](https://github.com/context-dot-dev/context-typescript-sdk/commit/87349d2037f4973e4b2b4579c5c3b83daa1ebb5a))
+
 ## [3.15.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.14.1...v3.15.0) (2026-10-23)
 
 
