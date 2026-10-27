@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.17.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.17.0...v3.17.1) (2026-10-27)
+
+
+### Documentation
+
+* **people:** note that complex ultra people searches can take up to 60 seconds ([#2206](https://github.com/context-dot-dev/context-typescript-sdk/issues/2206)) ([3b35d9a](https://github.com/context-dot-dev/context-typescript-sdk/commit/3b35d9a754e095d206804bcf0bfe3cb97dffd81a))
+
 ## [3.17.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.16.0...v3.17.0) (2026-10-27)
 
 
