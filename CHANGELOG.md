@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.18.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.17.1...v3.18.0) (2026-10-27)
+
+
+### Features
+
+* **parse:** mark PDF page numbers inline in Markdown with includeNumberedPages ([#2110](https://github.com/context-dot-dev/context-typescript-sdk/issues/2110)) ([eb1e97f](https://github.com/context-dot-dev/context-typescript-sdk/commit/eb1e97f29ca78b86611f808632e264cac59c0e53))
+
+
+### Bug Fixes
+
+* **people:** split ultra people ranking on its strongest phrase signals ([#2209](https://github.com/context-dot-dev/context-typescript-sdk/issues/2209)) ([6a36584](https://github.com/context-dot-dev/context-typescript-sdk/commit/6a3658407f1b0c9f4a4cdf520f305d9149b01d1d))
+
 ## [3.17.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.17.0...v3.17.1) (2026-10-27)
 
 
