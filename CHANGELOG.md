@@ -1,5 +1,36 @@
 # Changelog
 
+## [3.19.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.18.0...v3.19.0) (2026-10-28)
+
+
+### Features
+
+* **access-policies:** limit which websites API requests can reach ([#2213](https://github.com/context-dot-dev/context-typescript-sdk/issues/2213)) ([2e7cbf7](https://github.com/context-dot-dev/context-typescript-sdk/commit/2e7cbf721079a86aaf706bca719f74ae26191ac4))
+* **access-policies:** limit which websites API requests can reach ([#2213](https://github.com/context-dot-dev/context-typescript-sdk/issues/2213)) ([ff77d90](https://github.com/context-dot-dev/context-typescript-sdk/commit/ff77d900714bdbbfc8f4db32f07bc81421b25ac7))
+* **access-policies:** limit which websites API requests can reach ([#2213](https://github.com/context-dot-dev/context-typescript-sdk/issues/2213)) ([4a96b45](https://github.com/context-dot-dev/context-typescript-sdk/commit/4a96b45d64fbd0b9278205772e170ef81b49fb51))
+* **access-policies:** limit which websites API requests can reach ([#2213](https://github.com/context-dot-dev/context-typescript-sdk/issues/2213)) ([93ccc89](https://github.com/context-dot-dev/context-typescript-sdk/commit/93ccc892b4758e3ac4b2ad0954738f075d362655))
+* **access-policies:** limit which websites API requests can reach ([#2213](https://github.com/context-dot-dev/context-typescript-sdk/issues/2213)) ([e96b8e6](https://github.com/context-dot-dev/context-typescript-sdk/commit/e96b8e6833971894877b28e03e04486cedfa8a7c))
+* **brand:** support log-free brand and styleguide requests ([#2231](https://github.com/context-dot-dev/context-typescript-sdk/issues/2231)) ([2e7cbf7](https://github.com/context-dot-dev/context-typescript-sdk/commit/2e7cbf721079a86aaf706bca719f74ae26191ac4))
+* **brand:** support log-free brand and styleguide requests ([#2231](https://github.com/context-dot-dev/context-typescript-sdk/issues/2231)) ([ff77d90](https://github.com/context-dot-dev/context-typescript-sdk/commit/ff77d900714bdbbfc8f4db32f07bc81421b25ac7))
+* **brand:** support log-free brand and styleguide requests ([#2231](https://github.com/context-dot-dev/context-typescript-sdk/issues/2231)) ([4a96b45](https://github.com/context-dot-dev/context-typescript-sdk/commit/4a96b45d64fbd0b9278205772e170ef81b49fb51))
+* **brand:** support log-free brand and styleguide requests ([#2231](https://github.com/context-dot-dev/context-typescript-sdk/issues/2231)) ([93ccc89](https://github.com/context-dot-dev/context-typescript-sdk/commit/93ccc892b4758e3ac4b2ad0954738f075d362655))
+* **monitors:** add search target to watch the web for new developments ([#2215](https://github.com/context-dot-dev/context-typescript-sdk/issues/2215)) ([2e7cbf7](https://github.com/context-dot-dev/context-typescript-sdk/commit/2e7cbf721079a86aaf706bca719f74ae26191ac4))
+* **monitors:** add search target to watch the web for new developments ([#2215](https://github.com/context-dot-dev/context-typescript-sdk/issues/2215)) ([ff77d90](https://github.com/context-dot-dev/context-typescript-sdk/commit/ff77d900714bdbbfc8f4db32f07bc81421b25ac7))
+
+
+### Bug Fixes
+
+* **brand:** keep metadata-only usage logs for ZDR brand requests ([#2234](https://github.com/context-dot-dev/context-typescript-sdk/issues/2234)) ([2e7cbf7](https://github.com/context-dot-dev/context-typescript-sdk/commit/2e7cbf721079a86aaf706bca719f74ae26191ac4))
+* **brand:** keep metadata-only usage logs for ZDR brand requests ([#2234](https://github.com/context-dot-dev/context-typescript-sdk/issues/2234)) ([ff77d90](https://github.com/context-dot-dev/context-typescript-sdk/commit/ff77d900714bdbbfc8f4db32f07bc81421b25ac7))
+* **brand:** keep metadata-only usage logs for ZDR brand requests ([#2234](https://github.com/context-dot-dev/context-typescript-sdk/issues/2234)) ([4a96b45](https://github.com/context-dot-dev/context-typescript-sdk/commit/4a96b45d64fbd0b9278205772e170ef81b49fb51))
+* **openapi:** keep legacy batch inputs in the spec as deprecated ([#2225](https://github.com/context-dot-dev/context-typescript-sdk/issues/2225)) ([2e7cbf7](https://github.com/context-dot-dev/context-typescript-sdk/commit/2e7cbf721079a86aaf706bca719f74ae26191ac4))
+* **openapi:** keep legacy batch inputs in the spec as deprecated ([#2225](https://github.com/context-dot-dev/context-typescript-sdk/issues/2225)) ([ff77d90](https://github.com/context-dot-dev/context-typescript-sdk/commit/ff77d900714bdbbfc8f4db32f07bc81421b25ac7))
+* **openapi:** keep legacy batch inputs in the spec as deprecated ([#2225](https://github.com/context-dot-dev/context-typescript-sdk/issues/2225)) ([4a96b45](https://github.com/context-dot-dev/context-typescript-sdk/commit/4a96b45d64fbd0b9278205772e170ef81b49fb51))
+* **openapi:** keep legacy batch inputs in the spec as deprecated ([#2225](https://github.com/context-dot-dev/context-typescript-sdk/issues/2225)) ([93ccc89](https://github.com/context-dot-dev/context-typescript-sdk/commit/93ccc892b4758e3ac4b2ad0954738f075d362655))
+* **openapi:** keep legacy batch inputs in the spec as deprecated ([#2225](https://github.com/context-dot-dev/context-typescript-sdk/issues/2225)) ([e96b8e6](https://github.com/context-dot-dev/context-typescript-sdk/commit/e96b8e6833971894877b28e03e04486cedfa8a7c))
+* **openapi:** keep legacy batch inputs in the spec as deprecated ([#2225](https://github.com/context-dot-dev/context-typescript-sdk/issues/2225)) ([1bd3e5c](https://github.com/context-dot-dev/context-typescript-sdk/commit/1bd3e5ca3bebc1a079701c5b8c322a62b6361127))
+* **scrape:** restore Instagram profile posts from public pages ([#2233](https://github.com/context-dot-dev/context-typescript-sdk/issues/2233)) ([2e7cbf7](https://github.com/context-dot-dev/context-typescript-sdk/commit/2e7cbf721079a86aaf706bca719f74ae26191ac4))
+
 ## [3.18.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.17.1...v3.18.0) (2026-10-27)
 
 
