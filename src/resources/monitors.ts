@@ -302,8 +302,8 @@ export interface MonitorCreateResponse {
   id: string;
 
   /**
-   * How changes are judged. Defaults to `semantic` for extract targets and page
-   * targets with `instructions`, otherwise `exact`.
+   * How changes are judged. Defaults to `semantic` for extract and search targets
+   * and page targets with `instructions`, otherwise `exact`.
    */
   change_detection:
     | MonitorCreateResponse.MonitorsExactChangeDetection
@@ -337,12 +337,14 @@ export interface MonitorCreateResponse {
   status: 'active' | 'paused' | 'failed';
 
   /**
-   * What to watch: a page, a sitemap, or data extracted from a site.
+   * What to watch: a page, a sitemap, data extracted from a site, or web search
+   * results.
    */
   target:
     | MonitorCreateResponse.MonitorsPageTarget
     | MonitorCreateResponse.MonitorsSitemapTarget
-    | MonitorCreateResponse.MonitorsExtractTarget;
+    | MonitorCreateResponse.MonitorsExtractTarget
+    | MonitorCreateResponse.MonitorsSearchTarget;
 
   updated_at: string;
 
@@ -354,6 +356,7 @@ export interface MonitorCreateResponse {
     | MonitorCreateResponse.MonitorsPageBaseline
     | MonitorCreateResponse.MonitorsSitemapBaseline
     | MonitorCreateResponse.MonitorsExtractBaseline
+    | MonitorCreateResponse.MonitorsSearchBaseline
     | null;
 
   /**
@@ -408,11 +411,12 @@ export interface MonitorCreateResponse {
 export namespace MonitorCreateResponse {
   /**
    * Detect exact changes. For page targets, this means visible text diffs. For
-   * sitemap targets, this means URL additions and removals.
+   * sitemap targets, this means URL additions and removals. For search targets, this
+   * means every new result.
    */
   export interface MonitorsExactChangeDetection {
     /**
-     * Use `exact` to compare visible text or sitemap URLs.
+     * Use `exact` to compare visible text, sitemap URLs, or search results.
      */
     type: 'exact';
   }
@@ -621,6 +625,30 @@ export namespace MonitorCreateResponse {
   }
 
   /**
+   * Search the web on every run and report results not seen before, listed in the
+   * change’s `matched_urls` and `evidence`. Semantic detection reports only results
+   * describing a new development that matches `instructions`; exact detection
+   * reports every new result.
+   */
+  export interface MonitorsSearchTarget {
+    /**
+     * Web search query to run on every check. Supports operators such as `site:`,
+     * `-site:`, and quoted phrases.
+     */
+    query: string;
+
+    /**
+     * Use `search` to watch the whole web for new results about a topic.
+     */
+    type: 'search';
+
+    /**
+     * Plain-language description of which new results matter. Defaults to the query.
+     */
+    instructions?: string;
+  }
+
+  /**
    * Current baseline of a `page` monitor: the visible page text as last observed.
    */
   export interface MonitorsPageBaseline {
@@ -676,6 +704,39 @@ export namespace MonitorCreateResponse {
      * The page URLs the monitor tracks and analyzes for changes.
      */
     urls_analyzed: Array<string>;
+  }
+
+  /**
+   * Current baseline of a `search` monitor: the search results as last observed.
+   */
+  export interface MonitorsSearchBaseline {
+    /**
+     * When this baseline was last captured or replaced.
+     */
+    captured_at: string;
+
+    /**
+     * Search results as last observed.
+     */
+    results: Array<MonitorsSearchBaseline.Result>;
+  }
+
+  export namespace MonitorsSearchBaseline {
+    export interface Result {
+      /**
+       * Result snippet.
+       */
+      description: string;
+
+      /**
+       * When the result was published, when known.
+       */
+      published_at: string | null;
+
+      title: string;
+
+      url: string;
+    }
   }
 
   /**
@@ -785,8 +846,8 @@ export interface MonitorRetrieveResponse {
   id: string;
 
   /**
-   * How changes are judged. Defaults to `semantic` for extract targets and page
-   * targets with `instructions`, otherwise `exact`.
+   * How changes are judged. Defaults to `semantic` for extract and search targets
+   * and page targets with `instructions`, otherwise `exact`.
    */
   change_detection:
     | MonitorRetrieveResponse.MonitorsExactChangeDetection
@@ -814,12 +875,14 @@ export interface MonitorRetrieveResponse {
   status: 'active' | 'paused' | 'failed';
 
   /**
-   * What to watch: a page, a sitemap, or data extracted from a site.
+   * What to watch: a page, a sitemap, data extracted from a site, or web search
+   * results.
    */
   target:
     | MonitorRetrieveResponse.MonitorsPageTarget
     | MonitorRetrieveResponse.MonitorsSitemapTarget
-    | MonitorRetrieveResponse.MonitorsExtractTarget;
+    | MonitorRetrieveResponse.MonitorsExtractTarget
+    | MonitorRetrieveResponse.MonitorsSearchTarget;
 
   updated_at: string;
 
@@ -831,6 +894,7 @@ export interface MonitorRetrieveResponse {
     | MonitorRetrieveResponse.MonitorsPageBaseline
     | MonitorRetrieveResponse.MonitorsSitemapBaseline
     | MonitorRetrieveResponse.MonitorsExtractBaseline
+    | MonitorRetrieveResponse.MonitorsSearchBaseline
     | null;
 
   /**
@@ -885,11 +949,12 @@ export interface MonitorRetrieveResponse {
 export namespace MonitorRetrieveResponse {
   /**
    * Detect exact changes. For page targets, this means visible text diffs. For
-   * sitemap targets, this means URL additions and removals.
+   * sitemap targets, this means URL additions and removals. For search targets, this
+   * means every new result.
    */
   export interface MonitorsExactChangeDetection {
     /**
-     * Use `exact` to compare visible text or sitemap URLs.
+     * Use `exact` to compare visible text, sitemap URLs, or search results.
      */
     type: 'exact';
   }
@@ -1098,6 +1163,30 @@ export namespace MonitorRetrieveResponse {
   }
 
   /**
+   * Search the web on every run and report results not seen before, listed in the
+   * change’s `matched_urls` and `evidence`. Semantic detection reports only results
+   * describing a new development that matches `instructions`; exact detection
+   * reports every new result.
+   */
+  export interface MonitorsSearchTarget {
+    /**
+     * Web search query to run on every check. Supports operators such as `site:`,
+     * `-site:`, and quoted phrases.
+     */
+    query: string;
+
+    /**
+     * Use `search` to watch the whole web for new results about a topic.
+     */
+    type: 'search';
+
+    /**
+     * Plain-language description of which new results matter. Defaults to the query.
+     */
+    instructions?: string;
+  }
+
+  /**
    * Current baseline of a `page` monitor: the visible page text as last observed.
    */
   export interface MonitorsPageBaseline {
@@ -1153,6 +1242,39 @@ export namespace MonitorRetrieveResponse {
      * The page URLs the monitor tracks and analyzes for changes.
      */
     urls_analyzed: Array<string>;
+  }
+
+  /**
+   * Current baseline of a `search` monitor: the search results as last observed.
+   */
+  export interface MonitorsSearchBaseline {
+    /**
+     * When this baseline was last captured or replaced.
+     */
+    captured_at: string;
+
+    /**
+     * Search results as last observed.
+     */
+    results: Array<MonitorsSearchBaseline.Result>;
+  }
+
+  export namespace MonitorsSearchBaseline {
+    export interface Result {
+      /**
+       * Result snippet.
+       */
+      description: string;
+
+      /**
+       * When the result was published, when known.
+       */
+      published_at: string | null;
+
+      title: string;
+
+      url: string;
+    }
   }
 
   /**
@@ -1262,8 +1384,8 @@ export interface MonitorUpdateResponse {
   id: string;
 
   /**
-   * How changes are judged. Defaults to `semantic` for extract targets and page
-   * targets with `instructions`, otherwise `exact`.
+   * How changes are judged. Defaults to `semantic` for extract and search targets
+   * and page targets with `instructions`, otherwise `exact`.
    */
   change_detection:
     | MonitorUpdateResponse.MonitorsExactChangeDetection
@@ -1291,12 +1413,14 @@ export interface MonitorUpdateResponse {
   status: 'active' | 'paused' | 'failed';
 
   /**
-   * What to watch: a page, a sitemap, or data extracted from a site.
+   * What to watch: a page, a sitemap, data extracted from a site, or web search
+   * results.
    */
   target:
     | MonitorUpdateResponse.MonitorsPageTarget
     | MonitorUpdateResponse.MonitorsSitemapTarget
-    | MonitorUpdateResponse.MonitorsExtractTarget;
+    | MonitorUpdateResponse.MonitorsExtractTarget
+    | MonitorUpdateResponse.MonitorsSearchTarget;
 
   updated_at: string;
 
@@ -1308,6 +1432,7 @@ export interface MonitorUpdateResponse {
     | MonitorUpdateResponse.MonitorsPageBaseline
     | MonitorUpdateResponse.MonitorsSitemapBaseline
     | MonitorUpdateResponse.MonitorsExtractBaseline
+    | MonitorUpdateResponse.MonitorsSearchBaseline
     | null;
 
   /**
@@ -1362,11 +1487,12 @@ export interface MonitorUpdateResponse {
 export namespace MonitorUpdateResponse {
   /**
    * Detect exact changes. For page targets, this means visible text diffs. For
-   * sitemap targets, this means URL additions and removals.
+   * sitemap targets, this means URL additions and removals. For search targets, this
+   * means every new result.
    */
   export interface MonitorsExactChangeDetection {
     /**
-     * Use `exact` to compare visible text or sitemap URLs.
+     * Use `exact` to compare visible text, sitemap URLs, or search results.
      */
     type: 'exact';
   }
@@ -1575,6 +1701,30 @@ export namespace MonitorUpdateResponse {
   }
 
   /**
+   * Search the web on every run and report results not seen before, listed in the
+   * change’s `matched_urls` and `evidence`. Semantic detection reports only results
+   * describing a new development that matches `instructions`; exact detection
+   * reports every new result.
+   */
+  export interface MonitorsSearchTarget {
+    /**
+     * Web search query to run on every check. Supports operators such as `site:`,
+     * `-site:`, and quoted phrases.
+     */
+    query: string;
+
+    /**
+     * Use `search` to watch the whole web for new results about a topic.
+     */
+    type: 'search';
+
+    /**
+     * Plain-language description of which new results matter. Defaults to the query.
+     */
+    instructions?: string;
+  }
+
+  /**
    * Current baseline of a `page` monitor: the visible page text as last observed.
    */
   export interface MonitorsPageBaseline {
@@ -1630,6 +1780,39 @@ export namespace MonitorUpdateResponse {
      * The page URLs the monitor tracks and analyzes for changes.
      */
     urls_analyzed: Array<string>;
+  }
+
+  /**
+   * Current baseline of a `search` monitor: the search results as last observed.
+   */
+  export interface MonitorsSearchBaseline {
+    /**
+     * When this baseline was last captured or replaced.
+     */
+    captured_at: string;
+
+    /**
+     * Search results as last observed.
+     */
+    results: Array<MonitorsSearchBaseline.Result>;
+  }
+
+  export namespace MonitorsSearchBaseline {
+    export interface Result {
+      /**
+       * Result snippet.
+       */
+      description: string;
+
+      /**
+       * When the result was published, when known.
+       */
+      published_at: string | null;
+
+      title: string;
+
+      url: string;
+    }
   }
 
   /**
@@ -1757,14 +1940,14 @@ export interface MonitorListResponse {
 export namespace MonitorListResponse {
   /**
    * A web monitor. `mode` is the constant `web`; behavior is described by `target`
-   * (page/sitemap/extract) and `change_detection` (exact/semantic).
+   * (page/sitemap/extract/search) and `change_detection` (exact/semantic).
    */
   export interface Data {
     id: string;
 
     /**
-     * How changes are judged. Defaults to `semantic` for extract targets and page
-     * targets with `instructions`, otherwise `exact`.
+     * How changes are judged. Defaults to `semantic` for extract and search targets
+     * and page targets with `instructions`, otherwise `exact`.
      */
     change_detection: Data.MonitorsExactChangeDetection | Data.MonitorsSemanticChangeDetection;
 
@@ -1791,9 +1974,14 @@ export namespace MonitorListResponse {
     status: 'active' | 'paused' | 'failed';
 
     /**
-     * What to watch: a page, a sitemap, or data extracted from a site.
+     * What to watch: a page, a sitemap, data extracted from a site, or web search
+     * results.
      */
-    target: Data.MonitorsPageTarget | Data.MonitorsSitemapTarget | Data.MonitorsExtractTarget;
+    target:
+      | Data.MonitorsPageTarget
+      | Data.MonitorsSitemapTarget
+      | Data.MonitorsExtractTarget
+      | Data.MonitorsSearchTarget;
 
     updated_at: string;
 
@@ -1801,7 +1989,12 @@ export namespace MonitorListResponse {
      * Comparison baseline, included on Retrieve. Null until capture completes or after
      * target changes.
      */
-    baseline?: Data.MonitorsPageBaseline | Data.MonitorsSitemapBaseline | Data.MonitorsExtractBaseline | null;
+    baseline?:
+      | Data.MonitorsPageBaseline
+      | Data.MonitorsSitemapBaseline
+      | Data.MonitorsExtractBaseline
+      | Data.MonitorsSearchBaseline
+      | null;
 
     last_change_at?: string | null;
 
@@ -1843,11 +2036,12 @@ export namespace MonitorListResponse {
   export namespace Data {
     /**
      * Detect exact changes. For page targets, this means visible text diffs. For
-     * sitemap targets, this means URL additions and removals.
+     * sitemap targets, this means URL additions and removals. For search targets, this
+     * means every new result.
      */
     export interface MonitorsExactChangeDetection {
       /**
-       * Use `exact` to compare visible text or sitemap URLs.
+       * Use `exact` to compare visible text, sitemap URLs, or search results.
        */
       type: 'exact';
     }
@@ -2080,6 +2274,30 @@ export namespace MonitorListResponse {
     }
 
     /**
+     * Search the web on every run and report results not seen before, listed in the
+     * change’s `matched_urls` and `evidence`. Semantic detection reports only results
+     * describing a new development that matches `instructions`; exact detection
+     * reports every new result.
+     */
+    export interface MonitorsSearchTarget {
+      /**
+       * Web search query to run on every check. Supports operators such as `site:`,
+       * `-site:`, and quoted phrases.
+       */
+      query: string;
+
+      /**
+       * Use `search` to watch the whole web for new results about a topic.
+       */
+      type: 'search';
+
+      /**
+       * Plain-language description of which new results matter. Defaults to the query.
+       */
+      instructions?: string;
+    }
+
+    /**
      * Current baseline of a `page` monitor: the visible page text as last observed.
      */
     export interface MonitorsPageBaseline {
@@ -2135,6 +2353,39 @@ export namespace MonitorListResponse {
        * The page URLs the monitor tracks and analyzes for changes.
        */
       urls_analyzed: Array<string>;
+    }
+
+    /**
+     * Current baseline of a `search` monitor: the search results as last observed.
+     */
+    export interface MonitorsSearchBaseline {
+      /**
+       * When this baseline was last captured or replaced.
+       */
+      captured_at: string;
+
+      /**
+       * Search results as last observed.
+       */
+      results: Array<MonitorsSearchBaseline.Result>;
+    }
+
+    export namespace MonitorsSearchBaseline {
+      export interface Result {
+        /**
+         * Result snippet.
+         */
+        description: string;
+
+        /**
+         * When the result was published, when known.
+         */
+        published_at: string | null;
+
+        title: string;
+
+        url: string;
+      }
     }
 
     /**
@@ -2402,10 +2653,13 @@ export namespace MonitorListAccountChangesResponse {
      */
     tags: Array<string>;
 
-    target_type: 'page' | 'sitemap' | 'extract';
+    target_type: 'page' | 'sitemap' | 'extract' | 'search';
 
     title: string;
 
+    /**
+     * The monitored URL. For search targets, the first newly reported result.
+     */
     url: string;
 
     added_url_count?: number;
@@ -2531,7 +2785,7 @@ export namespace MonitorListAccountRunsResponse {
      */
     status: 'queued' | 'running' | 'completed' | 'failed' | 'skipped';
 
-    target_type: 'page' | 'sitemap' | 'extract';
+    target_type: 'page' | 'sitemap' | 'extract' | 'search';
 
     change_id?: string | null;
 
@@ -2637,10 +2891,13 @@ export namespace MonitorListChangesResponse {
      */
     tags: Array<string>;
 
-    target_type: 'page' | 'sitemap' | 'extract';
+    target_type: 'page' | 'sitemap' | 'extract' | 'search';
 
     title: string;
 
+    /**
+     * The monitored URL. For search targets, the first newly reported result.
+     */
     url: string;
 
     added_url_count?: number;
@@ -2766,7 +3023,7 @@ export namespace MonitorListRunsResponse {
      */
     status: 'queued' | 'running' | 'completed' | 'failed' | 'skipped';
 
-    target_type: 'page' | 'sitemap' | 'extract';
+    target_type: 'page' | 'sitemap' | 'extract' | 'search';
 
     change_id?: string | null;
 
@@ -2855,10 +3112,13 @@ export interface MonitorRetrieveChangeResponse {
    */
   tags: Array<string>;
 
-  target_type: 'page' | 'sitemap' | 'extract';
+  target_type: 'page' | 'sitemap' | 'extract' | 'search';
 
   title: string;
 
+  /**
+   * The monitored URL. For search targets, the first newly reported result.
+   */
   url: string;
 
   added_url_count?: number;
@@ -2974,7 +3234,7 @@ export interface MonitorRetrieveRunResponse {
    */
   status: 'queued' | 'running' | 'completed' | 'failed' | 'skipped';
 
-  target_type: 'page' | 'sitemap' | 'extract';
+  target_type: 'page' | 'sitemap' | 'extract' | 'search';
 
   change_id?: string | null;
 
@@ -3039,8 +3299,8 @@ export interface MonitorRotateWebhookSecretResponse {
   id: string;
 
   /**
-   * How changes are judged. Defaults to `semantic` for extract targets and page
-   * targets with `instructions`, otherwise `exact`.
+   * How changes are judged. Defaults to `semantic` for extract and search targets
+   * and page targets with `instructions`, otherwise `exact`.
    */
   change_detection:
     | MonitorRotateWebhookSecretResponse.MonitorsExactChangeDetection
@@ -3068,12 +3328,14 @@ export interface MonitorRotateWebhookSecretResponse {
   status: 'active' | 'paused' | 'failed';
 
   /**
-   * What to watch: a page, a sitemap, or data extracted from a site.
+   * What to watch: a page, a sitemap, data extracted from a site, or web search
+   * results.
    */
   target:
     | MonitorRotateWebhookSecretResponse.MonitorsPageTarget
     | MonitorRotateWebhookSecretResponse.MonitorsSitemapTarget
-    | MonitorRotateWebhookSecretResponse.MonitorsExtractTarget;
+    | MonitorRotateWebhookSecretResponse.MonitorsExtractTarget
+    | MonitorRotateWebhookSecretResponse.MonitorsSearchTarget;
 
   updated_at: string;
 
@@ -3085,6 +3347,7 @@ export interface MonitorRotateWebhookSecretResponse {
     | MonitorRotateWebhookSecretResponse.MonitorsPageBaseline
     | MonitorRotateWebhookSecretResponse.MonitorsSitemapBaseline
     | MonitorRotateWebhookSecretResponse.MonitorsExtractBaseline
+    | MonitorRotateWebhookSecretResponse.MonitorsSearchBaseline
     | null;
 
   /**
@@ -3139,11 +3402,12 @@ export interface MonitorRotateWebhookSecretResponse {
 export namespace MonitorRotateWebhookSecretResponse {
   /**
    * Detect exact changes. For page targets, this means visible text diffs. For
-   * sitemap targets, this means URL additions and removals.
+   * sitemap targets, this means URL additions and removals. For search targets, this
+   * means every new result.
    */
   export interface MonitorsExactChangeDetection {
     /**
-     * Use `exact` to compare visible text or sitemap URLs.
+     * Use `exact` to compare visible text, sitemap URLs, or search results.
      */
     type: 'exact';
   }
@@ -3352,6 +3616,30 @@ export namespace MonitorRotateWebhookSecretResponse {
   }
 
   /**
+   * Search the web on every run and report results not seen before, listed in the
+   * change’s `matched_urls` and `evidence`. Semantic detection reports only results
+   * describing a new development that matches `instructions`; exact detection
+   * reports every new result.
+   */
+  export interface MonitorsSearchTarget {
+    /**
+     * Web search query to run on every check. Supports operators such as `site:`,
+     * `-site:`, and quoted phrases.
+     */
+    query: string;
+
+    /**
+     * Use `search` to watch the whole web for new results about a topic.
+     */
+    type: 'search';
+
+    /**
+     * Plain-language description of which new results matter. Defaults to the query.
+     */
+    instructions?: string;
+  }
+
+  /**
    * Current baseline of a `page` monitor: the visible page text as last observed.
    */
   export interface MonitorsPageBaseline {
@@ -3407,6 +3695,39 @@ export namespace MonitorRotateWebhookSecretResponse {
      * The page URLs the monitor tracks and analyzes for changes.
      */
     urls_analyzed: Array<string>;
+  }
+
+  /**
+   * Current baseline of a `search` monitor: the search results as last observed.
+   */
+  export interface MonitorsSearchBaseline {
+    /**
+     * When this baseline was last captured or replaced.
+     */
+    captured_at: string;
+
+    /**
+     * Search results as last observed.
+     */
+    results: Array<MonitorsSearchBaseline.Result>;
+  }
+
+  export namespace MonitorsSearchBaseline {
+    export interface Result {
+      /**
+       * Result snippet.
+       */
+      description: string;
+
+      /**
+       * When the result was published, when known.
+       */
+      published_at: string | null;
+
+      title: string;
+
+      url: string;
+    }
   }
 
   /**
@@ -3558,16 +3879,18 @@ export interface MonitorCreateParams {
   name: string;
 
   /**
-   * What to watch: a page, a sitemap, or data extracted from a site.
+   * What to watch: a page, a sitemap, data extracted from a site, or web search
+   * results.
    */
   target:
     | MonitorCreateParams.MonitorsPageTarget
     | MonitorCreateParams.MonitorsSitemapTarget
-    | MonitorCreateParams.MonitorsExtractTarget;
+    | MonitorCreateParams.MonitorsExtractTarget
+    | MonitorCreateParams.MonitorsSearchTarget;
 
   /**
-   * How changes are judged. Defaults to `semantic` for extract targets and page
-   * targets with `instructions`, otherwise `exact`.
+   * How changes are judged. Defaults to `semantic` for extract and search targets
+   * and page targets with `instructions`, otherwise `exact`.
    */
   change_detection?:
     | MonitorCreateParams.MonitorsExactChangeDetection
@@ -3790,12 +4113,37 @@ export namespace MonitorCreateParams {
   }
 
   /**
+   * Search the web on every run and report results not seen before, listed in the
+   * change’s `matched_urls` and `evidence`. Semantic detection reports only results
+   * describing a new development that matches `instructions`; exact detection
+   * reports every new result.
+   */
+  export interface MonitorsSearchTarget {
+    /**
+     * Web search query to run on every check. Supports operators such as `site:`,
+     * `-site:`, and quoted phrases.
+     */
+    query: string;
+
+    /**
+     * Use `search` to watch the whole web for new results about a topic.
+     */
+    type: 'search';
+
+    /**
+     * Plain-language description of which new results matter. Defaults to the query.
+     */
+    instructions?: string;
+  }
+
+  /**
    * Detect exact changes. For page targets, this means visible text diffs. For
-   * sitemap targets, this means URL additions and removals.
+   * sitemap targets, this means URL additions and removals. For search targets, this
+   * means every new result.
    */
   export interface MonitorsExactChangeDetection {
     /**
-     * Use `exact` to compare visible text or sitemap URLs.
+     * Use `exact` to compare visible text, sitemap URLs, or search results.
      */
     type: 'exact';
   }
@@ -3865,8 +4213,8 @@ export namespace MonitorCreateParams {
 
 export interface MonitorUpdateParams {
   /**
-   * How changes are judged. Defaults to `semantic` for extract targets and page
-   * targets with `instructions`, otherwise `exact`.
+   * How changes are judged. Defaults to `semantic` for extract and search targets
+   * and page targets with `instructions`, otherwise `exact`.
    */
   change_detection?:
     | MonitorUpdateParams.MonitorsExactChangeDetection
@@ -3900,12 +4248,14 @@ export interface MonitorUpdateParams {
   tags?: Array<string>;
 
   /**
-   * What to watch: a page, a sitemap, or data extracted from a site.
+   * What to watch: a page, a sitemap, data extracted from a site, or web search
+   * results.
    */
   target?:
     | MonitorUpdateParams.MonitorsPageTarget
     | MonitorUpdateParams.MonitorsSitemapTarget
-    | MonitorUpdateParams.MonitorsExtractTarget;
+    | MonitorUpdateParams.MonitorsExtractTarget
+    | MonitorUpdateParams.MonitorsSearchTarget;
 
   /**
    * Set to null to remove the webhook. Changing `url` issues a new secret.
@@ -3916,11 +4266,12 @@ export interface MonitorUpdateParams {
 export namespace MonitorUpdateParams {
   /**
    * Detect exact changes. For page targets, this means visible text diffs. For
-   * sitemap targets, this means URL additions and removals.
+   * sitemap targets, this means URL additions and removals. For search targets, this
+   * means every new result.
    */
   export interface MonitorsExactChangeDetection {
     /**
-     * Use `exact` to compare visible text or sitemap URLs.
+     * Use `exact` to compare visible text, sitemap URLs, or search results.
      */
     type: 'exact';
   }
@@ -4153,6 +4504,30 @@ export namespace MonitorUpdateParams {
   }
 
   /**
+   * Search the web on every run and report results not seen before, listed in the
+   * change’s `matched_urls` and `evidence`. Semantic detection reports only results
+   * describing a new development that matches `instructions`; exact detection
+   * reports every new result.
+   */
+  export interface MonitorsSearchTarget {
+    /**
+     * Web search query to run on every check. Supports operators such as `site:`,
+     * `-site:`, and quoted phrases.
+     */
+    query: string;
+
+    /**
+     * Use `search` to watch the whole web for new results about a topic.
+     */
+    type: 'search';
+
+    /**
+     * Plain-language description of which new results matter. Defaults to the query.
+     */
+    instructions?: string;
+  }
+
+  /**
    * Set to null to remove the webhook. Changing `url` issues a new secret.
    */
   export interface Webhook {
@@ -4197,8 +4572,8 @@ export interface MonitorListParams {
   q?: string;
 
   /**
-   * Fields to search with `q`. Defaults to all fields; page and extract targets can
-   * have instructions.
+   * Fields to search with `q`. Defaults to all fields; page, extract, and search
+   * targets can have instructions, and `url` matches a search target’s query.
    */
   search_by?: Array<'name' | 'url' | 'instructions' | 'tags'> | null;
 
@@ -4226,7 +4601,7 @@ export interface MonitorListParams {
   /**
    * Filter by target type.
    */
-  target_type?: 'page' | 'sitemap' | 'extract';
+  target_type?: 'page' | 'sitemap' | 'extract' | 'search';
 }
 
 export interface MonitorGetCreditUsageParams {
@@ -4275,7 +4650,7 @@ export interface MonitorListAccountChangesParams {
   /**
    * Filter by target type.
    */
-  target_type?: 'page' | 'sitemap' | 'extract';
+  target_type?: 'page' | 'sitemap' | 'extract' | 'search';
 
   /**
    * Only include items before this ISO 8601 timestamp.
