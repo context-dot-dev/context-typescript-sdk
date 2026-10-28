@@ -2934,10 +2934,9 @@ export namespace BatchSubmitParams {
    */
   export interface Scrape {
     /**
-     * Use the same formats and parameters as POST /web/scrape, replacing url with
-     * urls. Options apply to every page.
+     * Pages to scrape and their output format.
      */
-    data: Scrape.Data;
+    data: Scrape.Markdown | Scrape.HTML | Scrape.BatchUnifiedScrapeData;
 
     /**
      * Scrape the pages in `data.urls`.
@@ -2947,39 +2946,711 @@ export namespace BatchSubmitParams {
 
   export namespace Scrape {
     /**
-     * Use the same formats and parameters as POST /web/scrape, replacing url with
-     * urls. Options apply to every page.
+     * @deprecated Scrape the listed pages as Markdown.
      */
-    export interface Data {
+    export interface Markdown {
       /**
-       * Outputs to return. Set at least one to `true`.
+       * Return page content as Markdown.
        */
-      formats: Data.Formats;
+      format: 'markdown';
 
       /**
        * Pages to scrape. Maximum 100000.
        */
-      urls: Array<Data.URL>;
+      urls: Array<Markdown.URL>;
+
+      /**
+       * Options for Markdown output.
+       */
+      options?: Markdown.Options;
+    }
+
+    export namespace Markdown {
+      /**
+       * A page to scrape, with optional data for matching results.
+       */
+      export interface URL {
+        /**
+         * Page URL to scrape.
+         */
+        url: string;
+
+        /**
+         * Your ID for this page, returned with its result. The same URL can use different
+         * IDs.
+         */
+        itemId?: string;
+
+        /**
+         * Custom JSON returned unchanged with this page result.
+         */
+        meta?: { [key: string]: unknown };
+      }
+
+      /**
+       * Options for Markdown output.
+       */
+      export interface Options {
+        /**
+         * Fetch from this country (ISO 3166-1 alpha-2).
+         */
+        country?:
+          | 'ad'
+          | 'ae'
+          | 'af'
+          | 'ag'
+          | 'ai'
+          | 'al'
+          | 'am'
+          | 'ao'
+          | 'ar'
+          | 'at'
+          | 'au'
+          | 'aw'
+          | 'az'
+          | 'ba'
+          | 'bb'
+          | 'bd'
+          | 'be'
+          | 'bf'
+          | 'bg'
+          | 'bh'
+          | 'bi'
+          | 'bj'
+          | 'bm'
+          | 'bn'
+          | 'bo'
+          | 'bq'
+          | 'br'
+          | 'bs'
+          | 'bw'
+          | 'by'
+          | 'bz'
+          | 'ca'
+          | 'cd'
+          | 'cf'
+          | 'cg'
+          | 'ch'
+          | 'ci'
+          | 'cl'
+          | 'cm'
+          | 'cn'
+          | 'co'
+          | 'cr'
+          | 'cv'
+          | 'cw'
+          | 'cy'
+          | 'cz'
+          | 'de'
+          | 'dj'
+          | 'dk'
+          | 'dm'
+          | 'do'
+          | 'dz'
+          | 'ec'
+          | 'ee'
+          | 'eg'
+          | 'es'
+          | 'et'
+          | 'fi'
+          | 'fj'
+          | 'fr'
+          | 'ga'
+          | 'gb'
+          | 'gd'
+          | 'ge'
+          | 'gf'
+          | 'gg'
+          | 'gh'
+          | 'gm'
+          | 'gn'
+          | 'gp'
+          | 'gq'
+          | 'gr'
+          | 'gt'
+          | 'gu'
+          | 'gw'
+          | 'gy'
+          | 'hk'
+          | 'hn'
+          | 'hr'
+          | 'ht'
+          | 'hu'
+          | 'id'
+          | 'ie'
+          | 'il'
+          | 'im'
+          | 'in'
+          | 'iq'
+          | 'ir'
+          | 'is'
+          | 'it'
+          | 'je'
+          | 'jm'
+          | 'jo'
+          | 'jp'
+          | 'ke'
+          | 'kg'
+          | 'kh'
+          | 'kn'
+          | 'kr'
+          | 'kw'
+          | 'ky'
+          | 'kz'
+          | 'la'
+          | 'lb'
+          | 'lc'
+          | 'lk'
+          | 'lr'
+          | 'ls'
+          | 'lt'
+          | 'lu'
+          | 'lv'
+          | 'ly'
+          | 'ma'
+          | 'mc'
+          | 'md'
+          | 'me'
+          | 'mf'
+          | 'mg'
+          | 'mk'
+          | 'ml'
+          | 'mm'
+          | 'mn'
+          | 'mo'
+          | 'mq'
+          | 'mr'
+          | 'mt'
+          | 'mu'
+          | 'mv'
+          | 'mw'
+          | 'mx'
+          | 'my'
+          | 'mz'
+          | 'na'
+          | 'nc'
+          | 'ne'
+          | 'ng'
+          | 'ni'
+          | 'nl'
+          | 'no'
+          | 'np'
+          | 'nz'
+          | 'om'
+          | 'pa'
+          | 'pe'
+          | 'pf'
+          | 'pg'
+          | 'ph'
+          | 'pk'
+          | 'pl'
+          | 'pr'
+          | 'ps'
+          | 'pt'
+          | 'py'
+          | 'qa'
+          | 're'
+          | 'ro'
+          | 'rs'
+          | 'ru'
+          | 'rw'
+          | 'sa'
+          | 'sc'
+          | 'sd'
+          | 'se'
+          | 'sg'
+          | 'si'
+          | 'sk'
+          | 'sl'
+          | 'sm'
+          | 'sn'
+          | 'so'
+          | 'sr'
+          | 'ss'
+          | 'st'
+          | 'sv'
+          | 'sx'
+          | 'sy'
+          | 'sz'
+          | 'tc'
+          | 'td'
+          | 'tg'
+          | 'th'
+          | 'tj'
+          | 'tl'
+          | 'tm'
+          | 'tn'
+          | 'tr'
+          | 'tt'
+          | 'tw'
+          | 'tz'
+          | 'ua'
+          | 'ug'
+          | 'us'
+          | 'uy'
+          | 'uz'
+          | 'vc'
+          | 've'
+          | 'vg'
+          | 'vi'
+          | 'vn'
+          | 'ye'
+          | 'yt'
+          | 'za'
+          | 'zm'
+          | 'zw';
+
+        /**
+         * Remove elements matching these CSS selectors. Applied after `includeSelectors`,
+         * so an element matching both is removed.
+         */
+        excludeSelectors?: Array<string> | null;
+
+        /**
+         * Also return each page's HTML in `html`.
+         */
+        includeHTML?: boolean;
+
+        /**
+         * Include image references in the Markdown (`html-conversion` only).
+         */
+        includeImages?: boolean;
+
+        /**
+         * Include links in the Markdown (`html-conversion` only).
+         */
+        includeLinks?: boolean;
+
+        /**
+         * Keep only elements matching these CSS selectors. Filtered pages ignore
+         * `maxAgeMs`.
+         */
+        includeSelectors?: Array<string> | null;
+
+        /**
+         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
+         * year (31536000000 ms). `0` fetches fresh.
+         */
+        maxAgeMs?: number | null;
+
+        /**
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         */
+        pdf?: Options.Pdf;
+
+        /**
+         * Wait for CSS animations to finish before extracting, on browser-rendered pages.
+         */
+        settleAnimations?: boolean;
+
+        /**
+         * Shorten inline base64 image data (`html-conversion` only).
+         */
+        shortenBase64Images?: boolean;
+
+        /**
+         * Markdown sources in order of preference: `html-conversion` converts the page
+         * HTML, `markdown-direct` uses Markdown the site publishes.
+         */
+        sourcePreference?: Array<'html-conversion' | 'markdown-direct'>;
+
+        /**
+         * Return the main content without navigation or footers.
+         */
+        useMainContentOnly?: boolean;
+
+        /**
+         * How long to wait after initial page load, in milliseconds. `0` waits 500 ms.
+         */
+        waitForMs?: number;
+      }
+
+      export namespace Options {
+        /**
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         */
+        export interface Pdf {
+          /**
+           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
+           * be >= start.
+           */
+          end?: number;
+
+          /**
+           * Read scanned PDF pages with OCR; preserve pages that already have text.
+           */
+          ocr?: boolean;
+
+          /**
+           * Parse PDF URLs. When false, PDFs fail with `PDF_SKIPPED`.
+           */
+          shouldParse?: boolean;
+
+          /**
+           * First 1-based PDF page to parse.
+           */
+          start?: number;
+        }
+      }
+    }
+
+    /**
+     * @deprecated Scrape the listed pages as HTML.
+     */
+    export interface HTML {
+      /**
+       * Return page content as HTML.
+       */
+      format: 'html';
+
+      /**
+       * Pages to scrape. Maximum 100000.
+       */
+      urls: Array<HTML.URL>;
+
+      /**
+       * Options for HTML output.
+       */
+      options?: HTML.Options;
+    }
+
+    export namespace HTML {
+      /**
+       * A page to scrape, with optional data for matching results.
+       */
+      export interface URL {
+        /**
+         * Page URL to scrape.
+         */
+        url: string;
+
+        /**
+         * Your ID for this page, returned with its result. The same URL can use different
+         * IDs.
+         */
+        itemId?: string;
+
+        /**
+         * Custom JSON returned unchanged with this page result.
+         */
+        meta?: { [key: string]: unknown };
+      }
+
+      /**
+       * Options for HTML output.
+       */
+      export interface Options {
+        /**
+         * Fetch from this country (ISO 3166-1 alpha-2).
+         */
+        country?:
+          | 'ad'
+          | 'ae'
+          | 'af'
+          | 'ag'
+          | 'ai'
+          | 'al'
+          | 'am'
+          | 'ao'
+          | 'ar'
+          | 'at'
+          | 'au'
+          | 'aw'
+          | 'az'
+          | 'ba'
+          | 'bb'
+          | 'bd'
+          | 'be'
+          | 'bf'
+          | 'bg'
+          | 'bh'
+          | 'bi'
+          | 'bj'
+          | 'bm'
+          | 'bn'
+          | 'bo'
+          | 'bq'
+          | 'br'
+          | 'bs'
+          | 'bw'
+          | 'by'
+          | 'bz'
+          | 'ca'
+          | 'cd'
+          | 'cf'
+          | 'cg'
+          | 'ch'
+          | 'ci'
+          | 'cl'
+          | 'cm'
+          | 'cn'
+          | 'co'
+          | 'cr'
+          | 'cv'
+          | 'cw'
+          | 'cy'
+          | 'cz'
+          | 'de'
+          | 'dj'
+          | 'dk'
+          | 'dm'
+          | 'do'
+          | 'dz'
+          | 'ec'
+          | 'ee'
+          | 'eg'
+          | 'es'
+          | 'et'
+          | 'fi'
+          | 'fj'
+          | 'fr'
+          | 'ga'
+          | 'gb'
+          | 'gd'
+          | 'ge'
+          | 'gf'
+          | 'gg'
+          | 'gh'
+          | 'gm'
+          | 'gn'
+          | 'gp'
+          | 'gq'
+          | 'gr'
+          | 'gt'
+          | 'gu'
+          | 'gw'
+          | 'gy'
+          | 'hk'
+          | 'hn'
+          | 'hr'
+          | 'ht'
+          | 'hu'
+          | 'id'
+          | 'ie'
+          | 'il'
+          | 'im'
+          | 'in'
+          | 'iq'
+          | 'ir'
+          | 'is'
+          | 'it'
+          | 'je'
+          | 'jm'
+          | 'jo'
+          | 'jp'
+          | 'ke'
+          | 'kg'
+          | 'kh'
+          | 'kn'
+          | 'kr'
+          | 'kw'
+          | 'ky'
+          | 'kz'
+          | 'la'
+          | 'lb'
+          | 'lc'
+          | 'lk'
+          | 'lr'
+          | 'ls'
+          | 'lt'
+          | 'lu'
+          | 'lv'
+          | 'ly'
+          | 'ma'
+          | 'mc'
+          | 'md'
+          | 'me'
+          | 'mf'
+          | 'mg'
+          | 'mk'
+          | 'ml'
+          | 'mm'
+          | 'mn'
+          | 'mo'
+          | 'mq'
+          | 'mr'
+          | 'mt'
+          | 'mu'
+          | 'mv'
+          | 'mw'
+          | 'mx'
+          | 'my'
+          | 'mz'
+          | 'na'
+          | 'nc'
+          | 'ne'
+          | 'ng'
+          | 'ni'
+          | 'nl'
+          | 'no'
+          | 'np'
+          | 'nz'
+          | 'om'
+          | 'pa'
+          | 'pe'
+          | 'pf'
+          | 'pg'
+          | 'ph'
+          | 'pk'
+          | 'pl'
+          | 'pr'
+          | 'ps'
+          | 'pt'
+          | 'py'
+          | 'qa'
+          | 're'
+          | 'ro'
+          | 'rs'
+          | 'ru'
+          | 'rw'
+          | 'sa'
+          | 'sc'
+          | 'sd'
+          | 'se'
+          | 'sg'
+          | 'si'
+          | 'sk'
+          | 'sl'
+          | 'sm'
+          | 'sn'
+          | 'so'
+          | 'sr'
+          | 'ss'
+          | 'st'
+          | 'sv'
+          | 'sx'
+          | 'sy'
+          | 'sz'
+          | 'tc'
+          | 'td'
+          | 'tg'
+          | 'th'
+          | 'tj'
+          | 'tl'
+          | 'tm'
+          | 'tn'
+          | 'tr'
+          | 'tt'
+          | 'tw'
+          | 'tz'
+          | 'ua'
+          | 'ug'
+          | 'us'
+          | 'uy'
+          | 'uz'
+          | 'vc'
+          | 've'
+          | 'vg'
+          | 'vi'
+          | 'vn'
+          | 'ye'
+          | 'yt'
+          | 'za'
+          | 'zm'
+          | 'zw';
+
+        /**
+         * Remove elements matching these CSS selectors. Applied after `includeSelectors`,
+         * so an element matching both is removed.
+         */
+        excludeSelectors?: Array<string> | null;
+
+        /**
+         * Keep only elements matching these CSS selectors. Filtered pages ignore
+         * `maxAgeMs`.
+         */
+        includeSelectors?: Array<string> | null;
+
+        /**
+         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
+         * year (31536000000 ms). `0` fetches fresh.
+         */
+        maxAgeMs?: number | null;
+
+        /**
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         */
+        pdf?: Options.Pdf;
+
+        /**
+         * Wait for CSS animations to finish before extracting, on browser-rendered pages.
+         */
+        settleAnimations?: boolean;
+
+        /**
+         * Return the main content without navigation or footers.
+         */
+        useMainContentOnly?: boolean;
+
+        /**
+         * How long to wait after initial page load, in milliseconds. `0` waits 500 ms.
+         */
+        waitForMs?: number;
+      }
+
+      export namespace Options {
+        /**
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         */
+        export interface Pdf {
+          /**
+           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
+           * be >= start.
+           */
+          end?: number;
+
+          /**
+           * Read scanned PDF pages with OCR; preserve pages that already have text.
+           */
+          ocr?: boolean;
+
+          /**
+           * Parse PDF URLs. When false, PDFs fail with `PDF_SKIPPED`.
+           */
+          shouldParse?: boolean;
+
+          /**
+           * First 1-based PDF page to parse.
+           */
+          start?: number;
+        }
+      }
+    }
+
+    /**
+     * Use the same formats and parameters as POST /web/scrape, replacing url with
+     * urls. Options apply to every page.
+     */
+    export interface BatchUnifiedScrapeData {
+      /**
+       * Outputs to return. Set at least one to `true`.
+       */
+      formats: BatchUnifiedScrapeData.Formats;
+
+      /**
+       * Pages to scrape. Maximum 100000.
+       */
+      urls: Array<BatchUnifiedScrapeData.URL>;
 
       /**
        * Requires `formats.highlights: true`; required when it is set.
        */
-      highlightsParams?: Data.HighlightsParams;
+      highlightsParams?: BatchUnifiedScrapeData.HighlightsParams;
 
       /**
        * Image options. Requires formats.images: true.
        */
-      imageParams?: Data.ImageParams;
+      imageParams?: BatchUnifiedScrapeData.ImageParams;
 
       /**
        * Requires `formats.json: true`; required when it is set.
        */
-      jsonParams?: Data.JsonParams;
+      jsonParams?: BatchUnifiedScrapeData.JsonParams;
 
       /**
        * Markdown options. Requires `formats.markdown`.
        */
-      markdownParams?: Data.MarkdownParams;
+      markdownParams?: BatchUnifiedScrapeData.MarkdownParams;
 
       /**
        * Maximum age of a cached output, in milliseconds. `0` fetches fresh. Defaults to
@@ -2990,22 +3661,22 @@ export namespace BatchSubmitParams {
       /**
        * Requires `formats.parse: true`; required when it is set.
        */
-      parseParams?: Data.CustomParser | Data.PrebuiltParser;
+      parseParams?: BatchUnifiedScrapeData.CustomParser | BatchUnifiedScrapeData.PrebuiltParser;
 
       /**
        * Product options. Requires formats.product: true.
        */
-      productParams?: Data.ProductParams;
+      productParams?: BatchUnifiedScrapeData.ProductParams;
 
       /**
        * Screenshot options. Requires formats.screenshot: true.
        */
-      screenshotParams?: Data.ScreenshotParams;
+      screenshotParams?: BatchUnifiedScrapeData.ScreenshotParams;
 
       /**
        * Browser and content settings shared by all outputs.
        */
-      sharedParams?: Data.SharedParams;
+      sharedParams?: BatchUnifiedScrapeData.SharedParams;
 
       /**
        * Labels for tracking request usage. Not retained when zdr is enabled.
@@ -3016,7 +3687,7 @@ export namespace BatchSubmitParams {
        * Deadline for each page, using the same behavior and defaults as POST
        * /web/scrape.
        */
-      timeoutOpts?: Data.TimeoutOpts;
+      timeoutOpts?: BatchUnifiedScrapeData.TimeoutOpts;
 
       /**
        * Batches persist their results. Only disabled is supported; enabled returns
@@ -3025,7 +3696,7 @@ export namespace BatchSubmitParams {
       zdr?: 'disabled';
     }
 
-    export namespace Data {
+    export namespace BatchUnifiedScrapeData {
       /**
        * Outputs to return. Set at least one to `true`.
        */
@@ -3637,10 +4308,9 @@ export namespace BatchSubmitParams {
    */
   export interface Crawl {
     /**
-     * Use the same formats and parameters as POST /web/scrape, replacing url with
-     * source. Options apply to every page.
+     * Crawl source and output format.
      */
-    data: Crawl.Data;
+    data: Crawl.Markdown | Crawl.HTML | Crawl.BatchUnifiedCrawlData;
 
     /**
      * Discover and scrape pages from `data.source`.
@@ -3650,39 +4320,1035 @@ export namespace BatchSubmitParams {
 
   export namespace Crawl {
     /**
-     * Use the same formats and parameters as POST /web/scrape, replacing url with
-     * source. Options apply to every page.
+     * @deprecated Crawl pages and return Markdown.
      */
-    export interface Data {
+    export interface Markdown {
       /**
-       * Outputs to return. Set at least one to `true`.
+       * Return page content as Markdown.
        */
-      formats: Data.Formats;
+      format: 'markdown';
 
       /**
        * How to find pages to crawl.
        */
-      source: Data.StartURL | Data.Sitemap;
+      source: Markdown.StartURL | Markdown.Sitemap;
+
+      /**
+       * Options for Markdown output.
+       */
+      options?: Markdown.Options;
+    }
+
+    export namespace Markdown {
+      /**
+       * Discover pages by following links from one URL.
+       */
+      export interface StartURL {
+        /**
+         * Start from one page.
+         */
+        type: 'start_url';
+
+        /**
+         * Page where crawling begins. A URL without a scheme is read as https://.
+         */
+        url: string;
+
+        /**
+         * Limits and filters for page discovery.
+         */
+        controls?: StartURL.Controls;
+      }
+
+      export namespace StartURL {
+        /**
+         * Limits and filters for page discovery.
+         */
+        export interface Controls {
+          /**
+           * Regex pattern for URLs to exclude, even when they match `regex`. The `start_url`
+           * itself is always included.
+           */
+          excludeRegex?: string;
+
+          /**
+           * Follow links to subdomains.
+           */
+          followSubdomains?: boolean;
+
+          /**
+           * Only follow pages in these languages, or `same_as_start_url`; all languages when
+           * omitted.
+           */
+          languages?:
+            | 'same_as_start_url'
+            | Array<
+                | 'am'
+                | 'ar'
+                | 'az'
+                | 'be'
+                | 'bg'
+                | 'bn'
+                | 'ca'
+                | 'ceb'
+                | 'cs'
+                | 'cy'
+                | 'da'
+                | 'de'
+                | 'el'
+                | 'en'
+                | 'es'
+                | 'et'
+                | 'eu'
+                | 'fa'
+                | 'fi'
+                | 'fr'
+                | 'gu'
+                | 'ha'
+                | 'haw'
+                | 'he'
+                | 'hi'
+                | 'hr'
+                | 'hu'
+                | 'hy'
+                | 'id'
+                | 'is'
+                | 'it'
+                | 'ja'
+                | 'ka'
+                | 'kk'
+                | 'kn'
+                | 'ko'
+                | 'ku'
+                | 'ky'
+                | 'lo'
+                | 'lt'
+                | 'lv'
+                | 'mk'
+                | 'ml'
+                | 'mn'
+                | 'mr'
+                | 'ms'
+                | 'ne'
+                | 'nl'
+                | 'no'
+                | 'or'
+                | 'pa'
+                | 'pl'
+                | 'ps'
+                | 'pt'
+                | 'ro'
+                | 'ru'
+                | 'sk'
+                | 'sl'
+                | 'so'
+                | 'sq'
+                | 'sr'
+                | 'sv'
+                | 'sw'
+                | 'ta'
+                | 'te'
+                | 'th'
+                | 'tl'
+                | 'tr'
+                | 'uk'
+                | 'ur'
+                | 'uz'
+                | 'vi'
+                | 'yo'
+                | 'zh'
+              >;
+
+          /**
+           * Maximum link depth. Source pages are depth 0. No limit when omitted.
+           */
+          maxDepth?: number;
+
+          /**
+           * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 100000.
+           */
+          maxUrls?: number;
+
+          /**
+           * Regex pattern for URLs to include. The `start_url` itself is always included.
+           */
+          regex?: string;
+        }
+      }
+
+      /**
+       * Scrape the pages listed in a domain's sitemap. Links on those pages are not
+       * followed.
+       */
+      export interface Sitemap {
+        /**
+         * Domain whose sitemap lists the pages to scrape. A full URL is reduced to its
+         * domain.
+         */
+        domain: string;
+
+        /**
+         * Scrape the URLs in the domain's sitemap.
+         */
+        type: 'sitemap';
+
+        /**
+         * Limits and filters for the sitemap URLs. A sitemap batch scrapes exactly those
+         * URLs and never follows links off them, so there is no crawl depth here.
+         */
+        controls?: Sitemap.Controls;
+      }
+
+      export namespace Sitemap {
+        /**
+         * Limits and filters for the sitemap URLs. A sitemap batch scrapes exactly those
+         * URLs and never follows links off them, so there is no crawl depth here.
+         */
+        export interface Controls {
+          /**
+           * Regex pattern; sitemap URLs matching it are not scraped, even when they match
+           * `regex`.
+           */
+          excludeRegex?: string;
+
+          /**
+           * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 100000.
+           */
+          maxUrls?: number;
+
+          /**
+           * Regex pattern; only sitemap URLs matching it are scraped.
+           */
+          regex?: string;
+        }
+      }
+
+      /**
+       * Options for Markdown output.
+       */
+      export interface Options {
+        /**
+         * Fetch from this country (ISO 3166-1 alpha-2).
+         */
+        country?:
+          | 'ad'
+          | 'ae'
+          | 'af'
+          | 'ag'
+          | 'ai'
+          | 'al'
+          | 'am'
+          | 'ao'
+          | 'ar'
+          | 'at'
+          | 'au'
+          | 'aw'
+          | 'az'
+          | 'ba'
+          | 'bb'
+          | 'bd'
+          | 'be'
+          | 'bf'
+          | 'bg'
+          | 'bh'
+          | 'bi'
+          | 'bj'
+          | 'bm'
+          | 'bn'
+          | 'bo'
+          | 'bq'
+          | 'br'
+          | 'bs'
+          | 'bw'
+          | 'by'
+          | 'bz'
+          | 'ca'
+          | 'cd'
+          | 'cf'
+          | 'cg'
+          | 'ch'
+          | 'ci'
+          | 'cl'
+          | 'cm'
+          | 'cn'
+          | 'co'
+          | 'cr'
+          | 'cv'
+          | 'cw'
+          | 'cy'
+          | 'cz'
+          | 'de'
+          | 'dj'
+          | 'dk'
+          | 'dm'
+          | 'do'
+          | 'dz'
+          | 'ec'
+          | 'ee'
+          | 'eg'
+          | 'es'
+          | 'et'
+          | 'fi'
+          | 'fj'
+          | 'fr'
+          | 'ga'
+          | 'gb'
+          | 'gd'
+          | 'ge'
+          | 'gf'
+          | 'gg'
+          | 'gh'
+          | 'gm'
+          | 'gn'
+          | 'gp'
+          | 'gq'
+          | 'gr'
+          | 'gt'
+          | 'gu'
+          | 'gw'
+          | 'gy'
+          | 'hk'
+          | 'hn'
+          | 'hr'
+          | 'ht'
+          | 'hu'
+          | 'id'
+          | 'ie'
+          | 'il'
+          | 'im'
+          | 'in'
+          | 'iq'
+          | 'ir'
+          | 'is'
+          | 'it'
+          | 'je'
+          | 'jm'
+          | 'jo'
+          | 'jp'
+          | 'ke'
+          | 'kg'
+          | 'kh'
+          | 'kn'
+          | 'kr'
+          | 'kw'
+          | 'ky'
+          | 'kz'
+          | 'la'
+          | 'lb'
+          | 'lc'
+          | 'lk'
+          | 'lr'
+          | 'ls'
+          | 'lt'
+          | 'lu'
+          | 'lv'
+          | 'ly'
+          | 'ma'
+          | 'mc'
+          | 'md'
+          | 'me'
+          | 'mf'
+          | 'mg'
+          | 'mk'
+          | 'ml'
+          | 'mm'
+          | 'mn'
+          | 'mo'
+          | 'mq'
+          | 'mr'
+          | 'mt'
+          | 'mu'
+          | 'mv'
+          | 'mw'
+          | 'mx'
+          | 'my'
+          | 'mz'
+          | 'na'
+          | 'nc'
+          | 'ne'
+          | 'ng'
+          | 'ni'
+          | 'nl'
+          | 'no'
+          | 'np'
+          | 'nz'
+          | 'om'
+          | 'pa'
+          | 'pe'
+          | 'pf'
+          | 'pg'
+          | 'ph'
+          | 'pk'
+          | 'pl'
+          | 'pr'
+          | 'ps'
+          | 'pt'
+          | 'py'
+          | 'qa'
+          | 're'
+          | 'ro'
+          | 'rs'
+          | 'ru'
+          | 'rw'
+          | 'sa'
+          | 'sc'
+          | 'sd'
+          | 'se'
+          | 'sg'
+          | 'si'
+          | 'sk'
+          | 'sl'
+          | 'sm'
+          | 'sn'
+          | 'so'
+          | 'sr'
+          | 'ss'
+          | 'st'
+          | 'sv'
+          | 'sx'
+          | 'sy'
+          | 'sz'
+          | 'tc'
+          | 'td'
+          | 'tg'
+          | 'th'
+          | 'tj'
+          | 'tl'
+          | 'tm'
+          | 'tn'
+          | 'tr'
+          | 'tt'
+          | 'tw'
+          | 'tz'
+          | 'ua'
+          | 'ug'
+          | 'us'
+          | 'uy'
+          | 'uz'
+          | 'vc'
+          | 've'
+          | 'vg'
+          | 'vi'
+          | 'vn'
+          | 'ye'
+          | 'yt'
+          | 'za'
+          | 'zm'
+          | 'zw';
+
+        /**
+         * Remove elements matching these CSS selectors. Applied after `includeSelectors`,
+         * so an element matching both is removed.
+         */
+        excludeSelectors?: Array<string> | null;
+
+        /**
+         * Also return each page's HTML in `html`.
+         */
+        includeHTML?: boolean;
+
+        /**
+         * Include image references in the Markdown (`html-conversion` only).
+         */
+        includeImages?: boolean;
+
+        /**
+         * Include links in the Markdown (`html-conversion` only).
+         */
+        includeLinks?: boolean;
+
+        /**
+         * Keep only elements matching these CSS selectors. Filtered pages ignore
+         * `maxAgeMs`.
+         */
+        includeSelectors?: Array<string> | null;
+
+        /**
+         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
+         * year (31536000000 ms). `0` fetches fresh.
+         */
+        maxAgeMs?: number | null;
+
+        /**
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         */
+        pdf?: Options.Pdf;
+
+        /**
+         * Wait for CSS animations to finish before extracting, on browser-rendered pages.
+         */
+        settleAnimations?: boolean;
+
+        /**
+         * Shorten inline base64 image data (`html-conversion` only).
+         */
+        shortenBase64Images?: boolean;
+
+        /**
+         * Markdown sources in order of preference: `html-conversion` converts the page
+         * HTML, `markdown-direct` uses Markdown the site publishes.
+         */
+        sourcePreference?: Array<'html-conversion' | 'markdown-direct'>;
+
+        /**
+         * Return the main content without navigation or footers.
+         */
+        useMainContentOnly?: boolean;
+
+        /**
+         * How long to wait after initial page load, in milliseconds. `0` waits 500 ms.
+         */
+        waitForMs?: number;
+      }
+
+      export namespace Options {
+        /**
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         */
+        export interface Pdf {
+          /**
+           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
+           * be >= start.
+           */
+          end?: number;
+
+          /**
+           * Read scanned PDF pages with OCR; preserve pages that already have text.
+           */
+          ocr?: boolean;
+
+          /**
+           * Parse PDF URLs. When false, PDFs fail with `PDF_SKIPPED`.
+           */
+          shouldParse?: boolean;
+
+          /**
+           * First 1-based PDF page to parse.
+           */
+          start?: number;
+        }
+      }
+    }
+
+    /**
+     * @deprecated Crawl pages and return HTML.
+     */
+    export interface HTML {
+      /**
+       * Return page content as HTML.
+       */
+      format: 'html';
+
+      /**
+       * How to find pages to crawl.
+       */
+      source: HTML.StartURL | HTML.Sitemap;
+
+      /**
+       * Options for HTML output.
+       */
+      options?: HTML.Options;
+    }
+
+    export namespace HTML {
+      /**
+       * Discover pages by following links from one URL.
+       */
+      export interface StartURL {
+        /**
+         * Start from one page.
+         */
+        type: 'start_url';
+
+        /**
+         * Page where crawling begins. A URL without a scheme is read as https://.
+         */
+        url: string;
+
+        /**
+         * Limits and filters for page discovery.
+         */
+        controls?: StartURL.Controls;
+      }
+
+      export namespace StartURL {
+        /**
+         * Limits and filters for page discovery.
+         */
+        export interface Controls {
+          /**
+           * Regex pattern for URLs to exclude, even when they match `regex`. The `start_url`
+           * itself is always included.
+           */
+          excludeRegex?: string;
+
+          /**
+           * Follow links to subdomains.
+           */
+          followSubdomains?: boolean;
+
+          /**
+           * Only follow pages in these languages, or `same_as_start_url`; all languages when
+           * omitted.
+           */
+          languages?:
+            | 'same_as_start_url'
+            | Array<
+                | 'am'
+                | 'ar'
+                | 'az'
+                | 'be'
+                | 'bg'
+                | 'bn'
+                | 'ca'
+                | 'ceb'
+                | 'cs'
+                | 'cy'
+                | 'da'
+                | 'de'
+                | 'el'
+                | 'en'
+                | 'es'
+                | 'et'
+                | 'eu'
+                | 'fa'
+                | 'fi'
+                | 'fr'
+                | 'gu'
+                | 'ha'
+                | 'haw'
+                | 'he'
+                | 'hi'
+                | 'hr'
+                | 'hu'
+                | 'hy'
+                | 'id'
+                | 'is'
+                | 'it'
+                | 'ja'
+                | 'ka'
+                | 'kk'
+                | 'kn'
+                | 'ko'
+                | 'ku'
+                | 'ky'
+                | 'lo'
+                | 'lt'
+                | 'lv'
+                | 'mk'
+                | 'ml'
+                | 'mn'
+                | 'mr'
+                | 'ms'
+                | 'ne'
+                | 'nl'
+                | 'no'
+                | 'or'
+                | 'pa'
+                | 'pl'
+                | 'ps'
+                | 'pt'
+                | 'ro'
+                | 'ru'
+                | 'sk'
+                | 'sl'
+                | 'so'
+                | 'sq'
+                | 'sr'
+                | 'sv'
+                | 'sw'
+                | 'ta'
+                | 'te'
+                | 'th'
+                | 'tl'
+                | 'tr'
+                | 'uk'
+                | 'ur'
+                | 'uz'
+                | 'vi'
+                | 'yo'
+                | 'zh'
+              >;
+
+          /**
+           * Maximum link depth. Source pages are depth 0. No limit when omitted.
+           */
+          maxDepth?: number;
+
+          /**
+           * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 100000.
+           */
+          maxUrls?: number;
+
+          /**
+           * Regex pattern for URLs to include. The `start_url` itself is always included.
+           */
+          regex?: string;
+        }
+      }
+
+      /**
+       * Scrape the pages listed in a domain's sitemap. Links on those pages are not
+       * followed.
+       */
+      export interface Sitemap {
+        /**
+         * Domain whose sitemap lists the pages to scrape. A full URL is reduced to its
+         * domain.
+         */
+        domain: string;
+
+        /**
+         * Scrape the URLs in the domain's sitemap.
+         */
+        type: 'sitemap';
+
+        /**
+         * Limits and filters for the sitemap URLs. A sitemap batch scrapes exactly those
+         * URLs and never follows links off them, so there is no crawl depth here.
+         */
+        controls?: Sitemap.Controls;
+      }
+
+      export namespace Sitemap {
+        /**
+         * Limits and filters for the sitemap URLs. A sitemap batch scrapes exactly those
+         * URLs and never follows links off them, so there is no crawl depth here.
+         */
+        export interface Controls {
+          /**
+           * Regex pattern; sitemap URLs matching it are not scraped, even when they match
+           * `regex`.
+           */
+          excludeRegex?: string;
+
+          /**
+           * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 100000.
+           */
+          maxUrls?: number;
+
+          /**
+           * Regex pattern; only sitemap URLs matching it are scraped.
+           */
+          regex?: string;
+        }
+      }
+
+      /**
+       * Options for HTML output.
+       */
+      export interface Options {
+        /**
+         * Fetch from this country (ISO 3166-1 alpha-2).
+         */
+        country?:
+          | 'ad'
+          | 'ae'
+          | 'af'
+          | 'ag'
+          | 'ai'
+          | 'al'
+          | 'am'
+          | 'ao'
+          | 'ar'
+          | 'at'
+          | 'au'
+          | 'aw'
+          | 'az'
+          | 'ba'
+          | 'bb'
+          | 'bd'
+          | 'be'
+          | 'bf'
+          | 'bg'
+          | 'bh'
+          | 'bi'
+          | 'bj'
+          | 'bm'
+          | 'bn'
+          | 'bo'
+          | 'bq'
+          | 'br'
+          | 'bs'
+          | 'bw'
+          | 'by'
+          | 'bz'
+          | 'ca'
+          | 'cd'
+          | 'cf'
+          | 'cg'
+          | 'ch'
+          | 'ci'
+          | 'cl'
+          | 'cm'
+          | 'cn'
+          | 'co'
+          | 'cr'
+          | 'cv'
+          | 'cw'
+          | 'cy'
+          | 'cz'
+          | 'de'
+          | 'dj'
+          | 'dk'
+          | 'dm'
+          | 'do'
+          | 'dz'
+          | 'ec'
+          | 'ee'
+          | 'eg'
+          | 'es'
+          | 'et'
+          | 'fi'
+          | 'fj'
+          | 'fr'
+          | 'ga'
+          | 'gb'
+          | 'gd'
+          | 'ge'
+          | 'gf'
+          | 'gg'
+          | 'gh'
+          | 'gm'
+          | 'gn'
+          | 'gp'
+          | 'gq'
+          | 'gr'
+          | 'gt'
+          | 'gu'
+          | 'gw'
+          | 'gy'
+          | 'hk'
+          | 'hn'
+          | 'hr'
+          | 'ht'
+          | 'hu'
+          | 'id'
+          | 'ie'
+          | 'il'
+          | 'im'
+          | 'in'
+          | 'iq'
+          | 'ir'
+          | 'is'
+          | 'it'
+          | 'je'
+          | 'jm'
+          | 'jo'
+          | 'jp'
+          | 'ke'
+          | 'kg'
+          | 'kh'
+          | 'kn'
+          | 'kr'
+          | 'kw'
+          | 'ky'
+          | 'kz'
+          | 'la'
+          | 'lb'
+          | 'lc'
+          | 'lk'
+          | 'lr'
+          | 'ls'
+          | 'lt'
+          | 'lu'
+          | 'lv'
+          | 'ly'
+          | 'ma'
+          | 'mc'
+          | 'md'
+          | 'me'
+          | 'mf'
+          | 'mg'
+          | 'mk'
+          | 'ml'
+          | 'mm'
+          | 'mn'
+          | 'mo'
+          | 'mq'
+          | 'mr'
+          | 'mt'
+          | 'mu'
+          | 'mv'
+          | 'mw'
+          | 'mx'
+          | 'my'
+          | 'mz'
+          | 'na'
+          | 'nc'
+          | 'ne'
+          | 'ng'
+          | 'ni'
+          | 'nl'
+          | 'no'
+          | 'np'
+          | 'nz'
+          | 'om'
+          | 'pa'
+          | 'pe'
+          | 'pf'
+          | 'pg'
+          | 'ph'
+          | 'pk'
+          | 'pl'
+          | 'pr'
+          | 'ps'
+          | 'pt'
+          | 'py'
+          | 'qa'
+          | 're'
+          | 'ro'
+          | 'rs'
+          | 'ru'
+          | 'rw'
+          | 'sa'
+          | 'sc'
+          | 'sd'
+          | 'se'
+          | 'sg'
+          | 'si'
+          | 'sk'
+          | 'sl'
+          | 'sm'
+          | 'sn'
+          | 'so'
+          | 'sr'
+          | 'ss'
+          | 'st'
+          | 'sv'
+          | 'sx'
+          | 'sy'
+          | 'sz'
+          | 'tc'
+          | 'td'
+          | 'tg'
+          | 'th'
+          | 'tj'
+          | 'tl'
+          | 'tm'
+          | 'tn'
+          | 'tr'
+          | 'tt'
+          | 'tw'
+          | 'tz'
+          | 'ua'
+          | 'ug'
+          | 'us'
+          | 'uy'
+          | 'uz'
+          | 'vc'
+          | 've'
+          | 'vg'
+          | 'vi'
+          | 'vn'
+          | 'ye'
+          | 'yt'
+          | 'za'
+          | 'zm'
+          | 'zw';
+
+        /**
+         * Remove elements matching these CSS selectors. Applied after `includeSelectors`,
+         * so an element matching both is removed.
+         */
+        excludeSelectors?: Array<string> | null;
+
+        /**
+         * Keep only elements matching these CSS selectors. Filtered pages ignore
+         * `maxAgeMs`.
+         */
+        includeSelectors?: Array<string> | null;
+
+        /**
+         * Maximum cache age in milliseconds. Defaults to 3 days (259200000 ms). Maximum: 1
+         * year (31536000000 ms). `0` fetches fresh.
+         */
+        maxAgeMs?: number | null;
+
+        /**
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         */
+        pdf?: Options.Pdf;
+
+        /**
+         * Wait for CSS animations to finish before extracting, on browser-rendered pages.
+         */
+        settleAnimations?: boolean;
+
+        /**
+         * Return the main content without navigation or footers.
+         */
+        useMainContentOnly?: boolean;
+
+        /**
+         * How long to wait after initial page load, in milliseconds. `0` waits 500 ms.
+         */
+        waitForMs?: number;
+      }
+
+      export namespace Options {
+        /**
+         * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+         */
+        export interface Pdf {
+          /**
+           * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
+           * be >= start.
+           */
+          end?: number;
+
+          /**
+           * Read scanned PDF pages with OCR; preserve pages that already have text.
+           */
+          ocr?: boolean;
+
+          /**
+           * Parse PDF URLs. When false, PDFs fail with `PDF_SKIPPED`.
+           */
+          shouldParse?: boolean;
+
+          /**
+           * First 1-based PDF page to parse.
+           */
+          start?: number;
+        }
+      }
+    }
+
+    /**
+     * Use the same formats and parameters as POST /web/scrape, replacing url with
+     * source. Options apply to every page.
+     */
+    export interface BatchUnifiedCrawlData {
+      /**
+       * Outputs to return. Set at least one to `true`.
+       */
+      formats: BatchUnifiedCrawlData.Formats;
+
+      /**
+       * How to find pages to crawl.
+       */
+      source: BatchUnifiedCrawlData.StartURL | BatchUnifiedCrawlData.Sitemap;
 
       /**
        * Requires `formats.highlights: true`; required when it is set.
        */
-      highlightsParams?: Data.HighlightsParams;
+      highlightsParams?: BatchUnifiedCrawlData.HighlightsParams;
 
       /**
        * Image options. Requires formats.images: true.
        */
-      imageParams?: Data.ImageParams;
+      imageParams?: BatchUnifiedCrawlData.ImageParams;
 
       /**
        * Requires `formats.json: true`; required when it is set.
        */
-      jsonParams?: Data.JsonParams;
+      jsonParams?: BatchUnifiedCrawlData.JsonParams;
 
       /**
        * Markdown options. Requires `formats.markdown`.
        */
-      markdownParams?: Data.MarkdownParams;
+      markdownParams?: BatchUnifiedCrawlData.MarkdownParams;
 
       /**
        * Maximum age of a cached output, in milliseconds. `0` fetches fresh. Defaults to
@@ -3693,22 +5359,22 @@ export namespace BatchSubmitParams {
       /**
        * Requires `formats.parse: true`; required when it is set.
        */
-      parseParams?: Data.CustomParser | Data.PrebuiltParser;
+      parseParams?: BatchUnifiedCrawlData.CustomParser | BatchUnifiedCrawlData.PrebuiltParser;
 
       /**
        * Product options. Requires formats.product: true.
        */
-      productParams?: Data.ProductParams;
+      productParams?: BatchUnifiedCrawlData.ProductParams;
 
       /**
        * Screenshot options. Requires formats.screenshot: true.
        */
-      screenshotParams?: Data.ScreenshotParams;
+      screenshotParams?: BatchUnifiedCrawlData.ScreenshotParams;
 
       /**
        * Browser and content settings shared by all outputs.
        */
-      sharedParams?: Data.SharedParams;
+      sharedParams?: BatchUnifiedCrawlData.SharedParams;
 
       /**
        * Labels for tracking request usage. Not retained when zdr is enabled.
@@ -3719,7 +5385,7 @@ export namespace BatchSubmitParams {
        * Deadline for each page, using the same behavior and defaults as POST
        * /web/scrape.
        */
-      timeoutOpts?: Data.TimeoutOpts;
+      timeoutOpts?: BatchUnifiedCrawlData.TimeoutOpts;
 
       /**
        * Batches persist their results. Only disabled is supported; enabled returns
@@ -3728,7 +5394,7 @@ export namespace BatchSubmitParams {
       zdr?: 'disabled';
     }
 
-    export namespace Data {
+    export namespace BatchUnifiedCrawlData {
       /**
        * Outputs to return. Set at least one to `true`.
        */
