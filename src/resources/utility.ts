@@ -85,6 +85,11 @@ export interface UtilityPrefetchParams {
   type: 'brand' | 'styleguide';
 
   /**
+   * Access policy IDs to apply. A URL must pass every policy.
+   */
+  policies?: Array<string>;
+
+  /**
    * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;

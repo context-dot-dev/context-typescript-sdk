@@ -39,6 +39,7 @@ describe('resource monitors', () => {
       },
       change_detection: { type: 'exact' },
       mode: 'web',
+      policies: ['pol_3f9c2a7e5b8d4c1f9a6e0b2d7c4f8a1e'],
       schedule: {
         frequency: 6,
         type: 'interval',

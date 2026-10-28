@@ -376,6 +376,11 @@ export interface MonitorCreateResponse {
   next_run_at?: string | null;
 
   /**
+   * Access policy IDs applied to every run.
+   */
+  policies?: Array<string>;
+
+  /**
    * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
    * every 6 hours or every 2 days. The total interval (frequency × unit) must be
    * between 10 minutes and 1 year.
@@ -848,6 +853,11 @@ export interface MonitorRetrieveResponse {
   next_run_at?: string | null;
 
   /**
+   * Access policy IDs applied to every run.
+   */
+  policies?: Array<string>;
+
+  /**
    * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
    * every 6 hours or every 2 days. The total interval (frequency × unit) must be
    * between 10 minutes and 1 year.
@@ -1318,6 +1328,11 @@ export interface MonitorUpdateResponse {
    * When the next scheduled run is due; null while paused.
    */
   next_run_at?: string | null;
+
+  /**
+   * Access policy IDs applied to every run.
+   */
+  policies?: Array<string>;
 
   /**
    * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
@@ -1801,6 +1816,11 @@ export namespace MonitorListResponse {
      * When the next scheduled run is due; null while paused.
      */
     next_run_at?: string | null;
+
+    /**
+     * Access policy IDs applied to every run.
+     */
+    policies?: Array<string>;
 
     /**
      * Labels for filtering monitors, their changes, and their usage.
@@ -3087,6 +3107,11 @@ export interface MonitorRotateWebhookSecretResponse {
   next_run_at?: string | null;
 
   /**
+   * Access policy IDs applied to every run.
+   */
+  policies?: Array<string>;
+
+  /**
    * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
    * every 6 hours or every 2 days. The total interval (frequency × unit) must be
    * between 10 minutes and 1 year.
@@ -3554,6 +3579,11 @@ export interface MonitorCreateParams {
   mode?: 'web';
 
   /**
+   * Access policy IDs to apply to every run.
+   */
+  policies?: Array<string>;
+
+  /**
    * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.
    * every 6 hours or every 2 days. The total interval (frequency × unit) must be
    * between 10 minutes and 1 year.
@@ -3846,6 +3876,11 @@ export interface MonitorUpdateParams {
    * Display name for the monitor.
    */
   name?: string;
+
+  /**
+   * Access policy IDs to apply to every run. Send an empty list to remove them.
+   */
+  policies?: Array<string>;
 
   /**
    * Run the monitor on a fixed interval defined by a frequency and a unit, e.g.

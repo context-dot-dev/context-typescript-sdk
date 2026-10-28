@@ -422,6 +422,11 @@ export interface BatchRetrieveResponse {
   key_metadata?: BatchRetrieveResponse.KeyMetadata;
 
   /**
+   * Access policy IDs applied to every page.
+   */
+  policies?: Array<string>;
+
+  /**
    * Batch completion delivery ID, when available.
    */
   webhook_delivery_id?: string;
@@ -701,6 +706,11 @@ export namespace BatchListResponse {
     tags: Array<string>;
 
     timing: Data.Timing;
+
+    /**
+     * Access policy IDs applied to every page.
+     */
+    policies?: Array<string>;
   }
 
   export namespace Data {
@@ -2903,6 +2913,12 @@ export interface BatchSubmitParams {
    * Body param: Choose a URL list or a site crawl.
    */
   input: BatchSubmitParams.Scrape | BatchSubmitParams.Crawl;
+
+  /**
+   * Body param: Access policy IDs to apply to every page. A URL must pass every
+   * policy.
+   */
+  policies?: Array<string>;
 
   /**
    * Body param: Tags stored on the batch. Filter the batch list by them later.

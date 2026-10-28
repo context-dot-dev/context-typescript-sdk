@@ -222,6 +222,11 @@ export interface NewsSearchParams {
   limit?: number;
 
   /**
+   * Access policy IDs to apply. A URL must pass every policy.
+   */
+  policies?: Array<string>;
+
+  /**
    * Result ordering. Defaults to newest for entity searches. Natural-language
    * searches are always ordered by relevance.
    */

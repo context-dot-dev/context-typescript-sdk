@@ -2153,6 +2153,11 @@ export interface WebAnswersParams {
   mode?: 'fast' | 'ultra';
 
   /**
+   * Access policy IDs to apply. A URL must pass every policy.
+   */
+  policies?: Array<string>;
+
+  /**
    * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;
@@ -2260,6 +2265,11 @@ export interface WebExtractStyleguideParams {
   maxAgeMs?: number | null;
 
   /**
+   * Comma-separated access policy IDs to apply. A URL must pass every policy.
+   */
+  policies?: Array<string>;
+
+  /**
    * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
    */
   tags?: Array<string>;
@@ -2320,6 +2330,11 @@ export interface WebMapURLsParams {
    * Maximum number of URLs to return.
    */
   maxLinks?: number;
+
+  /**
+   * Comma-separated access policy IDs to apply. A URL must pass every policy.
+   */
+  policies?: Array<string>;
 
   /**
    * Filter URLs by a topic or phrase, most relevant first.
@@ -2414,6 +2429,11 @@ export interface WebScrapeParams {
    * Requires `formats.parse: true`; required when it is set.
    */
   parseParams?: WebScrapeParams.CustomParser | WebScrapeParams.PrebuiltParser;
+
+  /**
+   * Access policy IDs to apply. A URL must pass every policy.
+   */
+  policies?: Array<string>;
 
   /**
    * Product options. Requires formats.product: true.
@@ -3758,6 +3778,11 @@ export interface WebSearchParams {
   numResults?: number;
 
   /**
+   * Access policy IDs to apply. A URL must pass every policy.
+   */
+  policies?: Array<string>;
+
+  /**
    * Currently has no effect.
    */
   queryFanout?: boolean;
@@ -4184,6 +4209,11 @@ export interface WebWebCrawlMdParams {
    * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
    */
   pdf?: WebWebCrawlMdParams.Pdf;
+
+  /**
+   * Access policy IDs to apply. A URL must pass every policy.
+   */
+  policies?: Array<string>;
 
   /**
    * Wait briefly for CSS animations and transitions to settle before reading each

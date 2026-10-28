@@ -1478,6 +1478,11 @@ export declare namespace BrandRetrieveParams {
     maxSpeed?: boolean;
 
     /**
+     * Access policy IDs to apply. A URL must pass every policy.
+     */
+    policies?: Array<string>;
+
+    /**
      * Labels for filtering usage in the dashboard.
      */
     tags?: Array<string>;
@@ -1899,6 +1904,11 @@ export declare namespace BrandRetrieveParams {
     maxSpeed?: boolean;
 
     /**
+     * Access policy IDs to apply. A URL must pass every policy.
+     */
+    policies?: Array<string>;
+
+    /**
      * Labels for filtering usage in the dashboard.
      */
     tags?: Array<string>;
@@ -2073,6 +2083,11 @@ export declare namespace BrandRetrieveParams {
      * less comprehensive data.
      */
     maxSpeed?: boolean;
+
+    /**
+     * Access policy IDs to apply. A URL must pass every policy.
+     */
+    policies?: Array<string>;
 
     /**
      * Labels for filtering usage in the dashboard.
@@ -2251,6 +2266,11 @@ export declare namespace BrandRetrieveParams {
     maxSpeed?: boolean;
 
     /**
+     * Access policy IDs to apply. A URL must pass every policy.
+     */
+    policies?: Array<string>;
+
+    /**
      * Labels for filtering usage in the dashboard.
      */
     tags?: Array<string>;
@@ -2368,6 +2388,11 @@ export declare namespace BrandRetrieveParams {
      * Discriminator for direct-URL-based brand retrieval.
      */
     type: 'by_direct_url';
+
+    /**
+     * Access policy IDs to apply. A URL must pass every policy.
+     */
+    policies?: Array<string>;
 
     /**
      * Labels for filtering usage in the dashboard.
@@ -2805,6 +2830,11 @@ export declare namespace BrandRetrieveParams {
      * Optional phone number from the transaction to help verify brand match.
      */
     phone?: string | number;
+
+    /**
+     * Access policy IDs to apply. A URL must pass every policy.
+     */
+    policies?: Array<string>;
 
     /**
      * Labels for filtering usage in the dashboard.
