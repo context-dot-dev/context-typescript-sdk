@@ -1491,6 +1491,13 @@ export declare namespace BrandRetrieveParams {
      * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveByDomainRequest.TimeoutOpts;
+
+    /**
+     * `enabled` disables request logs, usage logs, and traces. Brand data and hosted
+     * assets may still be stored. Returns 403 `ZDR_NOT_ENABLED` unless your
+     * organization has ZDR.
+     */
+    zdr?: 'enabled' | 'disabled';
   }
 
   export namespace BrandRetrieveByDomainRequest {
@@ -1917,6 +1924,13 @@ export declare namespace BrandRetrieveParams {
      * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveByNameRequest.TimeoutOpts;
+
+    /**
+     * `enabled` disables request logs, usage logs, and traces. Brand data and hosted
+     * assets may still be stored. Returns 403 `ZDR_NOT_ENABLED` unless your
+     * organization has ZDR.
+     */
+    zdr?: 'enabled' | 'disabled';
   }
 
   export namespace BrandRetrieveByNameRequest {
@@ -2098,6 +2112,13 @@ export declare namespace BrandRetrieveParams {
      * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveByEmailRequest.TimeoutOpts;
+
+    /**
+     * `enabled` disables request logs, usage logs, and traces. Brand data and hosted
+     * assets may still be stored. Returns 403 `ZDR_NOT_ENABLED` unless your
+     * organization has ZDR.
+     */
+    zdr?: 'enabled' | 'disabled';
   }
 
   export namespace BrandRetrieveByEmailRequest {
@@ -2356,6 +2377,13 @@ export declare namespace BrandRetrieveParams {
      * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveByTickerRequest.TimeoutOpts;
+
+    /**
+     * `enabled` disables request logs, usage logs, and traces. Brand data and hosted
+     * assets may still be stored. Returns 403 `ZDR_NOT_ENABLED` unless your
+     * organization has ZDR.
+     */
+    zdr?: 'enabled' | 'disabled';
   }
 
   export namespace BrandRetrieveByTickerRequest {
@@ -2403,6 +2431,13 @@ export declare namespace BrandRetrieveParams {
      * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveByDirectURLRequest.TimeoutOpts;
+
+    /**
+     * `enabled` disables request logs, usage logs, and traces. Brand data and hosted
+     * assets may still be stored. Returns 403 `ZDR_NOT_ENABLED` unless your
+     * organization has ZDR.
+     */
+    zdr?: 'enabled' | 'disabled';
   }
 
   export namespace BrandRetrieveByDirectURLRequest {
@@ -2845,6 +2880,13 @@ export declare namespace BrandRetrieveParams {
      * Request deadline and what to return when it passes.
      */
     timeoutOpts?: BrandRetrieveFromTransactionRequest.TimeoutOpts;
+
+    /**
+     * `enabled` disables request logs, usage logs, and traces. Brand data and hosted
+     * assets may still be stored. Returns 403 `ZDR_NOT_ENABLED` unless your
+     * organization has ZDR.
+     */
+    zdr?: 'enabled' | 'disabled';
   }
 
   export namespace BrandRetrieveFromTransactionRequest {
