@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.19.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.19.0...v3.19.1) (2026-10-29)
+
+
+### Bug Fixes
+
+* **scrape:** derive the /web/scrape request spec from its zod schema ([#2044](https://github.com/context-dot-dev/context-typescript-sdk/issues/2044)) ([211f581](https://github.com/context-dot-dev/context-typescript-sdk/commit/211f581508298cc4a21299f565c490aabeeed532))
+
 ## [3.19.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.18.0...v3.19.0) (2026-10-28)
 
 
