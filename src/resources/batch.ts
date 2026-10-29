@@ -3695,7 +3695,7 @@ export namespace BatchSubmitParams {
       sharedParams?: BatchUnifiedScrapeData.SharedParams;
 
       /**
-       * Labels for tracking request usage. Not retained when zdr is enabled.
+       * Labels for filtering usage in the dashboard.
        */
       tags?: Array<string>;
 
@@ -4010,6 +4010,11 @@ export namespace BatchSubmitParams {
          * Drop visually duplicate product images, keeping the largest copy.
          */
         dedupeImages?: boolean;
+
+        /**
+         * @deprecated Ignored. The AI fallback runs automatically.
+         */
+        useAIFallback?: boolean;
       }
 
       /**
@@ -5397,7 +5402,7 @@ export namespace BatchSubmitParams {
       sharedParams?: BatchUnifiedCrawlData.SharedParams;
 
       /**
-       * Labels for tracking request usage. Not retained when zdr is enabled.
+       * Labels for filtering usage in the dashboard.
        */
       tags?: Array<string>;
 
@@ -5874,6 +5879,11 @@ export namespace BatchSubmitParams {
          * Drop visually duplicate product images, keeping the largest copy.
          */
         dedupeImages?: boolean;
+
+        /**
+         * @deprecated Ignored. The AI fallback runs automatically.
+         */
+        useAIFallback?: boolean;
       }
 
       /**

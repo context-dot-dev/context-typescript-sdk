@@ -180,7 +180,7 @@ describe('resource web', () => {
         type: 'custom',
       },
       policies: ['pol_3f9c2a7e5b8d4c1f9a6e0b2d7c4f8a1e'],
-      productParams: { dedupeImages: true },
+      productParams: { dedupeImages: true, useAIFallback: true },
       screenshotParams: { area: 'viewport', format: 'png' },
       sharedParams: {
         actions: [{ action: 'Click the product details tab', type: 'perform' }],

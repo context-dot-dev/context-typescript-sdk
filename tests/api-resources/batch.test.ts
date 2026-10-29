@@ -179,7 +179,7 @@ describe('resource batch', () => {
             },
             type: 'custom',
           },
-          productParams: { dedupeImages: true },
+          productParams: { dedupeImages: true, useAIFallback: true },
           screenshotParams: { area: 'viewport', format: 'png' },
           sharedParams: {
             actions: [{ action: 'Click the product details tab', type: 'perform' }],

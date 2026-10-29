@@ -2452,13 +2452,12 @@ export interface WebScrapeParams {
   sharedParams?: WebScrapeParams.SharedParams;
 
   /**
-   * Labels for tracking request usage. Not retained when zdr is enabled.
+   * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;
 
   /**
-   * Deadline for the whole request. Defaults to 90000 ms with `fail`. Fixed waits
-   * must end before it.
+   * Request deadline and what to return when it passes.
    */
   timeoutOpts?: WebScrapeParams.TimeoutOpts;
 
@@ -2745,6 +2744,11 @@ export namespace WebScrapeParams {
      * Drop visually duplicate product images, keeping the largest copy.
      */
     dedupeImages?: boolean;
+
+    /**
+     * @deprecated Ignored. The AI fallback runs automatically.
+     */
+    useAIFallback?: boolean;
   }
 
   /**
@@ -3038,8 +3042,7 @@ export namespace WebScrapeParams {
   }
 
   /**
-   * Deadline for the whole request. Defaults to 90000 ms with `fail`. Fixed waits
-   * must end before it.
+   * Request deadline and what to return when it passes.
    */
   export interface TimeoutOpts {
     /**
