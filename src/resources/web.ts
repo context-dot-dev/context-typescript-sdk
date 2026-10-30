@@ -965,10 +965,11 @@ export interface WebScrapeResponse {
    * data, instagram-feed returns data.posts, tiktok-profile and tiktok-video return
    * one record as data, tiktok-feed returns data.videos, tiktok-comments returns
    * data.comments, tiktok-followers, tiktok-following, and tiktok-user-search return
-   * data.users, emails, phone-numbers, and links return data.emails,
-   * data.phone_numbers, and data.links from the rendered page; the store, Maps, G2,
-   * Instagram, and TikTok parsers read their data directly, independently of DOM
-   * filters and other outputs.
+   * data.users, yelp-search returns up to 20 ranked organic businesses in
+   * data.businesses, plus total and pagination, from a Yelp search URL; emails,
+   * phone-numbers, and links return data.emails, data.phone_numbers, and data.links
+   * from the rendered page; the store, Maps, G2, Instagram, and TikTok parsers read
+   * their data directly, independently of DOM filters and other outputs.
    */
   parsed: WebScrapeResponse.Parsed;
 
@@ -1365,10 +1366,11 @@ export namespace WebScrapeResponse {
    * data, instagram-feed returns data.posts, tiktok-profile and tiktok-video return
    * one record as data, tiktok-feed returns data.videos, tiktok-comments returns
    * data.comments, tiktok-followers, tiktok-following, and tiktok-user-search return
-   * data.users, emails, phone-numbers, and links return data.emails,
-   * data.phone_numbers, and data.links from the rendered page; the store, Maps, G2,
-   * Instagram, and TikTok parsers read their data directly, independently of DOM
-   * filters and other outputs.
+   * data.users, yelp-search returns up to 20 ranked organic businesses in
+   * data.businesses, plus total and pagination, from a Yelp search URL; emails,
+   * phone-numbers, and links return data.emails, data.phone_numbers, and data.links
+   * from the rendered page; the store, Maps, G2, Instagram, and TikTok parsers read
+   * their data directly, independently of DOM filters and other outputs.
    */
   export interface Parsed {
     data: { [key: string]: unknown } | null;
@@ -1403,6 +1405,7 @@ export namespace WebScrapeResponse {
       | 'tiktok-followers'
       | 'tiktok-following'
       | 'tiktok-user-search'
+      | 'yelp-search'
       | 'emails'
       | 'phone-numbers'
       | 'links';
@@ -2683,17 +2686,19 @@ export namespace WebScrapeParams {
      * (/search/user?q={query}) as data.users: id, username, nickname, biography,
      * avatar_url, sec_uid, follower_count, like_count, and is_verified. The TikTok
      * parsers accept tiktok.com, www.tiktok.com, and m.tiktok.com URLs but not short
-     * links (vm.tiktok.com, vt.tiktok.com, tiktok.com/t/…). emails accepts any page
-     * and returns its email addresses as data.emails ([{ email }]), read from mailto
-     * links, Cloudflare-protected addresses, and visible text. phone-numbers accepts
-     * any page and returns its valid phone numbers in E.164 as data.phone_numbers ([{
-     * phone }]), read from tel links and visible text; numbers without a country code
-     * are read for the country of the site TLD, defaulting to US. links accepts any
-     * page and returns its unique http(s) links as data.links ([{ url, text }]), with
-     * absolute URLs; text falls back to aria-label or image alt and is null when a
-     * link has none. The emails parser reads the rendered page and respects content
-     * filters; the other prebuilt parsers read their data independently of DOM
-     * filters.
+     * links (vm.tiktok.com, vt.tiktok.com, tiktok.com/t/…). yelp-search accepts Yelp
+     * search URLs with find_desc and find_loc, reads start as the result offset, and
+     * returns up to 20 ranked organic businesses in data.businesses with total and
+     * pagination. emails accepts any page and returns its email addresses as
+     * data.emails ([{ email }]), read from mailto links, Cloudflare-protected
+     * addresses, and visible text. phone-numbers accepts any page and returns its
+     * valid phone numbers in E.164 as data.phone_numbers ([{ phone }]), read from tel
+     * links and visible text; numbers without a country code are read for the country
+     * of the site TLD, defaulting to US. links accepts any page and returns its unique
+     * http(s) links as data.links ([{ url, text }]), with absolute URLs; text falls
+     * back to aria-label or image alt and is null when a link has none. The emails
+     * parser reads the rendered page and respects content filters; the other prebuilt
+     * parsers read their data independently of DOM filters.
      */
     parser:
       | 'google-maps'
@@ -2713,6 +2718,7 @@ export namespace WebScrapeParams {
       | 'tiktok-followers'
       | 'tiktok-following'
       | 'tiktok-user-search'
+      | 'yelp-search'
       | 'emails'
       | 'phone-numbers'
       | 'links';
