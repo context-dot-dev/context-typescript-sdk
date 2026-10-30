@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.20.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.19.1...v3.20.0) (2026-10-30)
+
+
+### Features
+
+* **scrape:** add Yelp reviews parser ([2ab8370](https://github.com/context-dot-dev/context-typescript-sdk/commit/2ab837017c196f99d336715e33a4acfc2a40cd24))
+* **scrape:** add Yelp search parser ([186069c](https://github.com/context-dot-dev/context-typescript-sdk/commit/186069c8b338250ace47c8106bda051f02df73b6))
+
 ## [3.19.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.19.0...v3.19.1) (2026-10-29)
 
 
