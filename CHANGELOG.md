@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.21.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.20.0...v3.21.0) (2026-10-31)
+
+
+### Features
+
+* **scrape:** add reddit-post prebuilt parser with full comment trees ([#2217](https://github.com/context-dot-dev/context-typescript-sdk/issues/2217)) ([733e0c9](https://github.com/context-dot-dev/context-typescript-sdk/commit/733e0c9a361a1dc19838bc8ed5f89f2e6e298416))
+
 ## [3.20.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.19.1...v3.20.0) (2026-10-30)
 
 
