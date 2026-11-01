@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.22.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.21.0...v3.22.0) (2026-11-01)
+
+
+### Features
+
+* **scrape:** return Yelp reviewer id and profile url in yelp-reviews ([#2402](https://github.com/context-dot-dev/context-typescript-sdk/issues/2402)) ([3f07f7e](https://github.com/context-dot-dev/context-typescript-sdk/commit/3f07f7e8b2f6be34d5f45dddf75e067e77f131ec))
+
 ## [3.21.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.20.0...v3.21.0) (2026-10-31)
 
 
