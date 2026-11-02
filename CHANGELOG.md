@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.23.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.22.0...v3.23.0) (2026-11-02)
+
+
+### Features
+
+* **scrape:** read framework-embedded page data in the json format ([#2405](https://github.com/context-dot-dev/context-typescript-sdk/issues/2405)) ([d1c58dc](https://github.com/context-dot-dev/context-typescript-sdk/commit/d1c58dc46af12cc8a3926620a935a2531e4df031))
+
 ## [3.22.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.21.0...v3.22.0) (2026-11-01)
 
 
