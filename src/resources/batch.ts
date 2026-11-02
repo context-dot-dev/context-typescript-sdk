@@ -483,7 +483,8 @@ export namespace BatchRetrieveResponse {
     images?: boolean;
 
     /**
-     * An object matching `jsonParams.schema`, extracted from the page.
+     * An object matching `jsonParams.schema`, extracted from the page text and its
+     * embedded data (JSON-LD, meta tags, framework state).
      */
     json?: boolean;
 
@@ -764,7 +765,8 @@ export namespace BatchListResponse {
       images?: boolean;
 
       /**
-       * An object matching `jsonParams.schema`, extracted from the page.
+       * An object matching `jsonParams.schema`, extracted from the page text and its
+       * embedded data (JSON-LD, meta tags, framework state).
        */
       json?: boolean;
 
@@ -1024,7 +1026,8 @@ export namespace BatchCancelResponse {
     images?: boolean;
 
     /**
-     * An object matching `jsonParams.schema`, extracted from the page.
+     * An object matching `jsonParams.schema`, extracted from the page text and its
+     * embedded data (JSON-LD, meta tags, framework state).
      */
     json?: boolean;
 
@@ -2826,7 +2829,8 @@ export namespace BatchSubmitResponse {
     images?: boolean;
 
     /**
-     * An object matching `jsonParams.schema`, extracted from the page.
+     * An object matching `jsonParams.schema`, extracted from the page text and its
+     * embedded data (JSON-LD, meta tags, framework state).
      */
     json?: boolean;
 
@@ -3762,7 +3766,8 @@ export namespace BatchSubmitParams {
         images?: boolean;
 
         /**
-         * An object matching `jsonParams.schema`, extracted from the page.
+         * An object matching `jsonParams.schema`, extracted from the page text and its
+         * embedded data (JSON-LD, meta tags, framework state).
          */
         json?: boolean;
 
@@ -5535,7 +5540,8 @@ export namespace BatchSubmitParams {
         images?: boolean;
 
         /**
-         * An object matching `jsonParams.schema`, extracted from the page.
+         * An object matching `jsonParams.schema`, extracted from the page text and its
+         * embedded data (JSON-LD, meta tags, framework state).
          */
         json?: boolean;
 

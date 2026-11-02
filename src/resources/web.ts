@@ -2505,7 +2505,8 @@ export namespace WebScrapeParams {
     images?: boolean;
 
     /**
-     * An object matching `jsonParams.schema`, extracted from the page.
+     * An object matching `jsonParams.schema`, extracted from the page text and its
+     * embedded data (JSON-LD, meta tags, framework state).
      */
     json?: boolean;
 
