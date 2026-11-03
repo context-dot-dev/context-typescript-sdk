@@ -107,6 +107,65 @@ console.log(page.screenshot.data);
 | Watch a page for changes                                         | `client.monitors.create` |
 | Look up a company's logo, colors and brand data                  | `client.brand.retrieve`  |
 
+## Verifying webhooks
+
+Context.dev signs every batch and monitor webhook attempt with an HMAC-SHA256 signature in the
+`X-Context-Signature` header (`t=<unix>,v1=<hex>`). Verify it against the raw request body before
+parsing or acting on the event:
+
+<!-- prettier-ignore -->
+```ts
+import express from 'express';
+import ContextDev from 'context.dev';
+
+const client = new ContextDev();
+
+const app = express();
+
+// Keep the raw body: the signature covers the exact bytes that were sent.
+app.post('/webhooks/context', express.raw({ type: '*/*' }), async (req, res) => {
+  try {
+    // Reads X-Context-Signature from the headers, verifies the HMAC, and parses the payload.
+    // The secret defaults to process.env.CONTEXT_DEV_WEBHOOK_SECRET when omitted.
+    const event = await client.webhooks.unwrap(req.body, req.headers);
+
+    if (event.event === 'change.detected') {
+      console.log('changed:', event.data);
+    }
+
+    res.status(200).send('ok');
+  } catch (err) {
+    res.status(400).send('invalid signature');
+  }
+});
+```
+
+`unwrap` rejects stale timestamps (5 minutes by default), signatures that do not match the body,
+and payloads that are not event envelopes. Use the event `id` as the deduplication key, because
+retries and replays resend the same `id`.
+
+If you only need the boolean result, or you already parsed the payload yourself, use
+`client.webhooks.verifySignature(rawBody, signatureHeader, secret)`. The same helpers are also
+exported as standalone functions:
+
+<!-- prettier-ignore -->
+```ts
+import { constructWebhookEvent, verifyWebhookSignature } from 'context.dev';
+
+const verified = await verifyWebhookSignature({
+  payload: rawBody,
+  signature: req.headers['x-context-signature'],
+  secret: process.env['CONTEXT_DEV_WEBHOOK_SECRET'],
+  toleranceInSeconds: 300, // pass null to skip the replay window check
+});
+
+const event = await constructWebhookEvent({
+  payload: rawBody,
+  signature: req.headers['x-context-signature'],
+  secret: process.env['CONTEXT_DEV_WEBHOOK_SECRET'],
+});
+```
+
 ## Use it from an AI agent
 
 Context.dev also ships as a plugin for [Claude](https://github.com/context-dot-dev/claude-plugin), [Cursor](https://github.com/context-dot-dev/cursor-plugin) and [Gemini CLI](https://github.com/context-dot-dev/gemini-cli-context), and as tools for [LangChain](https://github.com/context-dot-dev/langchain-context) and [Haystack](https://github.com/context-dot-dev/context-haystack).
