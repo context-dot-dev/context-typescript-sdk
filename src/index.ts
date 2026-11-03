@@ -4,6 +4,15 @@ export { ContextDev as default } from './client';
 
 export { type Uploadable, toFile } from './core/uploads';
 export { APIPromise } from './core/api-promise';
+export {
+  paginateCursor,
+  paginateNumbered,
+  type AutoPagingOptions,
+  type AutoPagingRequestOptions,
+  type CursorPageAccessors,
+  type NumberedPageAccessors,
+  type NumberedPaginationOptions,
+} from './lib/pagination';
 export { ContextDev, type ClientOptions } from './client';
 export {
   ContextDevError,

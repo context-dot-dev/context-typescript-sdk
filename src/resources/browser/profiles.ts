@@ -3,6 +3,7 @@
 import { APIResource } from '../../core/resource';
 import { APIPromise } from '../../core/api-promise';
 import { RequestOptions } from '../../internal/request-options';
+import { paginateCursor, type AutoPagingRequestOptions } from '../../lib/pagination';
 
 /**
  * See the authenticated browser profiles your organization created.
@@ -17,6 +18,28 @@ export class Profiles extends APIResource {
     options?: RequestOptions,
   ): APIPromise<ProfileListResponse> {
     return this._client.get('/org/browser/profiles', { query, ...options });
+  }
+
+  /**
+   * Iterate every browser profile your organization created, following `next_cursor`
+   * across pages.
+   *
+   * @example
+   * ```ts
+   * for await (const profile of client.browser.profiles.listAutoPaging()) {
+   *   console.log(profile.id);
+   * }
+   * ```
+   */
+  async *listAutoPaging(
+    query: ProfileListParams | null | undefined = {},
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<ProfileListResponse.Data, void, undefined> {
+    yield* paginateCursor(
+      (cursor) => this.list(cursor ? { ...query, cursor } : query, options),
+      { items: (page) => page.data, nextCursor: (page) => page.next_cursor },
+      { maxPages: options?.maxPages },
+    );
   }
 }
 

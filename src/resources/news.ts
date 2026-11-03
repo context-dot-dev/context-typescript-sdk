@@ -3,6 +3,7 @@
 import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
+import { paginateCursor, type AutoPagingRequestOptions } from '../lib/pagination';
 
 /**
  * Search live and historical news about a company.
@@ -25,6 +26,29 @@ export class News extends APIResource {
    */
   search(body: NewsSearchParams, options?: RequestOptions): APIPromise<NewsSearchResponse> {
     return this._client.post('/news/search', { body, ...options });
+  }
+
+  /**
+   * Iterate every article matching the search, following `next_cursor` across pages.
+   *
+   * @example
+   * ```ts
+   * for await (const article of client.news.searchAutoPaging({
+   *   searchBy: { type: 'entity', entity: { type: 'domain', domain: 'stripe.com' } },
+   * })) {
+   *   console.log(article.title);
+   * }
+   * ```
+   */
+  async *searchAutoPaging(
+    body: NewsSearchParams,
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<NewsSearchResponse.Data, void, undefined> {
+    yield* paginateCursor(
+      (cursor) => this.search(cursor ? { ...body, cursor } : body, options),
+      { items: (page) => page.data, nextCursor: (page) => page.next_cursor },
+      { maxPages: options?.maxPages },
+    );
   }
 }
 

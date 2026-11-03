@@ -6,6 +6,7 @@ import { APIPromise } from '../../core/api-promise';
 import { buildHeaders } from '../../internal/headers';
 import { RequestOptions } from '../../internal/request-options';
 import { path } from '../../internal/utils/path';
+import { paginateCursor, type AutoPagingRequestOptions } from '../../lib/pagination';
 
 /**
  * Inspect and retry batch and monitor webhook deliveries.
@@ -89,6 +90,55 @@ export class Deliveries extends APIResource {
         options?.headers,
       ]),
     });
+  }
+
+  /**
+   * Iterate every batch and monitor webhook delivery from the last 30 days, following
+   * `next_cursor` across pages.
+   *
+   * @example
+   * ```ts
+   * for await (const delivery of client.webhooks.deliveries.listAutoPaging({
+   *   type: 'batch',
+   *   status: 'failed',
+   * })) {
+   *   console.log(delivery.id);
+   * }
+   * ```
+   */
+  async *listAutoPaging(
+    body: DeliveryListParams,
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<DeliverySummary, void, undefined> {
+    yield* paginateCursor(
+      (cursor) => this.list(cursor ? { ...body, cursor } : body, options),
+      { items: (page) => page.data, nextCursor: (page) => page.next_cursor },
+      { maxPages: options?.maxPages },
+    );
+  }
+
+  /**
+   * Iterate every attempt of a delivery, newest first, following `next_cursor` across pages.
+   *
+   * @example
+   * ```ts
+   * for await (const attempt of client.webhooks.deliveries.listAttemptsAutoPaging(
+   *   'whd_210b9798eb53baa4e69d31c1071cf03d',
+   * )) {
+   *   console.log(attempt.attempt, attempt.http_status);
+   * }
+   * ```
+   */
+  async *listAttemptsAutoPaging(
+    deliveryID: string,
+    query: DeliveryListAttemptsParams | null | undefined = {},
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<Attempt, void, undefined> {
+    yield* paginateCursor(
+      (cursor) => this.listAttempts(deliveryID, cursor ? { ...query, cursor } : query, options),
+      { items: (page) => page.data, nextCursor: (page) => page.next_cursor },
+      { maxPages: options?.maxPages },
+    );
   }
 }
 

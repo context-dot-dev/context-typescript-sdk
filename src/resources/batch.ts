@@ -7,6 +7,7 @@ import { APIPromise } from '../core/api-promise';
 import { buildHeaders } from '../internal/headers';
 import { RequestOptions } from '../internal/request-options';
 import { path } from '../internal/utils/path';
+import { paginateCursor, type AutoPagingRequestOptions } from '../lib/pagination';
 
 /**
  * Scrape many pages or crawl a site asynchronously.
@@ -126,6 +127,28 @@ export class Batch extends APIResource {
         options?.headers,
       ]),
     });
+  }
+
+  /**
+   * Iterate every result record of a finished batch, following `next_cursor` across pages.
+   *
+   * @example
+   * ```ts
+   * for await (const record of client.batch.getResultsAutoPaging('batch_9f2c8a')) {
+   *   console.log(record.status, record.url);
+   * }
+   * ```
+   */
+  async *getResultsAutoPaging(
+    batchID: string,
+    query: BatchGetResultsParams | null | undefined = {},
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<BatchGetResultsResponse.Ok | BatchGetResultsResponse.Error, void, undefined> {
+    yield* paginateCursor(
+      (cursor) => this.getResults(batchID, cursor ? { ...query, cursor } : query, options),
+      { items: (page) => page.data ?? [], nextCursor: (page) => page.next_cursor },
+      { maxPages: options?.maxPages },
+    );
   }
 }
 

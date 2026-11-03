@@ -3,6 +3,7 @@
 import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
+import { paginateCursor, type AutoPagingRequestOptions } from '../lib/pagination';
 
 export class People extends APIResource {
   /**
@@ -39,6 +40,30 @@ export class People extends APIResource {
    */
   search(body: PersonSearchParams, options?: RequestOptions): APIPromise<PersonSearchResponse> {
     return this._client.post('/people/search', { body, ...options });
+  }
+
+  /**
+   * Iterate every person matching a natural-language search, following `next_cursor`
+   * across pages.
+   *
+   * @example
+   * ```ts
+   * for await (const person of client.people.searchAutoPaging({
+   *   query: 'VPs of sales at solar companies in California',
+   * })) {
+   *   console.log(person.name, person.score);
+   * }
+   * ```
+   */
+  async *searchAutoPaging(
+    body: PersonSearchParams,
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<PersonSearchResponse.Result, void, undefined> {
+    yield* paginateCursor(
+      (cursor) => this.search(cursor ? { ...body, cursor } : body, options),
+      { items: (page) => page.results, nextCursor: (page) => page.next_cursor },
+      { maxPages: options?.maxPages },
+    );
   }
 }
 

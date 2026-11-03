@@ -4,6 +4,7 @@ import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 import { path } from '../internal/utils/path';
+import { paginateNumbered, type AutoPagingRequestOptions } from '../lib/pagination';
 
 /**
  * Read your organization's API request logs.
@@ -22,6 +23,28 @@ export class Logs extends APIResource {
    */
   list(query: LogListParams | null | undefined = {}, options?: RequestOptions): APIPromise<LogListResponse> {
     return this._client.get('/org/logs', { query, ...options });
+  }
+
+  /**
+   * Iterate every log entry matching the filters, following `page` while `has_more` is
+   * set.
+   *
+   * @example
+   * ```ts
+   * for await (const entry of client.logs.listAutoPaging({ errors_only: true })) {
+   *   console.log(entry.path, entry.status_code);
+   * }
+   * ```
+   */
+  async *listAutoPaging(
+    query: LogListParams | null | undefined = {},
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<LogListResponse.Data, void, undefined> {
+    yield* paginateNumbered(
+      (page) => this.list({ ...query, page }, options),
+      { items: (page) => page.data, hasMore: (page) => page.has_more },
+      { startPage: query?.page ?? 1, maxPages: options?.maxPages },
+    );
   }
 }
 

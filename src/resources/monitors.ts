@@ -6,6 +6,7 @@ import * as WebhooksAPI from './webhooks/webhooks';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 import { path } from '../internal/utils/path';
+import { paginateCursor, type AutoPagingRequestOptions } from '../lib/pagination';
 
 /**
  * Watch websites for exact or meaningful changes.
@@ -254,6 +255,116 @@ export class Monitors extends APIResource {
    */
   run(monitorID: string, options?: RequestOptions): APIPromise<MonitorRunResponse> {
     return this._client.post(path`/monitors/${monitorID}/run`, options);
+  }
+
+  /**
+   * Iterate every monitor matching the filters, following `next_cursor` across pages.
+   *
+   * Convenience wrapper around {@link Monitors.list} for callers that want every result
+   * instead of one page at a time.
+   *
+   * @example
+   * ```ts
+   * for await (const monitor of client.monitors.listAutoPaging({ status: 'active' })) {
+   *   console.log(monitor.id, monitor.name);
+   * }
+   * ```
+   */
+  async *listAutoPaging(
+    query: MonitorListParams | null | undefined = {},
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<MonitorListResponse.Data, void, undefined> {
+    yield* paginateCursor(
+      (cursor) => this.list(cursor ? { ...query, cursor } : query, options),
+      { items: (page) => page.data, nextCursor: (page) => page.next_cursor },
+      { maxPages: options?.maxPages },
+    );
+  }
+
+  /**
+   * Iterate every change record across your monitors, following `next_cursor` across pages.
+   *
+   * @example
+   * ```ts
+   * for await (const change of client.monitors.listAccountChangesAutoPaging()) {
+   *   console.log(change.id);
+   * }
+   * ```
+   */
+  async *listAccountChangesAutoPaging(
+    query: MonitorListAccountChangesParams | null | undefined = {},
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<MonitorListAccountChangesResponse.Data, void, undefined> {
+    yield* paginateCursor(
+      (cursor) => this.listAccountChanges(cursor ? { ...query, cursor } : query, options),
+      { items: (page) => page.data, nextCursor: (page) => page.next_cursor },
+      { maxPages: options?.maxPages },
+    );
+  }
+
+  /**
+   * Iterate every run across your monitors, following `next_cursor` across pages.
+   *
+   * @example
+   * ```ts
+   * for await (const run of client.monitors.listAccountRunsAutoPaging({ status: 'failed' })) {
+   *   console.log(run.id);
+   * }
+   * ```
+   */
+  async *listAccountRunsAutoPaging(
+    query: MonitorListAccountRunsParams | null | undefined = {},
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<MonitorListAccountRunsResponse.Data, void, undefined> {
+    yield* paginateCursor(
+      (cursor) => this.listAccountRuns(cursor ? { ...query, cursor } : query, options),
+      { items: (page) => page.data, nextCursor: (page) => page.next_cursor },
+      { maxPages: options?.maxPages },
+    );
+  }
+
+  /**
+   * Iterate every change record of a monitor, following `next_cursor` across pages.
+   *
+   * @example
+   * ```ts
+   * for await (const change of client.monitors.listChangesAutoPaging('mon_123')) {
+   *   console.log(change.id);
+   * }
+   * ```
+   */
+  async *listChangesAutoPaging(
+    monitorID: string,
+    query: MonitorListChangesParams | null | undefined = {},
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<MonitorListChangesResponse.Data, void, undefined> {
+    yield* paginateCursor(
+      (cursor) => this.listChanges(monitorID, cursor ? { ...query, cursor } : query, options),
+      { items: (page) => page.data, nextCursor: (page) => page.next_cursor },
+      { maxPages: options?.maxPages },
+    );
+  }
+
+  /**
+   * Iterate every run of a monitor, following `next_cursor` across pages.
+   *
+   * @example
+   * ```ts
+   * for await (const run of client.monitors.listRunsAutoPaging('mon_123')) {
+   *   console.log(run.id, run.status);
+   * }
+   * ```
+   */
+  async *listRunsAutoPaging(
+    monitorID: string,
+    query: MonitorListRunsParams | null | undefined = {},
+    options?: AutoPagingRequestOptions,
+  ): AsyncGenerator<MonitorListRunsResponse.Data, void, undefined> {
+    yield* paginateCursor(
+      (cursor) => this.listRuns(monitorID, cursor ? { ...query, cursor } : query, options),
+      { items: (page) => page.data, nextCursor: (page) => page.next_cursor },
+      { maxPages: options?.maxPages },
+    );
   }
 }
 

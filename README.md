@@ -207,6 +207,65 @@ Note that requests which time out will be [retried twice by default](#retries).
 
 ## Advanced Usage
 
+### Auto-pagination
+
+Every list endpoint that returns a `next_cursor` (or a page number and `has_more`) also exposes an
+`…AutoPaging` iterator that walks all pages for you:
+
+<!-- prettier-ignore -->
+```ts
+import ContextDev from 'context.dev';
+
+const client = new ContextDev();
+
+for await (const monitor of client.monitors.listAutoPaging({ status: 'active' })) {
+  console.log(monitor.id, monitor.name);
+}
+
+for await (const record of client.batch.getResultsAutoPaging('batch_9f2c8a')) {
+  console.log(record.status, record.url);
+}
+
+for await (const entry of client.logs.listAutoPaging({ errors_only: true })) {
+  console.log(entry.path, entry.status_code);
+}
+```
+
+The available iterators are:
+
+| Iterator                                            | Iterates                       |
+| --------------------------------------------------- | ------------------------------ |
+| `client.monitors.listAutoPaging`                    | Monitors                       |
+| `client.monitors.listChangesAutoPaging`             | Change records for a monitor   |
+| `client.monitors.listRunsAutoPaging`                | Runs for a monitor             |
+| `client.monitors.listAccountChangesAutoPaging`      | Change records across monitors |
+| `client.monitors.listAccountRunsAutoPaging`         | Runs across monitors           |
+| `client.webhooks.deliveries.listAutoPaging`         | Webhook deliveries             |
+| `client.webhooks.deliveries.listAttemptsAutoPaging` | Attempts for a delivery        |
+| `client.batch.getResultsAutoPaging`                 | Result records for a batch     |
+| `client.news.searchAutoPaging`                      | News articles                  |
+| `client.people.searchAutoPaging`                    | People                         |
+| `client.browser.profiles.listAutoPaging`            | Browser profiles               |
+| `client.logs.listAutoPaging`                        | Request logs                   |
+
+Iteration stops when the API reports no next page. If the API ever returns the same cursor twice the
+iterator throws instead of looping forever, and `maxPages` limits how many pages a single iteration
+requests:
+
+<!-- prettier-ignore -->
+```ts
+for await (const monitor of client.monitors.listAutoPaging({}, { maxPages: 3 })) {
+  console.log(monitor.id);
+}
+```
+
+The underlying helpers are exported if you need to paginate a custom request:
+
+<!-- prettier-ignore -->
+```ts
+import { paginateCursor, paginateNumbered } from 'context.dev';
+```
+
 ### Accessing raw Response data (e.g., headers)
 
 The "raw" `Response` returned by `fetch()` can be accessed through the `.asResponse()` method on the `APIPromise` type that all methods return.
