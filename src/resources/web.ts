@@ -394,8 +394,8 @@ export namespace WebExtractStyleguideResponse {
 
     /**
      * Font assets keyed by family name as it appears in fontFamily/fontFallbacks
-     * (non-generic names only). Clients match typography.fontFamily / fontWeight or
-     * button styles to pick a file URL from files.
+     * (non-generic names only). Match font style and weight against faces to select a
+     * file URL.
      */
     fontLinks: { [key: string]: Styleguide.FontLinks };
 
@@ -695,12 +695,6 @@ export namespace WebExtractStyleguideResponse {
     }
 
     export interface FontLinks {
-      /**
-       * Upright font files keyed by weight string (e.g. "400" for regular, "500",
-       * "700"). Values are absolute URLs.
-       */
-      files: { [key: string]: string };
-
       type: 'google' | 'custom';
 
       /**
@@ -710,11 +704,53 @@ export namespace WebExtractStyleguideResponse {
       category?: string;
 
       /**
-       * Present when type is custom: human-readable name derived from the fontLinks key
-       * (strip build/hash suffixes, split camelCase / PascalCase, normalize separators).
-       * Google entries omit this.
+       * Human-readable family name. For custom fonts, derived from the fontLinks key;
+       * for Google fonts, the canonical Google Fonts family name.
        */
       displayName?: string;
+
+      /**
+       * Discovered font faces, including style, weight, and distinct Unicode subsets.
+       */
+      faces?: Array<FontLinks.Face>;
+
+      /**
+       * @deprecated Deprecated upright font lookup keyed by weight string. A variable
+       * font can map several standard weight keys to the same URL; faces retains its
+       * actual weight range.
+       */
+      files?: { [key: string]: string };
+    }
+
+    export namespace FontLinks {
+      export interface Face {
+        /**
+         * CSS font-style descriptor: normal, italic, or oblique, including an optional
+         * oblique angle or angle range (e.g. oblique 10deg 20deg).
+         */
+        style: string;
+
+        /**
+         * Preferred font file URL or inline font data URL.
+         */
+        url: string;
+
+        /**
+         * CSS font-weight descriptor. A variable font file can have a range such as "300
+         * 500", covering intermediate weights without separate files.
+         */
+        weight: string;
+
+        /**
+         * CSS unicode-range descriptor.
+         */
+        unicodeRange?: string;
+
+        /**
+         * CSS font-width or font-stretch descriptor.
+         */
+        width?: string;
+      }
     }
 
     /**
