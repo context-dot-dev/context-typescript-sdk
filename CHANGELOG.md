@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.23.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.23.0...v3.23.1) (2026-11-04)
+
+
+### Refactors
+
+* **fonts:** share font link schemas and inferred types ([d1525f3](https://github.com/context-dot-dev/context-typescript-sdk/commit/d1525f393fd8370fce4c1b820bf52c1609920650))
+
 ## [3.23.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.22.0...v3.23.0) (2026-11-02)
 
 
