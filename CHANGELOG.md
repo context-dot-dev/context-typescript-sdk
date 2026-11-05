@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.24.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.24.0...v3.24.1) (2026-11-05)
+
+
+### Documentation
+
+* **logs:** say that a request log appears a few seconds after the request ([#2564](https://github.com/context-dot-dev/context-typescript-sdk/issues/2564)) ([d28f0e9](https://github.com/context-dot-dev/context-typescript-sdk/commit/d28f0e97c76160ff12608ab796dc716e26c96dcf))
+
 ## [3.24.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.23.1...v3.24.0) (2026-11-05)
 
 
