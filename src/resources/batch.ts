@@ -1232,7 +1232,9 @@ export namespace BatchGetResultsResponse {
        * data.users, yelp-search returns up to 20 ranked organic businesses in
        * data.businesses, plus total and pagination, from a Yelp search URL; yelp-reviews
        * returns up to 20 latest public reviews in data.reviews, with business details
-       * and next_offset, from a Yelp business URL; emails, phone-numbers, and links
+       * and next_offset, from a Yelp business URL; tripadvisor-reviews returns 20
+       * reviews in data.reviews, with data.location and next_offset, from a Tripadvisor
+       * hotel, restaurant, or attraction review URL; emails, phone-numbers, and links
        * return data.emails, data.phone_numbers, and data.links from the rendered page;
        * the store, Maps, G2, Instagram, and TikTok parsers read their data directly,
        * independently of DOM filters and other outputs.
@@ -1635,7 +1637,9 @@ export namespace BatchGetResultsResponse {
        * data.users, yelp-search returns up to 20 ranked organic businesses in
        * data.businesses, plus total and pagination, from a Yelp search URL; yelp-reviews
        * returns up to 20 latest public reviews in data.reviews, with business details
-       * and next_offset, from a Yelp business URL; emails, phone-numbers, and links
+       * and next_offset, from a Yelp business URL; tripadvisor-reviews returns 20
+       * reviews in data.reviews, with data.location and next_offset, from a Tripadvisor
+       * hotel, restaurant, or attraction review URL; emails, phone-numbers, and links
        * return data.emails, data.phone_numbers, and data.links from the rendered page;
        * the store, Maps, G2, Instagram, and TikTok parsers read their data directly,
        * independently of DOM filters and other outputs.
@@ -1679,6 +1683,7 @@ export namespace BatchGetResultsResponse {
           | 'reddit-user'
           | 'yelp-search'
           | 'yelp-reviews'
+          | 'tripadvisor-reviews'
           | 'emails'
           | 'phone-numbers'
           | 'links';
@@ -2016,7 +2021,9 @@ export namespace BatchGetResultsResponse {
        * data.users, yelp-search returns up to 20 ranked organic businesses in
        * data.businesses, plus total and pagination, from a Yelp search URL; yelp-reviews
        * returns up to 20 latest public reviews in data.reviews, with business details
-       * and next_offset, from a Yelp business URL; emails, phone-numbers, and links
+       * and next_offset, from a Yelp business URL; tripadvisor-reviews returns 20
+       * reviews in data.reviews, with data.location and next_offset, from a Tripadvisor
+       * hotel, restaurant, or attraction review URL; emails, phone-numbers, and links
        * return data.emails, data.phone_numbers, and data.links from the rendered page;
        * the store, Maps, G2, Instagram, and TikTok parsers read their data directly,
        * independently of DOM filters and other outputs.
@@ -2419,7 +2426,9 @@ export namespace BatchGetResultsResponse {
        * data.users, yelp-search returns up to 20 ranked organic businesses in
        * data.businesses, plus total and pagination, from a Yelp search URL; yelp-reviews
        * returns up to 20 latest public reviews in data.reviews, with business details
-       * and next_offset, from a Yelp business URL; emails, phone-numbers, and links
+       * and next_offset, from a Yelp business URL; tripadvisor-reviews returns 20
+       * reviews in data.reviews, with data.location and next_offset, from a Tripadvisor
+       * hotel, restaurant, or attraction review URL; emails, phone-numbers, and links
        * return data.emails, data.phone_numbers, and data.links from the rendered page;
        * the store, Maps, G2, Instagram, and TikTok parsers read their data directly,
        * independently of DOM filters and other outputs.
@@ -2463,6 +2472,7 @@ export namespace BatchGetResultsResponse {
           | 'reddit-user'
           | 'yelp-search'
           | 'yelp-reviews'
+          | 'tripadvisor-reviews'
           | 'emails'
           | 'phone-numbers'
           | 'links';
@@ -4037,16 +4047,25 @@ export namespace BatchSubmitParams {
          * pagination.next_offset. Each review has rating, full text, updated_at, and
          * author (id is the Yelp user id from the reviewer profile URL, url links to that
          * profile, plus name, location, and review_count); owner replies and photos are
-         * not included. emails accepts any page and returns its email addresses as
-         * data.emails ([{ email }]), read from mailto links, Cloudflare-protected
-         * addresses, and visible text. phone-numbers accepts any page and returns its
-         * valid phone numbers in E.164 as data.phone_numbers ([{ phone }]), read from tel
-         * links and visible text; numbers without a country code are read for the country
-         * of the site TLD, defaulting to US. links accepts any page and returns its unique
-         * http(s) links as data.links ([{ url, text }]), with absolute URLs; text falls
-         * back to aria-label or image alt and is null when a link has none. The emails
-         * parser reads the rendered page and respects content filters; the other prebuilt
-         * parsers read their data independently of DOM filters.
+         * not included. tripadvisor-reviews accepts a Tripadvisor hotel, restaurant, or
+         * attraction review URL (tripadvisor.com/Hotel_Review-g{geo}-d{id}-Reviews-….html,
+         * on any Tripadvisor country domain), reads -or{N}- in the path as the offset, and
+         * returns 20 reviews in data.reviews in the order Tripadvisor shows them, with
+         * data.location (id, name, type, url, review_count) and pagination.next_offset.
+         * Each review has id, url, title, full text, rating, language, published_at,
+         * visit_month, helpful_votes, subratings, photo_urls, owner_response (text,
+         * published_at, author_name), and author (id, username, name, url,
+         * contribution_count); an unknown location returns no reviews. emails accepts any
+         * page and returns its email addresses as data.emails ([{ email }]), read from
+         * mailto links, Cloudflare-protected addresses, and visible text. phone-numbers
+         * accepts any page and returns its valid phone numbers in E.164 as
+         * data.phone_numbers ([{ phone }]), read from tel links and visible text; numbers
+         * without a country code are read for the country of the site TLD, defaulting to
+         * US. links accepts any page and returns its unique http(s) links as data.links
+         * ([{ url, text }]), with absolute URLs; text falls back to aria-label or image
+         * alt and is null when a link has none. The emails parser reads the rendered page
+         * and respects content filters; the other prebuilt parsers read their data
+         * independently of DOM filters.
          */
         parser:
           | 'google-maps'
@@ -4072,6 +4091,7 @@ export namespace BatchSubmitParams {
           | 'reddit-user'
           | 'yelp-search'
           | 'yelp-reviews'
+          | 'tripadvisor-reviews'
           | 'emails'
           | 'phone-numbers'
           | 'links';
@@ -5973,16 +5993,25 @@ export namespace BatchSubmitParams {
          * pagination.next_offset. Each review has rating, full text, updated_at, and
          * author (id is the Yelp user id from the reviewer profile URL, url links to that
          * profile, plus name, location, and review_count); owner replies and photos are
-         * not included. emails accepts any page and returns its email addresses as
-         * data.emails ([{ email }]), read from mailto links, Cloudflare-protected
-         * addresses, and visible text. phone-numbers accepts any page and returns its
-         * valid phone numbers in E.164 as data.phone_numbers ([{ phone }]), read from tel
-         * links and visible text; numbers without a country code are read for the country
-         * of the site TLD, defaulting to US. links accepts any page and returns its unique
-         * http(s) links as data.links ([{ url, text }]), with absolute URLs; text falls
-         * back to aria-label or image alt and is null when a link has none. The emails
-         * parser reads the rendered page and respects content filters; the other prebuilt
-         * parsers read their data independently of DOM filters.
+         * not included. tripadvisor-reviews accepts a Tripadvisor hotel, restaurant, or
+         * attraction review URL (tripadvisor.com/Hotel_Review-g{geo}-d{id}-Reviews-….html,
+         * on any Tripadvisor country domain), reads -or{N}- in the path as the offset, and
+         * returns 20 reviews in data.reviews in the order Tripadvisor shows them, with
+         * data.location (id, name, type, url, review_count) and pagination.next_offset.
+         * Each review has id, url, title, full text, rating, language, published_at,
+         * visit_month, helpful_votes, subratings, photo_urls, owner_response (text,
+         * published_at, author_name), and author (id, username, name, url,
+         * contribution_count); an unknown location returns no reviews. emails accepts any
+         * page and returns its email addresses as data.emails ([{ email }]), read from
+         * mailto links, Cloudflare-protected addresses, and visible text. phone-numbers
+         * accepts any page and returns its valid phone numbers in E.164 as
+         * data.phone_numbers ([{ phone }]), read from tel links and visible text; numbers
+         * without a country code are read for the country of the site TLD, defaulting to
+         * US. links accepts any page and returns its unique http(s) links as data.links
+         * ([{ url, text }]), with absolute URLs; text falls back to aria-label or image
+         * alt and is null when a link has none. The emails parser reads the rendered page
+         * and respects content filters; the other prebuilt parsers read their data
+         * independently of DOM filters.
          */
         parser:
           | 'google-maps'
@@ -6008,6 +6037,7 @@ export namespace BatchSubmitParams {
           | 'reddit-user'
           | 'yelp-search'
           | 'yelp-reviews'
+          | 'tripadvisor-reviews'
           | 'emails'
           | 'phone-numbers'
           | 'links';
