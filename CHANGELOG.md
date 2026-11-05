@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.24.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.23.1...v3.24.0) (2026-11-05)
+
+
+### Features
+
+* **scrape:** add Tripadvisor reviews parser ([#2508](https://github.com/context-dot-dev/context-typescript-sdk/issues/2508)) ([191a060](https://github.com/context-dot-dev/context-typescript-sdk/commit/191a060897c65270acf9b9421ef3b6516c54ddcc))
+
 ## [3.23.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.23.0...v3.23.1) (2026-11-04)
 
 
