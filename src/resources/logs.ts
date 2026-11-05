@@ -10,7 +10,10 @@ import { path } from '../internal/utils/path';
  */
 export class Logs extends APIResource {
   /**
-   * Retrieve a request’s metadata, retained input, and response.
+   * Retrieve a request’s metadata, retained input, and response. An entry becomes
+   * retrievable a few seconds after its request completes, so a 404 NOT_FOUND for a
+   * request that just finished means ingestion has not caught up yet; retry after a
+   * few seconds.
    */
   retrieve(requestID: string, options?: RequestOptions): APIPromise<LogRetrieveResponse> {
     return this._client.get(path`/org/logs/${requestID}`, options);
