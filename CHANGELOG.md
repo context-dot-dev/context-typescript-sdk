@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.25.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.24.1...v3.25.0) (2026-11-07)
+
+
+### Features
+
+* **batch:** accept lightweight submissions and queue pending work ([#2683](https://github.com/context-dot-dev/context-typescript-sdk/issues/2683)) ([14f386b](https://github.com/context-dot-dev/context-typescript-sdk/commit/14f386b89dff3f0ed647c2a0a912c66434b68111))
+
 ## [3.24.1](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.24.0...v3.24.1) (2026-11-05)
 
 
