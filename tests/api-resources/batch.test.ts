@@ -43,7 +43,7 @@ describe('resource batch', () => {
           q: 'batch_1a2b',
           search_type: 'exact',
           shouldIncludeUnified: true,
-          status: 'queued',
+          status: 'pending',
           tags: 'docs,competitor',
         },
         { path: '/_stainless_unknown_path' },

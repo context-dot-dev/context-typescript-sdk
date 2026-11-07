@@ -89,8 +89,15 @@ export class Batch extends APIResource {
   /**
    * Scrape up to 100,000 URLs, or crawl a site, asynchronously using the same
    * formats and scrape parameters as POST /web/scrape. Choose Markdown, HTML,
-   * screenshots, images, bytes, parsed fields, products, highlights, and JSON. Poll
-   * the batch ID or receive a webhook when it finishes.
+   * screenshots, images, bytes, parsed fields, products, highlights, and JSON.
+   * Submission persists the input and returns immediately with status pending.
+   * Organizations with fewer than 10 available credits and no overage are rejected
+   * with 402 up front. Each organization can submit up to 1,000 batches per minute,
+   * independently of its polling budget. Batches wait pending when execution
+   * capacity is full. Validation, sitemap discovery, the full credit quote, and
+   * shard scheduling happen afterward. Poll the batch ID or receive a webhook when
+   * it finishes. Deferred rejections appear as status failed with a failure code and
+   * message.
    *
    * @example
    * ```ts
@@ -405,9 +412,11 @@ export interface BatchRetrieveResponse {
   results: BatchRetrieveResponse.Results | null;
 
   /**
-   * Current state. `completed`, `cancelled`, and `failed` are final.
+   * Current state. `pending` means waiting for execution capacity or background
+   * validation. Capacity-limited batches remain pending until a slot opens.
+   * `completed`, `cancelled`, and `failed` are final.
    */
-  status: 'queued' | 'running' | 'cancelling' | 'completed' | 'cancelled' | 'failed';
+  status: 'pending' | 'queued' | 'running' | 'cancelling' | 'completed' | 'cancelled' | 'failed';
 
   /**
    * Tags stored on the batch at submission.
@@ -453,7 +462,8 @@ export namespace BatchRetrieveResponse {
     refunded: number;
 
     /**
-     * Credits held when the batch was accepted.
+     * Credits held by background preparation before scraping starts. Zero while
+     * pending.
      */
     reserved: number;
   }
@@ -697,9 +707,11 @@ export namespace BatchListResponse {
     results: Data.Results | null;
 
     /**
-     * Current state. `completed`, `cancelled`, and `failed` are final.
+     * Current state. `pending` means waiting for execution capacity or background
+     * validation. Capacity-limited batches remain pending until a slot opens.
+     * `completed`, `cancelled`, and `failed` are final.
      */
-    status: 'queued' | 'running' | 'cancelling' | 'completed' | 'cancelled' | 'failed';
+    status: 'pending' | 'queued' | 'running' | 'cancelling' | 'completed' | 'cancelled' | 'failed';
 
     /**
      * Tags stored on the batch at submission.
@@ -735,7 +747,8 @@ export namespace BatchListResponse {
       refunded: number;
 
       /**
-       * Credits held when the batch was accepted.
+       * Credits held by background preparation before scraping starts. Zero while
+       * pending.
        */
       reserved: number;
     }
@@ -2736,7 +2749,7 @@ export interface BatchSubmitResponse {
   created_at: string;
 
   /**
-   * What accepting this batch cost.
+   * Credits are reserved after background validation, before scraping starts.
    */
   credits: BatchSubmitResponse.Credits;
 
@@ -2767,9 +2780,11 @@ export interface BatchSubmitResponse {
   request_id: string;
 
   /**
-   * Always `queued`. An accepted batch has not started yet.
+   * Current state. `pending` means waiting for execution capacity or background
+   * validation. Capacity-limited batches remain pending until a slot opens.
+   * `completed`, `cancelled`, and `failed` are final.
    */
-  status: 'queued';
+  status: 'pending' | 'queued' | 'running' | 'cancelling' | 'completed' | 'cancelled' | 'failed';
 
   /**
    * Tags stored on the batch.
@@ -2805,11 +2820,11 @@ export namespace BatchSubmitResponse {
   }
 
   /**
-   * What accepting this batch cost.
+   * Credits are reserved after background validation, before scraping starts.
    */
   export interface Credits {
     /**
-     * Credits held at submission.
+     * Credits reserved by background preparation. Zero while pending.
      */
     reserved: number;
   }
@@ -2924,7 +2939,7 @@ export interface BatchListParams {
   /**
    * Filter by status.
    */
-  status?: 'queued' | 'running' | 'cancelling' | 'completed' | 'cancelled' | 'failed';
+  status?: 'pending' | 'queued' | 'running' | 'cancelling' | 'completed' | 'cancelled' | 'failed';
 
   /**
    * Tags to filter by (matches batches having any of them). Pass repeated `tags`
