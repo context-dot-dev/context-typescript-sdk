@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.26.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.25.0...v3.26.0) (2026-11-08)
+
+
+### Features
+
+* **batch:** raise batch submissions to 2,500 per minute per organization ([#2734](https://github.com/context-dot-dev/context-typescript-sdk/issues/2734)) ([2bbef8a](https://github.com/context-dot-dev/context-typescript-sdk/commit/2bbef8a6784dfd2b7847c20aeba8ecca0e41c1ff))
+
 ## [3.25.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.24.1...v3.25.0) (2026-11-07)
 
 
