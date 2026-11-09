@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.28.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.27.0...v3.28.0) (2026-11-09)
+
+
+### Features
+
+* **parse:** support WARC archives in parsing and scraping ([#2761](https://github.com/context-dot-dev/context-typescript-sdk/issues/2761)) ([0c7797d](https://github.com/context-dot-dev/context-typescript-sdk/commit/0c7797dc97ee6374404f5e60e2cf26b2a39fa98f))
+
 ## [3.27.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.26.0...v3.27.0) (2026-11-09)
 
 
