@@ -8,7 +8,10 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Parse extends APIResource {
   /**
-   * Convert uploaded file bytes into Markdown and optional HTML.
+   * Convert uploaded file bytes into Markdown and optional HTML. WARC and WARC.GZ
+   * archives combine HTTP response, resource, and conversion records in archive
+   * order. Revisit and segmented records are skipped. Decoded WARC content is
+   * limited to 50 MiB.
    */
   handle(
     body: Uploadable,
@@ -70,6 +73,7 @@ export interface ParseHandleResponse {
    * Detected content type used for parsing
    */
   type:
+    | 'warc'
     | 'html'
     | 'xml'
     | 'json'
@@ -143,9 +147,11 @@ export interface ParseHandleParams {
 
   /**
    * Query param: Optional file extension hint, such as pdf, docx, xlsx, pptx, html,
-   * json, csv, md, py, rtf, jpg, png, or txt.
+   * json, csv, md, py, rtf, jpg, png, txt, warc, or warc.gz.
    */
   extension?:
+    | 'warc'
+    | 'warc.gz'
     | 'txt'
     | 'text'
     | 'md'
