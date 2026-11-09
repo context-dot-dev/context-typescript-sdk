@@ -4661,6 +4661,14 @@ export namespace BatchSubmitParams {
          */
         export interface Controls {
           /**
+           * Path fragments that skip a sitemap URL in a crawl. Works separately from any
+           * regex inclusion or exclusion you define. Defaults to
+           * ["/feed","/rss","/atom","/api/","/cdn-cgi/","/_next/","/__"]. Pass `[]` to keep
+           * every listed URL.
+           */
+          excludePaths?: Array<string>;
+
+          /**
            * Regex pattern; sitemap URLs matching it are not scraped, even when they match
            * `regex`.
            */
@@ -5171,6 +5179,14 @@ export namespace BatchSubmitParams {
          * URLs and never follows links off them, so there is no crawl depth here.
          */
         export interface Controls {
+          /**
+           * Path fragments that skip a sitemap URL in a crawl. Works separately from any
+           * regex inclusion or exclusion you define. Defaults to
+           * ["/feed","/rss","/atom","/api/","/cdn-cgi/","/_next/","/__"]. Pass `[]` to keep
+           * every listed URL.
+           */
+          excludePaths?: Array<string>;
+
           /**
            * Regex pattern; sitemap URLs matching it are not scraped, even when they match
            * `regex`.
@@ -5766,6 +5782,14 @@ export namespace BatchSubmitParams {
          * URLs and never follows links off them, so there is no crawl depth here.
          */
         export interface Controls {
+          /**
+           * Path fragments that skip a sitemap URL in a crawl. Works separately from any
+           * regex inclusion or exclusion you define. Defaults to
+           * ["/feed","/rss","/atom","/api/","/cdn-cgi/","/_next/","/__"]. Pass `[]` to keep
+           * every listed URL.
+           */
+          excludePaths?: Array<string>;
+
           /**
            * Regex pattern; sitemap URLs matching it are not scraped, even when they match
            * `regex`.
