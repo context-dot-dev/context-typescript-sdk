@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.27.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.26.0...v3.27.0) (2026-11-09)
+
+
+### Features
+
+* **batches:** let sitemap crawls choose which paths count as non-pages ([#2796](https://github.com/context-dot-dev/context-typescript-sdk/issues/2796)) ([5e89196](https://github.com/context-dot-dev/context-typescript-sdk/commit/5e89196bfdddcddf3e88d646495b7ed0457aa356))
+
 ## [3.26.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.25.0...v3.26.0) (2026-11-08)
 
 
