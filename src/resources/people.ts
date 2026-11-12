@@ -655,6 +655,12 @@ export interface PersonSearchParams {
    * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;
+
+  /**
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
+   */
+  zdr?: 'enabled' | 'disabled';
 }
 
 export namespace PersonSearchParams {

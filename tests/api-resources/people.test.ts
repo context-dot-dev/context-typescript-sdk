@@ -44,6 +44,7 @@ describe('resource people', () => {
       },
       mode: 'fast',
       tags: ['production', 'team-alpha'],
+      zdr: 'enabled',
     });
   });
 });
