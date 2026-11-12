@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.29.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.28.0...v3.29.0) (2026-11-12)
+
+
+### Features
+
+* **zdr:** accept zero data retention on people search and company search ([#2852](https://github.com/context-dot-dev/context-typescript-sdk/issues/2852)) ([26775ce](https://github.com/context-dot-dev/context-typescript-sdk/commit/26775ce98bcecbea0824548f6665012dd750a539))
+
 ## [3.28.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.27.0...v3.28.0) (2026-11-09)
 
 
