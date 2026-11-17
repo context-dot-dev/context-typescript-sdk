@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.30.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.29.0...v3.30.0) (2026-11-17)
+
+
+### Features
+
+* **billing:** report plan facts in usage and limit errors ([#2897](https://github.com/context-dot-dev/context-typescript-sdk/issues/2897)) ([16a84a8](https://github.com/context-dot-dev/context-typescript-sdk/commit/16a84a80ac73485be395ced4b7c7c5ed585e53a2))
+
+
+### Chores
+
+* run release-please centrally from brand-dev-server ([79ed995](https://github.com/context-dot-dev/context-typescript-sdk/commit/79ed995ce1e37170c302bdd927f27dd4a0793ab5))
+
+
+### Documentation
+
+* **scrape:** mention transcripts on the Markdown format ([#2903](https://github.com/context-dot-dev/context-typescript-sdk/issues/2903)) ([16a84a8](https://github.com/context-dot-dev/context-typescript-sdk/commit/16a84a80ac73485be395ced4b7c7c5ed585e53a2))
+
 ## [3.29.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.28.0...v3.29.0) (2026-11-12)
 
 
