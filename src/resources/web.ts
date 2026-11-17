@@ -2552,7 +2552,7 @@ export namespace WebScrapeParams {
     json?: boolean;
 
     /**
-     * Page content as Markdown.
+     * Page content or video transcript as Markdown.
      */
     markdown?: boolean;
 
