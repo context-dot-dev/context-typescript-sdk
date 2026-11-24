@@ -2200,8 +2200,8 @@ export namespace WebWebCrawlMdResponse {
 
 export interface WebAnswersParams {
   /**
-   * Research task. The agent selects company/profile lookups, web searches, or page
-   * reads. Include domains or URLs to focus the research.
+   * Research task, up to 2000 characters. The agent selects company/profile lookups,
+   * web searches, or page reads. Include domains or URLs to focus the research.
    */
   task: string;
 

@@ -72,7 +72,14 @@ export interface FeedbackSubmitParams {
   /**
    * Kind of issue.
    */
-  category: 'bug' | 'docs_mismatch' | 'friction' | 'feature_gap' | 'quality_degradation' | 'other';
+  category:
+    | 'bug'
+    | 'docs_mismatch'
+    | 'friction'
+    | 'feature_gap'
+    | 'quality_degradation'
+    | 'bad_brand'
+    | 'other';
 
   /**
    * What went wrong and what you expected instead.
