@@ -161,8 +161,8 @@ export interface WebAnswersResponse {
   key_metadata?: WebAnswersResponse.KeyMetadata;
 
   /**
-   * True when the request deadline ended research and the answer uses the evidence
-   * collected so far.
+   * True when the answer is incomplete: the request deadline ended research, or a
+   * requested list item has no researched values.
    */
   partial?: boolean;
 }
