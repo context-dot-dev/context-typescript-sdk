@@ -1478,7 +1478,9 @@ export declare namespace BrandRetrieveParams {
     maxSpeed?: boolean;
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy.
+     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
+     * access policies are enabled for your organization; otherwise the request fails
+     * with `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 
@@ -1911,7 +1913,9 @@ export declare namespace BrandRetrieveParams {
     maxSpeed?: boolean;
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy.
+     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
+     * access policies are enabled for your organization; otherwise the request fails
+     * with `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 
@@ -2099,7 +2103,9 @@ export declare namespace BrandRetrieveParams {
     maxSpeed?: boolean;
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy.
+     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
+     * access policies are enabled for your organization; otherwise the request fails
+     * with `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 
@@ -2287,7 +2293,9 @@ export declare namespace BrandRetrieveParams {
     maxSpeed?: boolean;
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy.
+     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
+     * access policies are enabled for your organization; otherwise the request fails
+     * with `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 
@@ -2418,7 +2426,9 @@ export declare namespace BrandRetrieveParams {
     type: 'by_direct_url';
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy.
+     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
+     * access policies are enabled for your organization; otherwise the request fails
+     * with `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 
@@ -2867,7 +2877,9 @@ export declare namespace BrandRetrieveParams {
     phone?: string | number;
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy.
+     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
+     * access policies are enabled for your organization; otherwise the request fails
+     * with `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 

@@ -222,7 +222,9 @@ export interface NewsSearchParams {
   limit?: number;
 
   /**
-   * Access policy IDs to apply. A URL must pass every policy.
+   * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
+   * access policies are enabled for your organization; otherwise the request fails
+   * with `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 

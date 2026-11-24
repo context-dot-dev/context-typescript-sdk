@@ -2969,7 +2969,8 @@ export interface BatchSubmitParams {
 
   /**
    * Body param: Access policy IDs to apply to every page. A URL must pass every
-   * policy.
+   * policy. Leave it out unless access policies are enabled for your organization;
+   * otherwise the request fails with `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 

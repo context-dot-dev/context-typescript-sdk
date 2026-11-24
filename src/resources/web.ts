@@ -2218,7 +2218,9 @@ export interface WebAnswersParams {
   mode?: 'fast' | 'ultra';
 
   /**
-   * Access policy IDs to apply. A URL must pass every policy.
+   * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
+   * access policies are enabled for your organization; otherwise the request fails
+   * with `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
@@ -2330,7 +2332,9 @@ export interface WebExtractStyleguideParams {
   maxAgeMs?: number | null;
 
   /**
-   * Comma-separated access policy IDs to apply. A URL must pass every policy.
+   * Comma-separated access policy IDs to apply. A URL must pass every policy. Leave
+   * it out unless access policies are enabled for your organization; otherwise the
+   * request fails with `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
@@ -2401,7 +2405,9 @@ export interface WebMapURLsParams {
   maxLinks?: number;
 
   /**
-   * Comma-separated access policy IDs to apply. A URL must pass every policy.
+   * Comma-separated access policy IDs to apply. A URL must pass every policy. Leave
+   * it out unless access policies are enabled for your organization; otherwise the
+   * request fails with `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
@@ -2500,7 +2506,9 @@ export interface WebScrapeParams {
   parseParams?: WebScrapeParams.CustomParser | WebScrapeParams.PrebuiltParser;
 
   /**
-   * Access policy IDs to apply. A URL must pass every policy.
+   * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
+   * access policies are enabled for your organization; otherwise the request fails
+   * with `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
@@ -3943,7 +3951,9 @@ export interface WebSearchParams {
   numResults?: number;
 
   /**
-   * Access policy IDs to apply. A URL must pass every policy.
+   * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
+   * access policies are enabled for your organization; otherwise the request fails
+   * with `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
@@ -4379,7 +4389,9 @@ export interface WebWebCrawlMdParams {
   pdf?: WebWebCrawlMdParams.Pdf;
 
   /**
-   * Access policy IDs to apply. A URL must pass every policy.
+   * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
+   * access policies are enabled for your organization; otherwise the request fails
+   * with `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
