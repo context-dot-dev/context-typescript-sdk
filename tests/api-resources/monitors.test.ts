@@ -141,7 +141,11 @@ describe('resource monitors', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.monitors.getCreditUsage(
-        { since: '2026-06-01T00:00:00Z', until: '2026-06-28T00:00:00Z' },
+        {
+          since: '2026-06-01T00:00:00Z',
+          tag: 'pricing',
+          until: '2026-06-28T00:00:00Z',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(ContextDev.NotFoundError);

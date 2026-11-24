@@ -102,7 +102,8 @@ export class Monitors extends APIResource {
 
   /**
    * Return usage per monitor, highest first, for up to the 10,000 most recent runs
-   * in the requested window.
+   * in the requested window. Pass `tag` to report only the monitors that carry that
+   * tag, such as one customer’s monitors.
    *
    * @example
    * ```ts
@@ -4609,6 +4610,12 @@ export interface MonitorGetCreditUsageParams {
    * Only include items at or after this ISO 8601 timestamp.
    */
   since?: string;
+
+  /**
+   * Only include monitors that currently have this tag. Deleted monitors are left
+   * out.
+   */
+  tag?: string;
 
   /**
    * Only include items before this ISO 8601 timestamp.
