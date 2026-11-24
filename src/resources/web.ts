@@ -1870,6 +1870,7 @@ export namespace WebSearchResponse {
         | 'CONTENT_TOO_LARGE'
         | 'WEBSITE_ACCESS_ERROR'
         | 'WEBSITE_BLOCKED'
+        | 'WEBSITE_NOT_FOUND'
         | 'ERROR';
 
       /**
@@ -1877,6 +1878,11 @@ export namespace WebSearchResponse {
        * highlightsOptions.enabled is true and the page was read.
        */
       highlights: Array<string> | null;
+
+      /**
+       * Why this output is missing. Present only when `code` is a failure.
+       */
+      message?: string;
     }
 
     /**
@@ -1893,6 +1899,7 @@ export namespace WebSearchResponse {
         | 'CONTENT_TOO_LARGE'
         | 'WEBSITE_ACCESS_ERROR'
         | 'WEBSITE_BLOCKED'
+        | 'WEBSITE_NOT_FOUND'
         | 'ERROR';
 
       /**
@@ -1906,6 +1913,11 @@ export namespace WebSearchResponse {
        * loading.
        */
       finalDOMState?: 'loaded' | 'still-loading';
+
+      /**
+       * Why this output is missing. Present only when `code` is a failure.
+       */
+      message?: string;
     }
   }
 
