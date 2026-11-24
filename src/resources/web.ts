@@ -1623,6 +1623,29 @@ export namespace WebScrapeResponse {
            * Variant or offer URL when provided by the source. May be shared by variants.
            */
           url: string | null;
+
+          /**
+           * Normalized stock or ordering availability of this variant.
+           */
+          availability?:
+            | 'in_stock'
+            | 'out_of_stock'
+            | 'limited_availability'
+            | 'preorder'
+            | 'backorder'
+            | 'made_to_order'
+            | 'discontinued'
+            | null;
+
+          /**
+           * Currency code for the variant price (e.g., USD, EUR) when stated with it.
+           */
+          currency?: string | null;
+
+          /**
+           * Price of this variant when the source states one per variant.
+           */
+          price?: number | null;
         }
       }
     }
@@ -2039,7 +2062,7 @@ export namespace WebWebCrawlMdResponse {
       sourceUrl: string;
 
       /**
-       * HTTP status code of the response
+       * HTTP status code of the response (0 when the page could not be retrieved)
        */
       statusCode: number;
 
@@ -2082,6 +2105,14 @@ export namespace WebWebCrawlMdResponse {
        * Best description extracted from standard, Open Graph, or Twitter metadata.
        */
       description?: string;
+
+      /**
+       * Why the page failed. Present only when `success` is `false`: `WEBSITE_BLOCKED`
+       * (the site served an anti-bot challenge or access wall), `WEBSITE_ACCESS_ERROR`
+       * (the page could not be retrieved or had no usable content), `NOT_FOUND`,
+       * `UNSUPPORTED_CONTENT`, `NO_PUBLISHED_MARKDOWN`, or `INTERNAL_ERROR`.
+       */
+      error_code?: string;
 
       /**
        * Resolved favicon URL, when present.

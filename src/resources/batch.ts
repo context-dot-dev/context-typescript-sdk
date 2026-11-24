@@ -1864,6 +1864,29 @@ export namespace BatchGetResultsResponse {
                * Variant or offer URL when provided by the source. May be shared by variants.
                */
               url: string | null;
+
+              /**
+               * Normalized stock or ordering availability of this variant.
+               */
+              availability?:
+                | 'in_stock'
+                | 'out_of_stock'
+                | 'limited_availability'
+                | 'preorder'
+                | 'backorder'
+                | 'made_to_order'
+                | 'discontinued'
+                | null;
+
+              /**
+               * Currency code for the variant price (e.g., USD, EUR) when stated with it.
+               */
+              currency?: string | null;
+
+              /**
+               * Price of this variant when the source states one per variant.
+               */
+              price?: number | null;
             }
           }
         }
@@ -2653,6 +2676,29 @@ export namespace BatchGetResultsResponse {
                * Variant or offer URL when provided by the source. May be shared by variants.
                */
               url: string | null;
+
+              /**
+               * Normalized stock or ordering availability of this variant.
+               */
+              availability?:
+                | 'in_stock'
+                | 'out_of_stock'
+                | 'limited_availability'
+                | 'preorder'
+                | 'backorder'
+                | 'made_to_order'
+                | 'discontinued'
+                | null;
+
+              /**
+               * Currency code for the variant price (e.g., USD, EUR) when stated with it.
+               */
+              currency?: string | null;
+
+              /**
+               * Price of this variant when the source states one per variant.
+               */
+              price?: number | null;
             }
           }
         }
