@@ -86,6 +86,7 @@ import {
   PersonSearchParams,
   PersonSearchResponse,
 } from './resources/people';
+import { Scholar, ScholarSearchParams, ScholarSearchResponse } from './resources/scholar';
 import { Utility, UtilityPrefetchParams, UtilityPrefetchResponse } from './resources/utility';
 import {
   Web,
@@ -845,6 +846,10 @@ export class ContextDev {
    */
   news: API.News = new API.News(this);
   /**
+   * Search full-text academic papers from arXiv and Europe PMC.
+   */
+  scholar: API.Scholar = new API.Scholar(this);
+  /**
    * Read your organization's API request logs.
    */
   logs: API.Logs = new API.Logs(this);
@@ -865,6 +870,7 @@ ContextDev.Batch = Batch;
 ContextDev.Webhooks = Webhooks;
 ContextDev.People = People;
 ContextDev.News = News;
+ContextDev.Scholar = Scholar;
 ContextDev.Logs = Logs;
 ContextDev.Browser = Browser;
 ContextDev.Feedback = Feedback;
@@ -980,6 +986,12 @@ export declare namespace ContextDev {
     News as News,
     type NewsSearchResponse as NewsSearchResponse,
     type NewsSearchParams as NewsSearchParams,
+  };
+
+  export {
+    Scholar as Scholar,
+    type ScholarSearchResponse as ScholarSearchResponse,
+    type ScholarSearchParams as ScholarSearchParams,
   };
 
   export {

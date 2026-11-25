@@ -70,6 +70,7 @@ export {
   type PersonEnrichParams,
   type PersonSearchParams,
 } from './people';
+export { Scholar, type ScholarSearchResponse, type ScholarSearchParams } from './scholar';
 export { Utility, type UtilityPrefetchResponse, type UtilityPrefetchParams } from './utility';
 export {
   Web,

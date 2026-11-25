@@ -176,6 +176,16 @@ Methods:
 
 - <code title="post /news/search">client.news.<a href="./src/resources/news.ts">search</a>({ ...params }) -> NewsSearchResponse</code>
 
+# Scholar
+
+Types:
+
+- <code><a href="./src/resources/scholar.ts">ScholarSearchResponse</a></code>
+
+Methods:
+
+- <code title="post /scholar/search">client.scholar.<a href="./src/resources/scholar.ts">search</a>({ ...params }) -> ScholarSearchResponse</code>
+
 # Logs
 
 Types:
