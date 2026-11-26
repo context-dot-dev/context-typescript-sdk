@@ -26,6 +26,7 @@ describe('resource web', () => {
   test.skip('answers: required and optional params', async () => {
     const response = await client.web.answers({
       task: 'Find the pricing page URL and plan names for context.dev.',
+      controls: { excludeSources: ['string'], sources: ['string'] },
       json_format: { pricing_page_url: 'bar', plans: 'bar' },
       mode: 'fast',
       policies: ['pol_3f9c2a7e5b8d4c1f9a6e0b2d7c4f8a1e'],

@@ -2247,6 +2247,11 @@ export interface WebAnswersParams {
   task: string;
 
   /**
+   * Limits what the research may use.
+   */
+  controls?: WebAnswersParams.Controls;
+
+  /**
    * Example answer object, not JSON Schema. Up to 8 levels, 500 values, and 16000
    * characters; unknowns may be null.
    */
@@ -2283,6 +2288,25 @@ export interface WebAnswersParams {
 }
 
 export namespace WebAnswersParams {
+  /**
+   * Limits what the research may use.
+   */
+  export interface Controls {
+    /**
+     * Never search, read or cite these sites, sections or pages. Same format as
+     * `sources`. Up to 100 entries.
+     */
+    excludeSources?: Array<string>;
+
+    /**
+     * Only search, read and cite these sites, sections or pages. Each entry is a URL
+     * prefix: "example.com" covers the site and its subdomains, "example.com/docs"
+     * covers that section, and "example.com/docs/setup.html" is one page. Up to 20
+     * entries.
+     */
+    sources?: Array<string>;
+  }
+
   /**
    * Request deadline and what to return when it passes.
    */
