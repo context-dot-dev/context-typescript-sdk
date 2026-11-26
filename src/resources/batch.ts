@@ -172,9 +172,21 @@ export interface Failure {
  */
 export interface CrawlControls {
   /**
+   * Pages the crawl skipped. Null when it skipped none.
+   */
+  exclude: Array<CrawlControls.CrawlRegexMatcher | CrawlControls.CrawlProductMatcher> | null;
+
+  /**
    * Regex pattern URLs must not match to be crawled. Null when the crawl set none.
    */
   exclude_url_pattern: string | null;
+
+  /**
+   * Links the crawl followed. Null when it followed every link.
+   */
+  follow: Array<
+    CrawlControls.CrawlRegexMatcher | CrawlControls.CrawlPaginationMatcher | CrawlControls.CrawlProductMatcher
+  > | null;
 
   /**
    * Whether links to subdomains were followed. Always false for a sitemap crawl.
@@ -277,6 +289,11 @@ export interface CrawlControls {
   max_pages: number;
 
   /**
+   * Pages the crawl returned. Null when it returned every fetched page.
+   */
+  scrape: Array<CrawlControls.CrawlRegexMatcher | CrawlControls.CrawlProductMatcher> | null;
+
+  /**
    * Where the crawl started.
    */
   source: CrawlControls.StartURL | CrawlControls.Sitemap;
@@ -288,6 +305,91 @@ export interface CrawlControls {
 }
 
 export namespace CrawlControls {
+  /**
+   * Pages whose URL matches a regex pattern.
+   */
+  export interface CrawlRegexMatcher {
+    /**
+     * Match pages by URL pattern.
+     */
+    kind: 'regex';
+
+    /**
+     * Regex pattern for the page URL.
+     */
+    pattern: string;
+  }
+
+  /**
+   * Product detail pages.
+   */
+  export interface CrawlProductMatcher {
+    /**
+     * Match product detail pages.
+     */
+    kind: 'product';
+  }
+
+  /**
+   * Pages whose URL matches a regex pattern.
+   */
+  export interface CrawlRegexMatcher {
+    /**
+     * Match pages by URL pattern.
+     */
+    kind: 'regex';
+
+    /**
+     * Regex pattern for the page URL.
+     */
+    pattern: string;
+  }
+
+  /**
+   * Further pages of a paginated list, such as page 2 of a catalog.
+   */
+  export interface CrawlPaginationMatcher {
+    /**
+     * Match the further pages of a paginated list.
+     */
+    kind: 'pagination';
+  }
+
+  /**
+   * Product detail pages.
+   */
+  export interface CrawlProductMatcher {
+    /**
+     * Match product detail pages.
+     */
+    kind: 'product';
+  }
+
+  /**
+   * Pages whose URL matches a regex pattern.
+   */
+  export interface CrawlRegexMatcher {
+    /**
+     * Match pages by URL pattern.
+     */
+    kind: 'regex';
+
+    /**
+     * Regex pattern for the page URL.
+     */
+    pattern: string;
+  }
+
+  /**
+   * Product detail pages.
+   */
+  export interface CrawlProductMatcher {
+    /**
+     * Match product detail pages.
+     */
+    kind: 'product';
+  }
+
   /**
    * The crawl discovered pages by following links from one URL.
    */
@@ -4601,10 +4703,17 @@ export namespace BatchSubmitParams {
          */
         export interface Controls {
           /**
-           * Regex pattern for URLs to exclude, even when they match `regex`. The `start_url`
-           * itself is always included.
+           * Pages to skip entirely, even when they match `follow` or `scrape`.
            */
-          excludeRegex?: string;
+          exclude?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+
+          /**
+           * Links to follow from each page; every followed page is checked for links again.
+           * Follows all links when omitted.
+           */
+          follow?: Array<
+            Controls.CrawlRegexMatcher | Controls.CrawlPaginationMatcher | Controls.CrawlProductMatcher
+          >;
 
           /**
            * Follow links to subdomains.
@@ -4705,9 +4814,96 @@ export namespace BatchSubmitParams {
           maxUrls?: number;
 
           /**
-           * Regex pattern for URLs to include. The `start_url` itself is always included.
+           * Pages to return in the results. Returns every fetched page when omitted.
            */
-          regex?: string;
+          scrape?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+        }
+
+        export namespace Controls {
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
+
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Further pages of a paginated list, such as page 2 of a catalog.
+           */
+          export interface CrawlPaginationMatcher {
+            /**
+             * Match the further pages of a paginated list.
+             */
+            kind: 'pagination';
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
+
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
         }
       }
 
@@ -4741,18 +4937,17 @@ export namespace BatchSubmitParams {
          */
         export interface Controls {
           /**
-           * Path fragments that skip a sitemap URL in a crawl. Works separately from any
-           * regex inclusion or exclusion you define. Defaults to
+           * Sitemap pages to skip, even when they match `scrape`.
+           */
+          exclude?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+
+          /**
+           * Path fragments that skip a sitemap URL in a crawl. Works separately from
+           * `scrape` and `exclude`. Defaults to
            * ["/feed","/rss","/atom","/api/","/cdn-cgi/","/_next/","/__"]. Pass `[]` to keep
            * every listed URL.
            */
           excludePaths?: Array<string>;
-
-          /**
-           * Regex pattern; sitemap URLs matching it are not scraped, even when they match
-           * `regex`.
-           */
-          excludeRegex?: string;
 
           /**
            * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 100000.
@@ -4760,9 +4955,61 @@ export namespace BatchSubmitParams {
           maxUrls?: number;
 
           /**
-           * Regex pattern; only sitemap URLs matching it are scraped.
+           * Sitemap pages to return in the results. Returns every listed page when omitted.
            */
-          regex?: string;
+          scrape?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+        }
+
+        export namespace Controls {
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
+
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
         }
       }
 
@@ -5120,10 +5367,17 @@ export namespace BatchSubmitParams {
          */
         export interface Controls {
           /**
-           * Regex pattern for URLs to exclude, even when they match `regex`. The `start_url`
-           * itself is always included.
+           * Pages to skip entirely, even when they match `follow` or `scrape`.
            */
-          excludeRegex?: string;
+          exclude?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+
+          /**
+           * Links to follow from each page; every followed page is checked for links again.
+           * Follows all links when omitted.
+           */
+          follow?: Array<
+            Controls.CrawlRegexMatcher | Controls.CrawlPaginationMatcher | Controls.CrawlProductMatcher
+          >;
 
           /**
            * Follow links to subdomains.
@@ -5224,9 +5478,96 @@ export namespace BatchSubmitParams {
           maxUrls?: number;
 
           /**
-           * Regex pattern for URLs to include. The `start_url` itself is always included.
+           * Pages to return in the results. Returns every fetched page when omitted.
            */
-          regex?: string;
+          scrape?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+        }
+
+        export namespace Controls {
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
+
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Further pages of a paginated list, such as page 2 of a catalog.
+           */
+          export interface CrawlPaginationMatcher {
+            /**
+             * Match the further pages of a paginated list.
+             */
+            kind: 'pagination';
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
+
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
         }
       }
 
@@ -5260,18 +5601,17 @@ export namespace BatchSubmitParams {
          */
         export interface Controls {
           /**
-           * Path fragments that skip a sitemap URL in a crawl. Works separately from any
-           * regex inclusion or exclusion you define. Defaults to
+           * Sitemap pages to skip, even when they match `scrape`.
+           */
+          exclude?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+
+          /**
+           * Path fragments that skip a sitemap URL in a crawl. Works separately from
+           * `scrape` and `exclude`. Defaults to
            * ["/feed","/rss","/atom","/api/","/cdn-cgi/","/_next/","/__"]. Pass `[]` to keep
            * every listed URL.
            */
           excludePaths?: Array<string>;
-
-          /**
-           * Regex pattern; sitemap URLs matching it are not scraped, even when they match
-           * `regex`.
-           */
-          excludeRegex?: string;
 
           /**
            * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 100000.
@@ -5279,9 +5619,61 @@ export namespace BatchSubmitParams {
           maxUrls?: number;
 
           /**
-           * Regex pattern; only sitemap URLs matching it are scraped.
+           * Sitemap pages to return in the results. Returns every listed page when omitted.
            */
-          regex?: string;
+          scrape?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+        }
+
+        export namespace Controls {
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
+
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
         }
       }
 
@@ -5723,10 +6115,17 @@ export namespace BatchSubmitParams {
          */
         export interface Controls {
           /**
-           * Regex pattern for URLs to exclude, even when they match `regex`. The `start_url`
-           * itself is always included.
+           * Pages to skip entirely, even when they match `follow` or `scrape`.
            */
-          excludeRegex?: string;
+          exclude?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+
+          /**
+           * Links to follow from each page; every followed page is checked for links again.
+           * Follows all links when omitted.
+           */
+          follow?: Array<
+            Controls.CrawlRegexMatcher | Controls.CrawlPaginationMatcher | Controls.CrawlProductMatcher
+          >;
 
           /**
            * Follow links to subdomains.
@@ -5827,9 +6226,96 @@ export namespace BatchSubmitParams {
           maxUrls?: number;
 
           /**
-           * Regex pattern for URLs to include. The `start_url` itself is always included.
+           * Pages to return in the results. Returns every fetched page when omitted.
            */
-          regex?: string;
+          scrape?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+        }
+
+        export namespace Controls {
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
+
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Further pages of a paginated list, such as page 2 of a catalog.
+           */
+          export interface CrawlPaginationMatcher {
+            /**
+             * Match the further pages of a paginated list.
+             */
+            kind: 'pagination';
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
+
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
         }
       }
 
@@ -5863,18 +6349,17 @@ export namespace BatchSubmitParams {
          */
         export interface Controls {
           /**
-           * Path fragments that skip a sitemap URL in a crawl. Works separately from any
-           * regex inclusion or exclusion you define. Defaults to
+           * Sitemap pages to skip, even when they match `scrape`.
+           */
+          exclude?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+
+          /**
+           * Path fragments that skip a sitemap URL in a crawl. Works separately from
+           * `scrape` and `exclude`. Defaults to
            * ["/feed","/rss","/atom","/api/","/cdn-cgi/","/_next/","/__"]. Pass `[]` to keep
            * every listed URL.
            */
           excludePaths?: Array<string>;
-
-          /**
-           * Regex pattern; sitemap URLs matching it are not scraped, even when they match
-           * `regex`.
-           */
-          excludeRegex?: string;
 
           /**
            * Maximum pages to fetch. Unused reserved credits are refunded. Maximum 100000.
@@ -5882,9 +6367,61 @@ export namespace BatchSubmitParams {
           maxUrls?: number;
 
           /**
-           * Regex pattern; only sitemap URLs matching it are scraped.
+           * Sitemap pages to return in the results. Returns every listed page when omitted.
            */
-          regex?: string;
+          scrape?: Array<Controls.CrawlRegexMatcher | Controls.CrawlProductMatcher>;
+        }
+
+        export namespace Controls {
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
+
+          /**
+           * Pages whose URL matches a regex pattern.
+           */
+          export interface CrawlRegexMatcher {
+            /**
+             * Match pages by URL pattern.
+             */
+            kind: 'regex';
+
+            /**
+             * Regex pattern for the page URL.
+             */
+            pattern: string;
+          }
+
+          /**
+           * Product detail pages.
+           */
+          export interface CrawlProductMatcher {
+            /**
+             * Match product detail pages.
+             */
+            kind: 'product';
+          }
         }
       }
 
