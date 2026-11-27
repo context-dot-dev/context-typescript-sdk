@@ -4414,10 +4414,13 @@ export namespace BatchSubmitParams {
         headers?: { [key: string]: string };
 
         /**
-         * Include iframe content in HTML and text outputs. Screenshots always show visible
-         * frames.
+         * Which iframe contents to include in HTML and text outputs. Screenshots always
+         * show visible frames. `auto` (default) inlines only iframes that hold page
+         * content, such as same-site documents, framesets, job boards, forms and embedded
+         * documents, and skips ads and widgets. `true` inlines every iframe. `false`
+         * inlines none.
          */
-        includeFrames?: boolean;
+        includeFrames?: boolean | 'auto';
 
         /**
          * Keep only elements matching these CSS selectors.
@@ -6832,10 +6835,13 @@ export namespace BatchSubmitParams {
         headers?: { [key: string]: string };
 
         /**
-         * Include iframe content in HTML and text outputs. Screenshots always show visible
-         * frames.
+         * Which iframe contents to include in HTML and text outputs. Screenshots always
+         * show visible frames. `auto` (default) inlines only iframes that hold page
+         * content, such as same-site documents, framesets, job boards, forms and embedded
+         * documents, and skips ads and widgets. `true` inlines every iframe. `false`
+         * inlines none.
          */
-        includeFrames?: boolean;
+        includeFrames?: boolean | 'auto';
 
         /**
          * Keep only elements matching these CSS selectors.

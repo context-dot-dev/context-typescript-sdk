@@ -3065,10 +3065,13 @@ export namespace WebScrapeParams {
     headers?: { [key: string]: string };
 
     /**
-     * Include iframe content in HTML and text outputs. Screenshots always show visible
-     * frames.
+     * Which iframe contents to include in HTML and text outputs. Screenshots always
+     * show visible frames. `auto` (default) inlines only iframes that hold page
+     * content, such as same-site documents, framesets, job boards, forms and embedded
+     * documents, and skips ads and widgets. `true` inlines every iframe. `false`
+     * inlines none.
      */
-    includeFrames?: boolean;
+    includeFrames?: boolean | 'auto';
 
     /**
      * Keep only elements matching these CSS selectors.
@@ -4075,9 +4078,12 @@ export namespace WebSearchParams {
     enabled?: boolean;
 
     /**
-     * Render iframe contents into the Markdown.
+     * Which iframe contents to render into the Markdown. `auto` (default) inlines only
+     * iframes that hold page content, such as same-site documents, framesets, job
+     * boards, forms and embedded documents, and skips ads and widgets. `true` inlines
+     * every iframe. `false` inlines none.
      */
-    includeFrames?: boolean;
+    includeFrames?: boolean | 'auto';
 
     /**
      * Emit image references in the Markdown.
@@ -4417,10 +4423,12 @@ export interface WebWebCrawlMdParams {
   followSubdomains?: boolean;
 
   /**
-   * When true, the contents of iframes are rendered to Markdown for each crawled
-   * page.
+   * Which iframe contents to render to Markdown for each crawled page. `auto`
+   * (default) inlines only iframes that hold page content, such as same-site
+   * documents, framesets, job boards, forms and embedded documents, and skips ads
+   * and widgets. `true` inlines every iframe. `false` inlines none.
    */
-  includeFrames?: boolean;
+  includeFrames?: boolean | 'auto';
 
   /**
    * Include image references in the Markdown output (`html-conversion` only).

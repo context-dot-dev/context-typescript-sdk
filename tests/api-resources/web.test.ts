@@ -190,7 +190,7 @@ describe('resource web', () => {
         dismissPopups: true,
         excludeSelectors: ['P'],
         headers: { 'Accept-Language': 'en-US' },
-        includeFrames: true,
+        includeFrames: 'auto',
         includeSelectors: ['P'],
         mainContentOnly: true,
         parsers: {
@@ -278,7 +278,7 @@ describe('resource web', () => {
       languages: 'all',
       markdownOptions: {
         enabled: true,
-        includeFrames: true,
+        includeFrames: 'auto',
         includeImages: true,
         includeLinks: true,
         maxAgeMs: 0,
@@ -321,7 +321,7 @@ describe('resource web', () => {
       excludeSelectors: ['x'],
       excludeUrlRegex: '/tag/|/author/',
       followSubdomains: true,
-      includeFrames: true,
+      includeFrames: 'auto',
       includeImages: true,
       includeLinks: true,
       includeSelectors: ['x'],
