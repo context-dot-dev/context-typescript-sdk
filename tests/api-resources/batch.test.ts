@@ -42,7 +42,6 @@ describe('resource batch', () => {
           limit: 1,
           q: 'batch_1a2b',
           search_type: 'exact',
-          shouldIncludeUnified: true,
           status: 'pending',
           tags: 'docs,competitor',
         },

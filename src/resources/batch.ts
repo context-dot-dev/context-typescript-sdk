@@ -3100,11 +3100,6 @@ export interface BatchListParams {
   search_type?: 'exact' | 'prefix';
 
   /**
-   * Include batches submitted with Scrape Anything formats. Defaults to false.
-   */
-  shouldIncludeUnified?: boolean;
-
-  /**
    * Filter by status.
    */
   status?: 'pending' | 'queued' | 'running' | 'cancelling' | 'completed' | 'cancelled' | 'failed';
