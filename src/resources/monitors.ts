@@ -4594,11 +4594,6 @@ export interface MonitorListParams {
   status?: 'active' | 'paused' | 'failed';
 
   /**
-   * Filter to items that have this tag.
-   */
-  tag?: string;
-
-  /**
    * Comma-separated list of tags to filter by (matches monitors having any of them).
    */
   tags?: Array<string> | null;

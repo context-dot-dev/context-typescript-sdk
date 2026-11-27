@@ -4030,11 +4030,6 @@ export interface WebSearchParams {
   policies?: Array<string>;
 
   /**
-   * Currently has no effect.
-   */
-  queryFanout?: boolean;
-
-  /**
    * Labels for filtering usage in the dashboard.
    */
   tags?: Array<string>;

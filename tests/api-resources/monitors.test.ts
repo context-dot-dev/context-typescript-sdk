@@ -103,7 +103,6 @@ describe('resource monitors', () => {
           search_by: ['name'],
           search_type: 'exact',
           status: 'active',
-          tag: 'pricing',
           tags: ['x'],
           target_type: 'page',
         },

@@ -3149,12 +3149,6 @@ export interface BatchSubmitParams {
   webhook?: BatchSubmitParams.Webhook;
 
   /**
-   * Body param: Legacy URL notified when the batch finishes. Preserves one
-   * best-effort attempt. Cannot be combined with webhook.
-   */
-  webhookUrl?: string;
-
-  /**
    * Header param: Unique key per submission. Retrying with the same key and body
    * returns the original batch; a different body returns `409`.
    */
