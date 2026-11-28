@@ -1,5 +1,39 @@
 # Changelog
 
+## [3.31.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.30.0...v3.31.0) (2026-11-28)
+
+
+### Features
+
+* **answers:** limit research to listed sources with controls ([#3252](https://github.com/context-dot-dev/context-typescript-sdk/issues/3252)) ([d11c76f](https://github.com/context-dot-dev/context-typescript-sdk/commit/d11c76fe34cba2d289ef7b3780a45931122ff527))
+* **batch:** add follow, scrape and exclude crawl rules ([#3244](https://github.com/context-dot-dev/context-typescript-sdk/issues/3244)) ([b2bbb7b](https://github.com/context-dot-dev/context-typescript-sdk/commit/b2bbb7b06d021a9a60bcf6e6809bd3795adb3caa))
+* **crawl:** say why a crawled page failed ([#3130](https://github.com/context-dot-dev/context-typescript-sdk/issues/3130)) ([5e62e44](https://github.com/context-dot-dev/context-typescript-sdk/commit/5e62e44d9331e01b2549237e39b5944cfe7c0600))
+* **feedback:** add bad_brand feedback category ([#3136](https://github.com/context-dot-dev/context-typescript-sdk/issues/3136)) ([0bacf7d](https://github.com/context-dot-dev/context-typescript-sdk/commit/0bacf7d496e62b68adad1c0ae7e309a07490bf39))
+* **monitors:** filter monitor credit usage by tag ([#3077](https://github.com/context-dot-dev/context-typescript-sdk/issues/3077)) ([d3e6b23](https://github.com/context-dot-dev/context-typescript-sdk/commit/d3e6b2355fca7bbb3dc21349f7c46512a3cfd2bd))
+* **scholar:** add POST /scholar/search endpoint ([#2997](https://github.com/context-dot-dev/context-typescript-sdk/issues/2997)) ([2018a10](https://github.com/context-dot-dev/context-typescript-sdk/commit/2018a10d679eca4dd45c9453477772dff8c7f330))
+* **scrape:** accept includeFrames auto and make it the default ([#3280](https://github.com/context-dot-dev/context-typescript-sdk/issues/3280)) ([d523561](https://github.com/context-dot-dev/context-typescript-sdk/commit/d5235611d80459dba04d1a02c452c40e7e13dbe6))
+* **scrape:** add a car-rental-locations parser for avis and budget branches ([#3021](https://github.com/context-dot-dev/context-typescript-sdk/issues/3021)) ([99aa554](https://github.com/context-dot-dev/context-typescript-sdk/commit/99aa554c858c31eed27fe1cc5e9bd7c343f9a571))
+* **scrape:** include price and availability on product variants ([#3113](https://github.com/context-dot-dev/context-typescript-sdk/issues/3113)) ([5e62e44](https://github.com/context-dot-dev/context-typescript-sdk/commit/5e62e44d9331e01b2549237e39b5944cfe7c0600))
+
+
+### Bug Fixes
+
+* **access-policies:** tell callers to drop `policies` when the feature is off ([#3090](https://github.com/context-dot-dev/context-typescript-sdk/issues/3090)) ([d2c9e72](https://github.com/context-dot-dev/context-typescript-sdk/commit/d2c9e7277389f2ce52d8caa9e76f21d2d67349ec))
+* **answers:** flag list items that came back unresearched and send incomplete answers back once ([#3145](https://github.com/context-dot-dev/context-typescript-sdk/issues/3145)) ([95d76ea](https://github.com/context-dot-dev/context-typescript-sdk/commit/95d76eafe995e5e146bc9384343c7c9d10d61db7))
+* **batch:** list every batch and remove shouldIncludeUnified ([#3322](https://github.com/context-dot-dev/context-typescript-sdk/issues/3322)) ([60c2eba](https://github.com/context-dot-dev/context-typescript-sdk/commit/60c2ebaa8b9b737f7ca0e14b8ec11f0e97622d3e))
+* **brand:** rename country_gl to country and CountryGL to LowercaseCountryCode ([#3326](https://github.com/context-dot-dev/context-typescript-sdk/issues/3326)) ([7f46090](https://github.com/context-dot-dev/context-typescript-sdk/commit/7f460905a9468744b326fa3fd0db44e30780399d))
+* **google-maps:** search from the URL's country, merge two draws, and read the real primary category ([#3158](https://github.com/context-dot-dev/context-typescript-sdk/issues/3158)) ([431f5c1](https://github.com/context-dot-dev/context-typescript-sdk/commit/431f5c1e232df2a32bcd50e4649a163f83016f9a))
+* **scrape:** read google play ratings from the storefront that offers the app ([#3084](https://github.com/context-dot-dev/context-typescript-sdk/issues/3084)) ([d3e6b23](https://github.com/context-dot-dev/context-typescript-sdk/commit/d3e6b2355fca7bbb3dc21349f7c46512a3cfd2bd))
+* **web-search:** explain why a result's page content is missing ([#3074](https://github.com/context-dot-dev/context-typescript-sdk/issues/3074)) ([cc5db20](https://github.com/context-dot-dev/context-typescript-sdk/commit/cc5db20486dced6265b3f4dfd39919ae9e8c534a))
+
+
+### Documentation
+
+* **answers:** state the 2000-character task limit in its description ([#3137](https://github.com/context-dot-dev/context-typescript-sdk/issues/3137)) ([0bacf7d](https://github.com/context-dot-dev/context-typescript-sdk/commit/0bacf7d496e62b68adad1c0ae7e309a07490bf39))
+* **openapi:** hide superseded inputs and document missing 403 and 402 responses ([#3323](https://github.com/context-dot-dev/context-typescript-sdk/issues/3323)) ([87a7f3e](https://github.com/context-dot-dev/context-typescript-sdk/commit/87a7f3e804d4f9be3d90e22f18e32885e9a37aef))
+* **openapi:** rewrite public reference copy and normalize field order ([#3325](https://github.com/context-dot-dev/context-typescript-sdk/issues/3325)) ([03dd988](https://github.com/context-dot-dev/context-typescript-sdk/commit/03dd98875303db7ceff822398ff950071b6f5ab7))
+* **scrape:** describe late scrape outputs as per-output REQUEST_TIMEOUT in a 200 ([#3080](https://github.com/context-dot-dev/context-typescript-sdk/issues/3080)) ([40b47bb](https://github.com/context-dot-dev/context-typescript-sdk/commit/40b47bbb74de3e888f632e3d37e5293c9da23378))
+
 ## [3.30.0](https://github.com/context-dot-dev/context-typescript-sdk/compare/v3.29.0...v3.30.0) (2026-11-17)
 
 
