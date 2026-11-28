@@ -1532,10 +1532,9 @@ export declare namespace BrandRetrieveParams {
     type: 'by_name';
 
     /**
-     * Two-letter ISO 3166-1 alpha-2 country code (GL parameter) used to localize
-     * search.
+     * Lowercase ISO 3166-1 alpha-2 country code, such as `us`.
      */
-    country_gl?:
+    country?:
       | 'af'
       | 'al'
       | 'dz'
@@ -2485,10 +2484,9 @@ export declare namespace BrandRetrieveParams {
     city?: string;
 
     /**
-     * Two-letter ISO 3166-1 alpha-2 country code (GL parameter) used to localize
-     * search.
+     * Lowercase ISO 3166-1 alpha-2 country code, such as `us`.
      */
-    country_gl?:
+    country?:
       | 'af'
       | 'al'
       | 'dz'
