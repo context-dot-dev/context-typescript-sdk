@@ -4,6 +4,9 @@ import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
+/**
+ * Extract structured data, competitors, styleguides, and fonts from any website.
+ */
 export class Industry extends APIResource {
   /**
    * Classify a company into NAICS industry codes.
@@ -97,7 +100,7 @@ export namespace IndustryRetrieveNaicsResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -195,7 +198,7 @@ export namespace IndustryRetrieveSicResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -221,7 +224,8 @@ export interface IndustryRetrieveNaicsParams {
   minResults?: number;
 
   /**
-   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
+   * Comma-separated labels for this request, such as `production,team-alpha`. Filter
+   * usage and request logs by them.
    */
   tags?: Array<string>;
 
@@ -248,8 +252,8 @@ export namespace IndustryRetrieveNaicsParams {
     milliseconds: number;
 
     /**
-     * "fail" returns 408 at the deadline. "return-partial" returns available results;
-     * inspect the response’s partial flag.
+     * `fail` returns 408 at the deadline. `return-partial` returns the results
+     * collected so far and marks the response as partial.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -274,7 +278,8 @@ export interface IndustryRetrieveSicParams {
   minResults?: number;
 
   /**
-   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
+   * Comma-separated labels for this request, such as `production,team-alpha`. Filter
+   * usage and request logs by them.
    */
   tags?: Array<string>;
 
@@ -306,8 +311,8 @@ export namespace IndustryRetrieveSicParams {
     milliseconds: number;
 
     /**
-     * "fail" returns 408 at the deadline. "return-partial" returns available results;
-     * inspect the response’s partial flag.
+     * `fail` returns 408 at the deadline. `return-partial` returns the results
+     * collected so far and marks the response as partial.
      */
     behavior?: 'fail' | 'return-partial';
   }

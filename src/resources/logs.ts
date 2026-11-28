@@ -6,22 +6,21 @@ import { RequestOptions } from '../internal/request-options';
 import { path } from '../internal/utils/path';
 
 /**
- * Read your organization's API request logs.
+ * Inspect your organization's API requests, including retained inputs and responses.
  */
 export class Logs extends APIResource {
   /**
-   * Retrieve a request’s metadata, retained input, and response. An entry becomes
-   * retrievable a few seconds after its request completes, so a 404 NOT_FOUND for a
-   * request that just finished means ingestion has not caught up yet; retry after a
-   * few seconds.
+   * Retrieve a request's metadata, retained input, and response. A request that just
+   * finished can return 404 `NOT_FOUND` for a few seconds, so retry shortly.
    */
   retrieve(requestID: string, options?: RequestOptions): APIPromise<LogRetrieveResponse> {
     return this._client.get(path`/org/logs/${requestID}`, options);
   }
 
   /**
-   * List your organization’s request logs with filters and pagination. Logs also
-   * include batch settlements and monitor runs.
+   * List your organization's API requests, newest first. Filter by time, endpoint,
+   * API key, status, error code, tags, or text. Includes batch settlements and
+   * monitor runs.
    */
   list(query: LogListParams | null | undefined = {}, options?: RequestOptions): APIPromise<LogListResponse> {
     return this._client.get('/org/logs', { query, ...options });
@@ -51,48 +50,48 @@ export namespace LogRetrieveResponse {
     credits_used: number;
 
     /**
-     * The `error_code` from the response, or null on success.
+     * The response's `error_code`. `null` on success.
      */
     error_code: string | null;
 
     /**
-     * What was sent with the request.
+     * Input retained from the request.
      */
     input: Data.Input;
 
     /**
-     * ID of the API key that made the request.
+     * ID of the API key that made the request. Can be `null` for `MONITOR` and `BATCH`
+     * entries.
      */
     key_id: string | null;
 
     /**
-     * Server-side processing time in milliseconds.
+     * Server-side processing time, in milliseconds.
      */
     latency_ms: number;
 
     /**
-     * HTTP method, or `MONITOR` / `BATCH` for monitor-run and batch-settlement
-     * entries.
+     * HTTP method, or `MONITOR` for a monitor run and `BATCH` for a batch settlement.
      */
     method: string;
 
     /**
-     * Endpoint path as called.
+     * Endpoint path that was called.
      */
     path: string;
 
     /**
-     * Request ID of the logged API call.
+     * ID of the logged request.
      */
     request_id: string;
 
     /**
-     * HTTP status code returned.
+     * HTTP status code of the response.
      */
     status_code: number;
 
     /**
-     * Request tags supplied by the caller.
+     * Tags sent with the request.
      */
     tags: Array<string>;
 
@@ -102,28 +101,29 @@ export namespace LogRetrieveResponse {
     timestamp: string;
 
     /**
-     * User-Agent header of the request.
+     * The request's `User-Agent` header.
      */
     user_agent: string | null;
 
     /**
-     * Whether the request was made under zero data retention.
+     * Whether the request used zero data retention (ZDR).
      */
     zdr: boolean;
 
     /**
-     * The retained JSON response with credentials redacted, or null when unavailable.
+     * Retained JSON response with credentials redacted. `null` when unavailable, such
+     * as under ZDR.
      */
     response?: unknown;
   }
 
   export namespace Data {
     /**
-     * What was sent with the request.
+     * Input retained from the request.
      */
     export interface Input {
       /**
-       * Query parameters as sent.
+       * Query parameters of the request.
        */
       query: { [key: string]: unknown };
 
@@ -144,7 +144,7 @@ export namespace LogRetrieveResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -152,17 +152,17 @@ export namespace LogRetrieveResponse {
 
 export interface LogListResponse {
   /**
-   * Log entries, newest first.
+   * Log entries on this page, newest first.
    */
   data: Array<LogListResponse.Data>;
 
   /**
-   * Whether a next page exists.
+   * Whether more results are available after this page.
    */
   has_more: boolean;
 
   /**
-   * Entries per page.
+   * Maximum number of log entries to return per page.
    */
   limit: number;
 
@@ -191,43 +191,43 @@ export namespace LogListResponse {
     credits_used: number;
 
     /**
-     * The `error_code` from the response, or null on success.
+     * The response's `error_code`. `null` on success.
      */
     error_code: string | null;
 
     /**
-     * ID of the API key that made the request.
+     * ID of the API key that made the request. Can be `null` for `MONITOR` and `BATCH`
+     * entries.
      */
     key_id: string | null;
 
     /**
-     * Server-side processing time in milliseconds.
+     * Server-side processing time, in milliseconds.
      */
     latency_ms: number;
 
     /**
-     * HTTP method, or `MONITOR` / `BATCH` for monitor-run and batch-settlement
-     * entries.
+     * HTTP method, or `MONITOR` for a monitor run and `BATCH` for a batch settlement.
      */
     method: string;
 
     /**
-     * Endpoint path as called.
+     * Endpoint path that was called.
      */
     path: string;
 
     /**
-     * Request ID of the logged API call.
+     * ID of the logged request.
      */
     request_id: string;
 
     /**
-     * HTTP status code returned.
+     * HTTP status code of the response.
      */
     status_code: number;
 
     /**
-     * Request tags supplied by the caller.
+     * Tags sent with the request.
      */
     tags: Array<string>;
 
@@ -237,7 +237,7 @@ export namespace LogListResponse {
     timestamp: string;
 
     /**
-     * Whether the request was made under zero data retention.
+     * Whether the request used zero data retention (ZDR).
      */
     zdr: boolean;
   }
@@ -252,7 +252,7 @@ export namespace LogListResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -265,23 +265,22 @@ export interface LogListParams {
   error_code?: string;
 
   /**
-   * Only include requests that returned a 4xx or 5xx status.
+   * Return only requests that failed with a 4xx or 5xx status.
    */
   errors_only?: boolean;
 
   /**
-   * Only include requests at or after this ISO 8601 timestamp. Defaults to 24 hours
-   * before `to`.
+   * Return requests at or after this time. Defaults to 24 hours before `to`.
    */
   from?: string;
 
   /**
-   * Filter by the API key that made the request.
+   * Filter by the ID of the API key that made the request.
    */
   key_id?: string;
 
   /**
-   * Number of log entries per page.
+   * Maximum number of log entries to return per page.
    */
   limit?: number;
 
@@ -291,13 +290,12 @@ export interface LogListParams {
   page?: number;
 
   /**
-   * Filter by endpoint path, with or without the /v1 prefix.
+   * Filter by endpoint path, with or without the `/v1` prefix.
    */
   path?: string;
 
   /**
-   * Case-insensitive substring match against the request query and body, e.g. a
-   * domain.
+   * Case-insensitive text to find in the request query or body, such as a domain.
    */
   search?: string;
 
@@ -307,13 +305,13 @@ export interface LogListParams {
   status_code?: number;
 
   /**
-   * Comma-separated request tags. Matches requests carrying any of them. Up to 20
-   * tags, each 1-50 characters.
+   * Comma-separated tags. Returns log entries that have any of them. Up to 20 tags
+   * of 1 to 50 characters each.
    */
   tags?: string;
 
   /**
-   * Only include requests at or before this ISO 8601 timestamp. Defaults to now.
+   * Return requests at or before this time. Defaults to now.
    */
   to?: string;
 }

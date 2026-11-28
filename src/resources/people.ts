@@ -4,10 +4,15 @@ import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
+/**
+ * Enrich a person from identity clues, or find people with a natural-language query.
+ */
 export class People extends APIResource {
   /**
-   * Find a person from identity clues and return their profile with a match score.
-   * Available on all plans; free or disposable email addresses return 422.
+   * Match a person from a work email, a profile URL, or a name with company,
+   * education, or location context, and get their profile with an identity-match
+   * score from 0 to 100. The best candidate is returned even when the match is weak,
+   * so set a score threshold for your workflow. `not_found` results are free.
    *
    * @example
    * ```ts
@@ -28,7 +33,10 @@ export class People extends APIResource {
   }
 
   /**
-   * Find people with a natural-language query.
+   * Find people from a plain-language description, such as
+   * `VPs of sales at solar companies in California`. Each result includes the
+   * current role and employer, location, years of experience, skills, schools, and
+   * public profile URLs. Pages with no matches are free.
    *
    * @example
    * ```ts
@@ -44,7 +52,7 @@ export class People extends APIResource {
 
 export interface PersonEnrichResponse {
   /**
-   * The highest-scoring person candidate.
+   * The best-matching person, with an identity-match score.
    */
   match:
     | PersonEnrichResponse.PersonEnrichmentCandidateMatch
@@ -62,217 +70,465 @@ export interface PersonEnrichResponse {
   key_metadata?: PersonEnrichResponse.KeyMetadata;
 
   /**
-   * True when the timeout ended processing and this response contains the usable
-   * data completed so far. Unfinished fields are omitted.
+   * `true` when the `timeoutOpts` deadline ended processing early. The response
+   * holds the data completed so far; unfinished fields are omitted.
    */
   partial?: boolean;
 }
 
 export namespace PersonEnrichResponse {
   /**
-   * The highest-scoring person candidate.
+   * The best-matching person, with an identity-match score.
    */
   export interface PersonEnrichmentCandidateMatch {
+    /**
+     * Profile of the matched person.
+     */
     person: PersonEnrichmentCandidateMatch.Person;
 
+    /**
+     * Identity-match score from 0 to 100. Higher is a stronger match; weak candidates
+     * are still returned.
+     */
     score: number;
 
+    /**
+     * Always `candidate` for a match.
+     */
     status: 'candidate';
   }
 
   export namespace PersonEnrichmentCandidateMatch {
+    /**
+     * Profile of the matched person.
+     */
     export interface Person {
       /**
-       * Whether the person's current role is known. `present` — current_role is
-       * populated. `none` — the work history explicitly shows every role has ended.
-       * `unknown` — our data sources could not confirm either way; treat a missing
-       * current_role as unverified rather than vacant.
+       * Whether the person's current role is known. `present` means `current_role` is
+       * filled in; `none` means the work history shows every role has ended; `unknown`
+       * means it could not be confirmed either way, so treat a missing `current_role` as
+       * unverified, not vacant.
        */
       current_role_status: 'present' | 'none' | 'unknown';
 
+      /**
+       * Education history.
+       */
       education: Array<Person.Education>;
 
+      /**
+       * Work history. Each entry has the same fields as `current_role`.
+       */
       experience: Array<Person.Experience>;
 
+      /**
+       * Professional skills.
+       */
       skills: Array<string>;
 
+      /**
+       * Public profile URLs for the person.
+       */
       social_urls: Array<string>;
 
+      /**
+       * Other websites associated with the person.
+       */
       website_urls: Array<string>;
 
+      /**
+       * URL of the hosted profile picture. Omitted with zero data retention.
+       */
       avatar_url?: string;
 
+      /**
+       * Short bio from the person's profile.
+       */
       bio?: string;
 
       /**
-       * When we last refreshed this profile from our data sources (ISO 8601).
+       * When Context.dev last refreshed the profile from its sources, as an ISO 8601
+       * timestamp.
        */
       checked_at?: string;
 
+      /**
+       * The person's current job. See `current_role_status` when it is missing.
+       */
       current_role?: Person.CurrentRole;
 
+      /**
+       * Email address of the person.
+       */
       email?: string;
 
       /**
-       * When the underlying profile data last changed in our data sources (ISO 8601).
+       * When the profile data last changed at its sources, as an ISO 8601 timestamp.
        * Omitted when unknown.
        */
       last_updated?: string;
 
+      /**
+       * Where the person is based.
+       */
       location?: Person.Location;
 
+      /**
+       * Name of the person.
+       */
       name?: Person.Name;
     }
 
     export namespace Person {
       export interface Education {
+        /**
+         * School or university.
+         */
         institution: Education.Institution;
 
+        /**
+         * Degree or qualification.
+         */
         degree?: string;
 
+        /**
+         * Description of the studies.
+         */
         description?: string;
 
+        /**
+         * When the studies ended.
+         */
         end_date?: Education.EndDate;
 
+        /**
+         * Subject or major studied.
+         */
         field_of_study?: string;
 
+        /**
+         * When the studies started.
+         */
         start_date?: Education.StartDate;
       }
 
       export namespace Education {
+        /**
+         * School or university.
+         */
         export interface Institution {
+          /**
+           * Name of the organization.
+           */
           name: string;
 
+          /**
+           * Website domain of the organization. Omitted when unknown.
+           */
           domain?: string;
         }
 
+        /**
+         * When the studies ended.
+         */
         export interface EndDate {
+          /**
+           * Four-digit year.
+           */
           year: number;
 
+          /**
+           * Day of the month. Omitted when unknown.
+           */
           day?: number;
 
+          /**
+           * Month. Omitted when unknown.
+           */
           month?: number;
         }
 
+        /**
+         * When the studies started.
+         */
         export interface StartDate {
+          /**
+           * Four-digit year.
+           */
           year: number;
 
+          /**
+           * Day of the month. Omitted when unknown.
+           */
           day?: number;
 
+          /**
+           * Month. Omitted when unknown.
+           */
           month?: number;
         }
       }
 
       export interface Experience {
+        /**
+         * Employer for this role.
+         */
         organization: Experience.Organization;
 
+        /**
+         * Job title.
+         */
         title: string;
 
+        /**
+         * Description of the role.
+         */
         description?: string;
 
+        /**
+         * When the role ended.
+         */
         end_date?: Experience.EndDate;
 
+        /**
+         * Whether the person still holds this role.
+         */
         is_current?: boolean;
 
+        /**
+         * Where the role is based.
+         */
         location?: string;
 
+        /**
+         * When the role started.
+         */
         start_date?: Experience.StartDate;
       }
 
       export namespace Experience {
+        /**
+         * Employer for this role.
+         */
         export interface Organization {
+          /**
+           * Name of the organization.
+           */
           name: string;
 
+          /**
+           * Website domain of the organization. Omitted when unknown.
+           */
           domain?: string;
         }
 
+        /**
+         * When the role ended.
+         */
         export interface EndDate {
+          /**
+           * Four-digit year.
+           */
           year: number;
 
+          /**
+           * Day of the month. Omitted when unknown.
+           */
           day?: number;
 
+          /**
+           * Month. Omitted when unknown.
+           */
           month?: number;
         }
 
+        /**
+         * When the role started.
+         */
         export interface StartDate {
+          /**
+           * Four-digit year.
+           */
           year: number;
 
+          /**
+           * Day of the month. Omitted when unknown.
+           */
           day?: number;
 
+          /**
+           * Month. Omitted when unknown.
+           */
           month?: number;
         }
       }
 
+      /**
+       * The person's current job. See `current_role_status` when it is missing.
+       */
       export interface CurrentRole {
+        /**
+         * Employer for this role.
+         */
         organization: CurrentRole.Organization;
 
+        /**
+         * Job title.
+         */
         title: string;
 
+        /**
+         * Description of the role.
+         */
         description?: string;
 
+        /**
+         * When the role ended.
+         */
         end_date?: CurrentRole.EndDate;
 
+        /**
+         * Whether the person still holds this role.
+         */
         is_current?: boolean;
 
+        /**
+         * Where the role is based.
+         */
         location?: string;
 
+        /**
+         * When the role started.
+         */
         start_date?: CurrentRole.StartDate;
       }
 
       export namespace CurrentRole {
+        /**
+         * Employer for this role.
+         */
         export interface Organization {
+          /**
+           * Name of the organization.
+           */
           name: string;
 
+          /**
+           * Website domain of the organization. Omitted when unknown.
+           */
           domain?: string;
         }
 
+        /**
+         * When the role ended.
+         */
         export interface EndDate {
+          /**
+           * Four-digit year.
+           */
           year: number;
 
+          /**
+           * Day of the month. Omitted when unknown.
+           */
           day?: number;
 
+          /**
+           * Month. Omitted when unknown.
+           */
           month?: number;
         }
 
+        /**
+         * When the role started.
+         */
         export interface StartDate {
+          /**
+           * Four-digit year.
+           */
           year: number;
 
+          /**
+           * Day of the month. Omitted when unknown.
+           */
           day?: number;
 
+          /**
+           * Month. Omitted when unknown.
+           */
           month?: number;
         }
       }
 
+      /**
+       * Where the person is based.
+       */
       export interface Location {
+        /**
+         * City.
+         */
         city?: string;
 
+        /**
+         * Country name.
+         */
         country?: string;
 
+        /**
+         * ISO 3166-1 alpha-2 country code.
+         */
         country_code?: string;
 
+        /**
+         * Location as a single display string.
+         */
         display?: string;
 
+        /**
+         * State, province, or region.
+         */
         region?: string;
       }
 
+      /**
+       * Name of the person.
+       */
       export interface Name {
+        /**
+         * First or given name.
+         */
         first?: string;
 
+        /**
+         * Full name.
+         */
         full?: string;
 
+        /**
+         * Last or family name.
+         */
         last?: string;
       }
     }
   }
 
   /**
-   * No usable person candidate was found.
+   * No usable candidate was found.
    */
   export interface PersonEnrichmentNotFoundMatch {
+    /**
+     * Always `null`.
+     */
     person: null;
 
+    /**
+     * Always `null`.
+     */
     score: null;
 
+    /**
+     * Always `not_found` when no candidate exists.
+     */
     status: 'not_found';
   }
 
@@ -286,7 +542,7 @@ export namespace PersonEnrichResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -310,14 +566,14 @@ export interface PersonSearchResponse {
   key_metadata?: PersonSearchResponse.KeyMetadata;
 
   /**
-   * Pass as cursor to fetch the next page; null when there are no more results.
+   * Pass as `cursor` to fetch the next page. `null` on the last page.
    */
   next_cursor?: string | null;
 }
 
 export namespace PersonSearchResponse {
   /**
-   * A person matching your search; unavailable details are null or empty lists.
+   * A person who matches your search. Unknown details are `null` or empty lists.
    */
   export interface Result {
     /**
@@ -326,7 +582,7 @@ export namespace PersonSearchResponse {
     description: string | null;
 
     /**
-     * Whether the person is currently a founder or co-founder.
+     * Whether the person is currently a founder or co-founder. `null` when unknown.
      */
     is_founder: boolean | null;
 
@@ -341,12 +597,13 @@ export namespace PersonSearchResponse {
     name: string | null;
 
     /**
-     * Public professional profile URLs.
+     * Public professional profile URLs. Send one to `POST /people/enrich` as
+     * `social_urls` for the full profile.
      */
     profiles: Array<string>;
 
     /**
-     * The person’s current role.
+     * The person's current role.
      */
     role: Result.Role;
 
@@ -361,12 +618,12 @@ export namespace PersonSearchResponse {
     skills: Array<string>;
 
     /**
-     * Years of professional experience.
+     * Years of professional experience. `null` when unknown.
      */
     years_of_experience: number | null;
 
     /**
-     * How well the person matches the query. Only returned in `ultra` mode.
+     * How well the person matches the query. Returned only in `ultra` mode.
      */
     match?: Result.Match;
   }
@@ -382,7 +639,7 @@ export namespace PersonSearchResponse {
       city: string | null;
 
       /**
-       * Country as a two-letter code, such as US or GB.
+       * ISO 3166-1 alpha-2 country code, such as `US`.
        */
       country_code: string | null;
 
@@ -393,26 +650,26 @@ export namespace PersonSearchResponse {
     }
 
     /**
-     * The person’s current role.
+     * The person's current role.
      */
     export interface Role {
       /**
-       * Current employer, when known.
+       * Current employer. `null` when unknown.
        */
       company: Role.Company | null;
 
       /**
-       * Areas of responsibility.
+       * Areas of responsibility, such as `sales`.
        */
       functions: Array<string>;
 
       /**
-       * Seniority level.
+       * Seniority level, such as `executive`.
        */
       seniority: string | null;
 
       /**
-       * Role start date (YYYY-MM-DD).
+       * When the role started, as `YYYY-MM-DD`.
        */
       started_on: string | null;
 
@@ -424,11 +681,11 @@ export namespace PersonSearchResponse {
 
     export namespace Role {
       /**
-       * Current employer, when known.
+       * Current employer. `null` when unknown.
        */
       export interface Company {
         /**
-         * The company’s website domain.
+         * Website domain of the company.
          */
         domain: string | null;
 
@@ -440,7 +697,7 @@ export namespace PersonSearchResponse {
     }
 
     /**
-     * How well the person matches the query. Only returned in `ultra` mode.
+     * How well the person matches the query. Returned only in `ultra` mode.
      */
     export interface Match {
       /**
@@ -460,7 +717,7 @@ export namespace PersonSearchResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -468,7 +725,7 @@ export namespace PersonSearchResponse {
 
 export interface PersonEnrichParams {
   /**
-   * Company context to help identify the person. Provide a name or domain.
+   * Company associated with the person. Send a `name`, a `domain`, or both.
    */
   company?: PersonEnrichParams.Company;
 
@@ -478,30 +735,32 @@ export interface PersonEnrichParams {
   education?: Array<PersonEnrichParams.Education>;
 
   /**
-   * Email address of the person to find.
+   * Work email address of the person. Free and disposable email providers
+   * return 422.
    */
   email?: string;
 
   /**
-   * Location context to help identify the person. Provide a city, region, or
-   * country.
+   * Location associated with the person. Send at least one of `city`, `region`, or
+   * `country`.
    */
   location?: PersonEnrichParams.Location;
 
   /**
-   * Person name. Without an email or person-profile URL, provide both first and last
-   * name plus company, education, or location.
+   * Name of the person. Without an email or profile URL, send both `first` and
+   * `last` plus `company`, `education`, or `location`.
    */
   name?: PersonEnrichParams.Name;
 
   /**
-   * Public profile URLs for the person. A person-profile URL can identify the person
-   * without a name.
+   * Public profile URLs for the person. A person-profile URL is enough to identify
+   * them without a name.
    */
   social_urls?: Array<string>;
 
   /**
-   * Labels for filtering usage in the dashboard.
+   * Labels for this request. Filter usage and request logs by them in the dashboard
+   * or with `GET /org/logs`.
    */
   tags?: Array<string>;
 
@@ -519,7 +778,7 @@ export interface PersonEnrichParams {
 
 export namespace PersonEnrichParams {
   /**
-   * Company context to help identify the person. Provide a name or domain.
+   * Company associated with the person. Send a `name`, a `domain`, or both.
    */
   export interface Company {
     /**
@@ -573,8 +832,8 @@ export namespace PersonEnrichParams {
   }
 
   /**
-   * Location context to help identify the person. Provide a city, region, or
-   * country.
+   * Location associated with the person. Send at least one of `city`, `region`, or
+   * `country`.
    */
   export interface Location {
     /**
@@ -594,8 +853,8 @@ export namespace PersonEnrichParams {
   }
 
   /**
-   * Person name. Without an email or person-profile URL, provide both first and last
-   * name plus company, education, or location.
+   * Name of the person. Without an email or profile URL, send both `first` and
+   * `last` plus `company`, `education`, or `location`.
    */
   export interface Name {
     /**
@@ -619,8 +878,8 @@ export namespace PersonEnrichParams {
     milliseconds: number;
 
     /**
-     * "fail" returns 408 at the deadline. "return-partial" returns available results;
-     * inspect the response’s partial flag.
+     * `fail` returns 408 at the deadline. `return-partial` returns the results
+     * collected so far and marks the response as partial.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -628,31 +887,33 @@ export namespace PersonEnrichParams {
 
 export interface PersonSearchParams {
   /**
-   * Describe the people to find. Up to 500 characters in `fast` mode and 5000 in
-   * `ultra` mode.
+   * Plain-language description of the people to find. Up to 500 characters in `fast`
+   * mode and 5000 in `ultra` mode.
    */
   query: string;
 
   /**
-   * Use next_cursor with the same query, mode and filters to fetch the next page.
+   * Cursor from the previous page's `next_cursor`. Omit for the first page. Send the
+   * same `query`, `mode`, and `filters` with it.
    */
   cursor?: string;
 
   /**
-   * Additional constraints every result must match.
+   * Constraints every result must match, in addition to `query`.
    */
   filters?: PersonSearchParams.Filters;
 
   /**
-   * `fast` matches people on basic criteria (e.g. their role, location or
-   * background); `ultra` plans a deeper search, judges each candidate against every
-   * criterion in the query. Complex `ultra` searches can take up to 30 seconds to
-   * complete, so allow for that in your client timeout.
+   * `fast` matches people on basic criteria such as role, location, or background;
+   * `ultra` runs a deeper search, checks every candidate against each criterion in
+   * your query, and adds a `match` score. Complex `ultra` searches can take up to 30
+   * seconds, so set your client timeout to match.
    */
   mode?: 'fast' | 'ultra';
 
   /**
-   * Labels for filtering usage in the dashboard.
+   * Labels for this request. Filter usage and request logs by them in the dashboard
+   * or with `GET /org/logs`.
    */
   tags?: Array<string>;
 
@@ -665,11 +926,12 @@ export interface PersonSearchParams {
 
 export namespace PersonSearchParams {
   /**
-   * Additional constraints every result must match.
+   * Constraints every result must match, in addition to `query`.
    */
   export interface Filters {
     /**
-     * Countries people live in as two-letter codes, such as US or GB.
+     * Only return people who live in these countries, as ISO 3166-1 alpha-2 codes such
+     * as `US`.
      */
     countries?: Array<string>;
 

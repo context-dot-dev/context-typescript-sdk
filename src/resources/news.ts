@@ -5,13 +5,14 @@ import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
 /**
- * Search live and historical news about a company.
+ * Search live and historical news by company or with a natural-language query.
  */
 export class News extends APIResource {
   /**
    * Find news about a company by name, domain, ticker, or ISIN, or search all news
-   * with a natural-language query. Filter articles and continue through results with
-   * a cursor.
+   * with a natural-language query. Each article includes its publisher, type of
+   * coverage, and, for company searches, whether the company is the main subject.
+   * Narrow results by publisher, country, language, article type, or publish date.
    *
    * @example
    * ```ts
@@ -30,23 +31,22 @@ export class News extends APIResource {
 
 export interface NewsSearchResponse {
   /**
-   * Articles matching the search, in the requested order.
+   * Articles on this page, in the requested order.
    */
   data: Array<NewsSearchResponse.Data>;
 
   /**
-   * True when more results are available beyond this page.
+   * Whether more results are available after this page.
    */
   has_more: boolean;
 
   /**
-   * Summary information about this response.
+   * Summary of this page.
    */
   meta: NewsSearchResponse.Meta;
 
   /**
-   * Pass as cursor in the next request to fetch the following page. Null when there
-   * are no more results.
+   * Pass as `cursor` to fetch the next page. `null` on the last page.
    */
   next_cursor: string | null;
 
@@ -65,102 +65,102 @@ export interface NewsSearchResponse {
 export namespace NewsSearchResponse {
   export interface Data {
     /**
-     * Stable unique identifier for this article. Use it to deduplicate or reference an
-     * article across requests.
+     * Unique ID of the article. It stays the same across requests, so you can use it
+     * to deduplicate.
      */
     id: string;
 
     /**
-     * Bylined authors. Empty when no byline is available.
+     * Authors named in the byline. Empty when there is no byline.
      */
     authors: Array<string>;
 
     /**
-     * Article summary or excerpt. Natural-language search descriptions include
-     * matching passages and are capped at 2,000 characters.
+     * Summary or excerpt of the article. For natural-language searches, it includes
+     * the matching passages, up to 2,000 characters.
      */
     description: string | null;
 
     /**
-     * Lead image for the article, when one is available.
+     * URL of the article's lead image. `null` when there is none.
      */
     image_url: string | null;
 
     /**
-     * Language the article is written in, as a lowercase ISO 639-1 code such as en.
-     * Null when unknown.
+     * Language of the article, as an ISO 639-1 code such as `en`. `null` when unknown.
      */
     language: string | null;
 
     /**
-     * How the article relates to the company you searched for. Null for
+     * How the article relates to the company you searched for. `null` for
      * natural-language searches.
      */
     match: Data.Match | null;
 
     /**
-     * When the article was published, as an ISO 8601 timestamp. Null when the
-     * publisher does not state a reliable date.
+     * When the article was published. `null` when the publisher does not give a
+     * reliable date.
      */
     published_at: string | null;
 
     /**
-     * The publication that published the article.
+     * Publication that published the article.
      */
     source: Data.Source;
 
     /**
-     * Shared by articles covering the same story on the same day. Use it to group or
-     * collapse syndicated copies of one announcement across outlets.
+     * ID shared by articles that cover the same story on the same day. Use it to group
+     * syndicated copies of one announcement across outlets.
      */
     story_id: string;
 
     /**
-     * Article headline.
+     * Headline of the article.
      */
     title: string;
 
     /**
-     * Kind of coverage. Use it to separate independent reporting (editorial) from
-     * company-issued content (press_release, regulatory_filing, advisory).
+     * Type of coverage. Use it to separate independent reporting (`editorial`) from
+     * company-issued content (`press_release`, `regulatory_filing`, `advisory`).
      */
     type: 'editorial' | 'press_release' | 'regulatory_filing' | 'advisory';
 
     /**
-     * Link to the article on the publisher site.
+     * URL of the article on the publisher's site.
      */
     url: string;
   }
 
   export namespace Data {
     /**
-     * How the article relates to the company you searched for. Null for
+     * How the article relates to the company you searched for. `null` for
      * natural-language searches.
      */
     export interface Match {
       /**
-       * How confident the match is, from 0 to 1. Null when a score is unavailable.
+       * Confidence in the match, from 0 to 1. `null` when no score is available.
        */
       confidence: number | null;
 
       /**
-       * primary when the article is mainly about the company, secondary when the company
-       * is mentioned but is not the main subject.
+       * `primary` when the article is mainly about the company; `secondary` when the
+       * company is mentioned but is not the main subject.
        */
       level: 'primary' | 'secondary';
     }
 
     /**
-     * The publication that published the article.
+     * Publication that published the article.
      */
     export interface Source {
       /**
-       * True when Context observed this article in the publisher-owned feed.
+       * Whether the article came directly from the publisher's own feed rather than
+       * through an aggregator.
        */
       direct: boolean;
 
       /**
-       * Website domain of the publication.
+       * Website domain of the publication, such as `reuters.com`.
        */
       domain: string;
 
@@ -172,11 +172,11 @@ export namespace NewsSearchResponse {
   }
 
   /**
-   * Summary information about this response.
+   * Summary of this page.
    */
   export interface Meta {
     /**
-     * Number of articles in this page.
+     * Number of articles on this page.
      */
     count: number;
   }
@@ -191,7 +191,7 @@ export namespace NewsSearchResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -199,43 +199,43 @@ export namespace NewsSearchResponse {
 
 export interface NewsSearchParams {
   /**
-   * What to search for: a specific company, or a natural-language query across all
-   * news.
+   * What to search for: news about a specific company, or a natural-language query
+   * across all news.
    */
   searchBy: NewsSearchParams.NewsSearchByNaturalLanguage | NewsSearchParams.NewsSearchByEntity;
 
   /**
-   * Opaque next_cursor from the previous response, or null for the first page.
+   * Cursor from the previous page's `next_cursor`. Omit for the first page.
    */
   cursor?: string | null;
 
   /**
-   * Optional result filters. Use at most one of sourceDomain, sourceCountry,
-   * articleLanguage, or articleType. A date range may accompany that category;
-   * date.from must not exceed date.to.
+   * Filters for the results. Use at most one of `sourceDomain`, `sourceCountry`,
+   * `articleLanguage`, or `articleType`, optionally combined with `date`.
    */
   filterBy?: NewsSearchParams.FilterBy;
 
   /**
-   * Maximum results to return. Defaults to 10.
+   * Maximum number of articles to return per page.
    */
   limit?: number;
 
   /**
-   * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-   * access policies are enabled for your organization; otherwise the request fails
-   * with `ACCESS_POLICIES_NOT_ENABLED`.
+   * Access policy IDs to apply; each URL must pass all of them. Requires access
+   * policies enabled for your organization; otherwise returns
+   * `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
   /**
-   * Result ordering. Defaults to newest for entity searches. Natural-language
-   * searches are always ordered by relevance.
+   * How to order results. Company searches default to `newest`; natural-language
+   * searches always use `relevance`.
    */
   sortBy?: NewsSearchParams.SortBy;
 
   /**
-   * Labels for filtering usage in the dashboard.
+   * Labels for this request. Filter usage and request logs by them in the dashboard
+   * or with `GET /org/logs`.
    */
   tags?: Array<string>;
 }
@@ -247,13 +247,13 @@ export namespace NewsSearchParams {
    */
   export interface NewsSearchByNaturalLanguage {
     /**
-     * What to search for, in plain language, such as "chip export restrictions to
-     * China".
+     * What to search for, in plain language, such as
+     * `chip export restrictions to China`.
      */
     query: string;
 
     /**
-     * Use `natural_language` to search all news with a plain-language query.
+     * Set to `natural_language` to search all news with a plain-language query.
      */
     type: 'natural_language';
   }
@@ -272,7 +272,7 @@ export namespace NewsSearchParams {
       | NewsSearchByEntity.NewsSearchEntityByIsin;
 
     /**
-     * Use `entity` to find news about a specific company.
+     * Set to `entity` to find news about a specific company.
      */
     type: 'entity';
   }
@@ -283,12 +283,12 @@ export namespace NewsSearchParams {
      */
     export interface NewsSearchEntityByName {
       /**
-       * Company name.
+       * Company name, such as `Stripe`.
        */
       name: string;
 
       /**
-       * Use `name` to identify the company by name.
+       * Set to `name` to identify the company by name.
        */
       type: 'name';
     }
@@ -298,33 +298,33 @@ export namespace NewsSearchParams {
      */
     export interface NewsSearchEntityByDomain {
       /**
-       * Company website domain, such as apple.com.
+       * Company website domain, such as `apple.com`.
        */
       domain: string;
 
       /**
-       * Use `domain` to identify the company by website domain.
+       * Set to `domain` to identify the company by website domain.
        */
       type: 'domain';
     }
 
     /**
-     * Identify the company by stock ticker, optionally scoped to an exchange.
+     * Identify the company by stock ticker, optionally on a specific exchange.
      */
     export interface NewsSearchEntityByTicker {
       /**
-       * Public-company ticker.
+       * Stock ticker symbol, such as `AAPL`.
        */
       ticker: string;
 
       /**
-       * Use `ticker` to identify a publicly traded company.
+       * Set to `ticker` to identify a publicly traded company.
        */
       type: 'ticker';
 
       /**
-       * Stock exchange the ticker trades on, used to disambiguate tickers listed on
-       * multiple exchanges.
+       * Exchange the ticker trades on. Use it when the same ticker is listed on more
+       * than one exchange.
        */
       exchange?:
         | 'AMEX'
@@ -402,29 +402,29 @@ export namespace NewsSearchParams {
     }
 
     /**
-     * Identify the company by International Securities Identification Number.
+     * Identify the company by International Securities Identification Number (ISIN).
      */
     export interface NewsSearchEntityByIsin {
       /**
-       * International Securities Identification Number.
+       * International Securities Identification Number, such as `US0378331005`.
        */
       isin: string;
 
       /**
-       * Use `isin` to identify the company by its securities identifier.
+       * Set to `isin` to identify the company by its International Securities
+       * Identification Number.
        */
       type: 'isin';
     }
   }
 
   /**
-   * Optional result filters. Use at most one of sourceDomain, sourceCountry,
-   * articleLanguage, or articleType. A date range may accompany that category;
-   * date.from must not exceed date.to.
+   * Filters for the results. Use at most one of `sourceDomain`, `sourceCountry`,
+   * `articleLanguage`, or `articleType`, optionally combined with `date`.
    */
   export interface FilterBy {
     /**
-     * Article languages to include. Up to 3.
+     * Only return articles in these languages, as ISO 639 codes such as `en`.
      */
     articleLanguage?: Array<
       | 'am'
@@ -504,17 +504,18 @@ export namespace NewsSearchParams {
     >;
 
     /**
-     * Article types to include. Up to 3.
+     * Only return these types of coverage, such as `press_release`.
      */
     articleType?: Array<'editorial' | 'press_release' | 'regulatory_filing' | 'advisory'>;
 
     /**
-     * Published-at window in epoch milliseconds. from must be before or equal to to.
+     * Publish date range, in epoch milliseconds. `from` must not be later than `to`.
      */
     date?: FilterBy.Date;
 
     /**
-     * Publisher countries to include, as lowercase ISO 3166-1 alpha-2 codes. Up to 3.
+     * Only return articles from publishers in these countries, as ISO 3166-1 alpha-2
+     * codes such as `us`.
      */
     sourceCountry?: Array<
       | 'ae'
@@ -547,35 +548,36 @@ export namespace NewsSearchParams {
     >;
 
     /**
-     * Publisher domains to include. Up to 3.
+     * Only return articles from these publisher domains, such as `reuters.com`.
      */
     sourceDomain?: Array<string>;
   }
 
   export namespace FilterBy {
     /**
-     * Published-at window in epoch milliseconds. from must be before or equal to to.
+     * Publish date range, in epoch milliseconds. `from` must not be later than `to`.
      */
     export interface Date {
       /**
-       * Inclusive start of the published-at window, in epoch milliseconds.
+       * Inclusive start of the publish date range, in epoch milliseconds.
        */
       from?: number;
 
       /**
-       * Inclusive end of the published-at window, in epoch milliseconds.
+       * Inclusive end of the publish date range, in epoch milliseconds.
        */
       to?: number;
     }
   }
 
   /**
-   * Result ordering. Defaults to newest for entity searches. Natural-language
-   * searches are always ordered by relevance.
+   * How to order results. Company searches default to `newest`; natural-language
+   * searches always use `relevance`.
    */
   export interface SortBy {
     /**
-     * Result ordering.
+     * `newest` puts the most recently published articles first; `relevance` puts the
+     * closest matches first.
      */
     type: 'relevance' | 'newest';
   }

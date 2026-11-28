@@ -5,12 +5,13 @@ import { APIPromise } from '../../core/api-promise';
 import { RequestOptions } from '../../internal/request-options';
 
 /**
- * See the authenticated browser profiles your organization created.
+ * List the authenticated browser profiles your organization created.
  */
 export class Profiles extends APIResource {
   /**
-   * List the browser profiles your organization created with `/web/scrape`, newest
-   * first.
+   * List the browser profiles your organization saved through `POST /web/scrape`,
+   * newest first. Pass a profile `id` as `sharedParams.profile.profileId` to scrape
+   * as that signed-in user.
    */
   list(
     query: ProfileListParams | null | undefined = {},
@@ -22,17 +23,17 @@ export class Profiles extends APIResource {
 
 export interface ProfileListResponse {
   /**
-   * Browser profiles, newest first.
+   * Browser profiles on this page, newest first.
    */
   data: Array<ProfileListResponse.Data>;
 
   /**
-   * Whether a next page exists.
+   * Whether more results are available after this page.
    */
   has_more: boolean;
 
   /**
-   * Pass as `cursor` to fetch the next page.
+   * Pass as `cursor` to fetch the next page. `null` on the last page.
    */
   next_cursor: string | null;
 
@@ -51,17 +52,18 @@ export interface ProfileListResponse {
 export namespace ProfileListResponse {
   export interface Data {
     /**
-     * Profile ID to pass as `sharedParams.profile.profileId` on `/web/scrape`.
+     * Unique ID of the browser profile. Pass it as `sharedParams.profile.profileId` on
+     * `POST /web/scrape`.
      */
     id: string;
 
     /**
-     * When the profile was created.
+     * When the browser profile was created.
      */
     created_at: string;
 
     /**
-     * The description supplied when the profile was created, or null.
+     * Label set when the profile was created. `null` when none was set.
      */
     description: string | null;
   }
@@ -76,7 +78,7 @@ export namespace ProfileListResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -84,12 +86,12 @@ export namespace ProfileListResponse {
 
 export interface ProfileListParams {
   /**
-   * The `next_cursor` from the previous page.
+   * Cursor from the previous page's `next_cursor`. Omit for the first page.
    */
   cursor?: string;
 
   /**
-   * Number of profiles per page.
+   * Maximum number of profiles to return per page.
    */
   limit?: number;
 }

@@ -12,7 +12,7 @@ import { path } from '../../internal/utils/path';
  */
 export class Deliveries extends APIResource {
   /**
-   * Retrieve a webhook delivery’s status and original payload.
+   * Retrieve a webhook delivery's status, retry settings, and most recent attempt.
    *
    * @example
    * ```ts
@@ -30,7 +30,8 @@ export class Deliveries extends APIResource {
   }
 
   /**
-   * List batch and monitor webhook deliveries from the last 30 days.
+   * List webhook deliveries for your batches or monitors from the last 30 days,
+   * newest first. Filter by source, status, or creation time.
    *
    * @example
    * ```ts
@@ -46,7 +47,7 @@ export class Deliveries extends APIResource {
   }
 
   /**
-   * List a delivery’s attempts, newest first.
+   * List a webhook delivery's attempts, newest first.
    *
    * @example
    * ```ts
@@ -65,8 +66,8 @@ export class Deliveries extends APIResource {
   }
 
   /**
-   * Resend the original payload using the source’s current URL and secret. Available
-   * for 7 days after the event.
+   * Resend a delivery's original payload to the source's current webhook URL, signed
+   * with its current secret. Available for 7 days after the event.
    *
    * @example
    * ```ts
@@ -99,48 +100,50 @@ export interface Attempt {
   attempt: number;
 
   /**
-   * Completion time, or null while in progress.
+   * When the attempt finished. `null` while in progress.
    */
   completed_at: string | null;
 
   /**
-   * Attempt error, or null if none.
+   * Why the attempt failed. `null` when it did not fail.
    */
   error: Attempt.Error | null;
 
   /**
-   * HTTP response status, or null if no response was received.
+   * HTTP status your endpoint returned. `null` when no response was received.
    */
   http_status: number | null;
 
   /**
-   * Attempt start time.
+   * When the attempt started.
    */
   started_at: string;
 
   /**
-   * `initial`, `automatic` (scheduled retry), or `manual` (Retry endpoint).
+   * What started the attempt: `initial` is the first send, `automatic` is a
+   * scheduled retry, and `manual` came from
+   * `POST /webhooks/deliveries/{delivery_id}/retry`.
    */
   trigger: 'initial' | 'automatic' | 'manual';
 
   /**
-   * URL used for this attempt.
+   * URL this attempt was sent to.
    */
   url: string;
 }
 
 export namespace Attempt {
   /**
-   * Attempt error, or null if none.
+   * Why the attempt failed. `null` when it did not fail.
    */
   export interface Error {
     /**
-     * Error code.
+     * Machine-readable error code.
      */
     code: string;
 
     /**
-     * Error details.
+     * Human-readable explanation of the error.
      */
     message: string;
   }
@@ -148,52 +151,53 @@ export namespace Attempt {
 
 export interface Delivery {
   /**
-   * Delivery ID.
+   * Unique ID of the delivery.
    */
   id: string;
 
   /**
-   * Event creation time.
+   * When the event was created.
    */
   created_at: string;
 
   /**
-   * Last successful delivery time, or null if never delivered.
+   * When the delivery last succeeded. `null` until it succeeds.
    */
   delivered_at: string | null;
 
   /**
-   * Webhook event type.
+   * Event that triggered the delivery.
    */
   event: 'batch.completed' | 'batch.failed' | 'batch.cancelled' | 'change.detected' | 'run.completed';
 
   /**
-   * Stable event ID for deduplicating received webhooks.
+   * Event ID, sent as `X-Context-Id` and as `id` in the payload. It stays the same
+   * across retries, so use it to deduplicate.
    */
   event_id: string;
 
   /**
-   * Latest attempt, or null if none.
+   * Most recent attempt. `null` before the first attempt.
    */
   last_attempt: Attempt | null;
 
   /**
-   * Latest delivery error, or null if none.
+   * Most recent delivery error. `null` when there is none.
    */
   last_error: Delivery.LastError | null;
 
   /**
-   * Next scheduled attempt, or null if none.
+   * When the next attempt is scheduled. `null` when none is scheduled.
    */
   next_attempt_at: string | null;
 
   /**
-   * Webhook retry settings. Use {} for the default schedule.
+   * Automatic retry settings. Pass `{}` for the default schedule.
    */
   retry: WebhooksAPI.RetryConfig;
 
   /**
-   * Last time you can retry manually (7 days after the event).
+   * Last time you can retry the delivery manually, 7 days after the event.
    */
   retry_expires_at: string;
 
@@ -203,58 +207,60 @@ export interface Delivery {
   source: Delivery.Batch | Delivery.Monitor;
 
   /**
-   * `pending`, `delivering`, `retrying`, `delivered`, `failed`, or `cancelled`
-   * (source or its webhook was removed).
+   * Delivery state. `pending` is waiting for an attempt, `delivering` has an attempt
+   * in progress, `retrying` is waiting for an automatic retry, `delivered` was
+   * acknowledged with a 2xx, `failed` has no automatic retries left, and `cancelled`
+   * means the source or its webhook was removed.
    */
   status: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
 
   /**
-   * Webhook destination URL.
+   * URL the webhook is sent to.
    */
   url: string;
 }
 
 export namespace Delivery {
   /**
-   * Latest delivery error, or null if none.
+   * Most recent delivery error. `null` when there is none.
    */
   export interface LastError {
     /**
-     * Error code.
+     * Machine-readable error code.
      */
     code: string;
 
     /**
-     * Error details.
+     * Human-readable explanation of the error.
      */
     message: string;
   }
 
   export interface Batch {
     /**
-     * Batch ID.
+     * ID of the batch.
      */
     batch_id: string;
 
     /**
-     * Which deliveries to list: `batch` or `monitor`.
+     * The event came from a batch.
      */
     type: 'batch';
   }
 
   export interface Monitor {
     /**
-     * Monitor ID.
+     * ID of the monitor.
      */
     monitor_id: string;
 
     /**
-     * Monitor run ID.
+     * ID of the monitor run.
      */
     run_id: string;
 
     /**
-     * Which deliveries to list: `batch` or `monitor`.
+     * The event came from a monitor run.
      */
     type: 'monitor';
   }
@@ -262,37 +268,37 @@ export namespace Delivery {
 
 export interface DeliverySummary {
   /**
-   * Delivery ID.
+   * Unique ID of the delivery.
    */
   id: string;
 
   /**
-   * Event creation time.
+   * When the event was created.
    */
   created_at: string;
 
   /**
-   * Last successful delivery time, or null if never delivered.
+   * When the delivery last succeeded. `null` until it succeeds.
    */
   delivered_at: string | null;
 
   /**
-   * Webhook event type.
+   * Event that triggered the delivery.
    */
   event: 'batch.completed' | 'batch.failed' | 'batch.cancelled' | 'change.detected' | 'run.completed';
 
   /**
-   * Latest delivery error, or null if none.
+   * Most recent delivery error. `null` when there is none.
    */
   last_error: DeliverySummary.LastError | null;
 
   /**
-   * Next scheduled attempt, or null if none.
+   * When the next attempt is scheduled. `null` when none is scheduled.
    */
   next_attempt_at: string | null;
 
   /**
-   * Last time you can retry manually (7 days after the event).
+   * Last time you can retry the delivery manually, 7 days after the event.
    */
   retry_expires_at: string;
 
@@ -302,58 +308,60 @@ export interface DeliverySummary {
   source: DeliverySummary.Batch | DeliverySummary.Monitor;
 
   /**
-   * `pending`, `delivering`, `retrying`, `delivered`, `failed`, or `cancelled`
-   * (source or its webhook was removed).
+   * Delivery state. `pending` is waiting for an attempt, `delivering` has an attempt
+   * in progress, `retrying` is waiting for an automatic retry, `delivered` was
+   * acknowledged with a 2xx, `failed` has no automatic retries left, and `cancelled`
+   * means the source or its webhook was removed.
    */
   status: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
 
   /**
-   * Webhook destination URL.
+   * URL the webhook is sent to.
    */
   url: string;
 }
 
 export namespace DeliverySummary {
   /**
-   * Latest delivery error, or null if none.
+   * Most recent delivery error. `null` when there is none.
    */
   export interface LastError {
     /**
-     * Error code.
+     * Machine-readable error code.
      */
     code: string;
 
     /**
-     * Error details.
+     * Human-readable explanation of the error.
      */
     message: string;
   }
 
   export interface Batch {
     /**
-     * Batch ID.
+     * ID of the batch.
      */
     batch_id: string;
 
     /**
-     * Which deliveries to list: `batch` or `monitor`.
+     * The event came from a batch.
      */
     type: 'batch';
   }
 
   export interface Monitor {
     /**
-     * Monitor ID.
+     * ID of the monitor.
      */
     monitor_id: string;
 
     /**
-     * Monitor run ID.
+     * ID of the monitor run.
      */
     run_id: string;
 
     /**
-     * Which deliveries to list: `batch` or `monitor`.
+     * The event came from a monitor run.
      */
     type: 'monitor';
   }
@@ -383,7 +391,7 @@ export namespace DeliveryRetrieveResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -391,17 +399,17 @@ export namespace DeliveryRetrieveResponse {
 
 export interface DeliveryListResponse {
   /**
-   * Webhook deliveries.
+   * Webhook deliveries on this page.
    */
   data: Array<DeliverySummary>;
 
   /**
-   * Whether more deliveries are available.
+   * Whether more results are available after this page.
    */
   has_more: boolean;
 
   /**
-   * Next page cursor, or null on the last page.
+   * Pass as `cursor` to fetch the next page. `null` on the last page.
    */
   next_cursor: string | null;
 
@@ -428,7 +436,7 @@ export namespace DeliveryListResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -436,17 +444,17 @@ export namespace DeliveryListResponse {
 
 export interface DeliveryListAttemptsResponse {
   /**
-   * Delivery attempts.
+   * Delivery attempts on this page.
    */
   data: Array<Attempt>;
 
   /**
-   * Whether more attempts are available.
+   * Whether more results are available after this page.
    */
   has_more: boolean;
 
   /**
-   * Next page cursor, or null on the last page.
+   * Pass as `cursor` to fetch the next page. `null` on the last page.
    */
   next_cursor: string | null;
 
@@ -473,7 +481,7 @@ export namespace DeliveryListAttemptsResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -481,7 +489,7 @@ export namespace DeliveryListAttemptsResponse {
 
 export interface DeliveryRetryResponse {
   /**
-   * Delivery ID.
+   * Unique ID of the delivery.
    */
   id: string;
 
@@ -508,7 +516,7 @@ export namespace DeliveryRetryResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -516,7 +524,8 @@ export namespace DeliveryRetryResponse {
 
 export interface DeliveryRetrieveParams {
   /**
-   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
+   * Comma-separated labels for this request, such as `production,team-alpha`. Filter
+   * usage and request logs by them.
    */
   tags?: Array<string>;
 }
@@ -526,7 +535,7 @@ export type DeliveryListParams = DeliveryListParams.ByBatch | DeliveryListParams
 export declare namespace DeliveryListParams {
   export interface ByBatch {
     /**
-     * Delivery source.
+     * List batch webhook deliveries.
      */
     type: 'batch';
 
@@ -536,17 +545,17 @@ export declare namespace DeliveryListParams {
     batch_id?: string;
 
     /**
-     * Only include events created after this ISO 8601 timestamp.
+     * Only include deliveries created after this time.
      */
     created_after?: string;
 
     /**
-     * The next_cursor from the previous response.
+     * Cursor from the previous page's `next_cursor`. Omit for the first page.
      */
     cursor?: string;
 
     /**
-     * Number of deliveries to return.
+     * Maximum number of deliveries to return per page.
      */
     limit?: number;
 
@@ -556,29 +565,30 @@ export declare namespace DeliveryListParams {
     status?: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
 
     /**
-     * Labels for filtering usage in the dashboard.
+     * Labels for this request. Filter usage and request logs by them in the dashboard
+     * or with `GET /org/logs`.
      */
     tags?: Array<string>;
   }
 
   export interface ByMonitor {
     /**
-     * Delivery source.
+     * List monitor webhook deliveries.
      */
     type: 'monitor';
 
     /**
-     * Only include events created after this ISO 8601 timestamp.
+     * Only include deliveries created after this time.
      */
     created_after?: string;
 
     /**
-     * The next_cursor from the previous response.
+     * Cursor from the previous page's `next_cursor`. Omit for the first page.
      */
     cursor?: string;
 
     /**
-     * Number of deliveries to return.
+     * Maximum number of deliveries to return per page.
      */
     limit?: number;
 
@@ -598,7 +608,8 @@ export declare namespace DeliveryListParams {
     status?: 'pending' | 'delivering' | 'retrying' | 'delivered' | 'failed' | 'cancelled';
 
     /**
-     * Labels for filtering usage in the dashboard.
+     * Labels for this request. Filter usage and request logs by them in the dashboard
+     * or with `GET /org/logs`.
      */
     tags?: Array<string>;
   }
@@ -606,34 +617,37 @@ export declare namespace DeliveryListParams {
 
 export interface DeliveryListAttemptsParams {
   /**
-   * The next_cursor from the previous response.
+   * Cursor from the previous page's `next_cursor`. Omit for the first page.
    */
   cursor?: string;
 
   /**
-   * Number of attempts to return.
+   * Maximum number of attempts to return per page.
    */
   limit?: number;
 
   /**
-   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
+   * Comma-separated labels for this request, such as `production,team-alpha`. Filter
+   * usage and request logs by them.
    */
   tags?: Array<string>;
 }
 
 export interface DeliveryRetryParams {
   /**
-   * Body param: Resend even if the delivery already succeeded. Defaults to false.
+   * Body param: Resend even if the delivery already succeeded.
    */
   force?: boolean;
 
   /**
-   * Body param: Labels for filtering usage in the dashboard.
+   * Body param: Labels for this request. Filter usage and request logs by them in
+   * the dashboard or with `GET /org/logs`.
    */
   tags?: Array<string>;
 
   /**
-   * Header param: Unique key to prevent duplicate retry requests.
+   * Header param: Unique key for this retry. Repeating the request with the same key
+   * does not send the payload again.
    */
   'Idempotency-Key'?: string;
 }

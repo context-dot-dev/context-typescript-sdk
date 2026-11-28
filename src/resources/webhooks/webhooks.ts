@@ -22,12 +22,12 @@ export class Webhooks extends APIResource {
 }
 
 /**
- * Webhook retry settings. Use {} for the default schedule.
+ * Automatic retry settings. Pass `{}` for the default schedule.
  */
 export interface RetryConfig {
   /**
-   * Retry delays in seconds, totaling at most 72 hours. Use [] to disable automatic
-   * retries.
+   * Delay before each automatic retry, in seconds, totaling at most 72 hours. Pass
+   * `[]` to disable automatic retries.
    */
   delays_seconds?: Array<number>;
 }

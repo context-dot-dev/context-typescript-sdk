@@ -4,10 +4,15 @@ import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
+/**
+ * Retrieve a brand's logos, colors, company details, and social links, or find brands by name or domain.
+ */
 export class Brand extends APIResource {
   /**
-   * Retrieve logos, colors, company details, and social links using one lookup
-   * identifier. A direct URL limits extraction to that page.
+   * Look up a brand by domain, company name, work email, stock ticker, page URL, or
+   * card transaction descriptor. Returns logos, colors, backdrops, description,
+   * industries, address, stock listing, and social links. A `by_direct_url` lookup
+   * reads only that page.
    *
    * @example
    * ```ts
@@ -22,10 +27,10 @@ export class Brand extends APIResource {
   }
 
   /**
-   * Find up to 10 brands by name or domain, ordered by popularity. Optionally filter
-   * by country and primary language; both filters must match when provided together.
-   * Results include description, country, and language when available. Use the
-   * returned domain to retrieve a full brand profile.
+   * Autocomplete brand names and domains as a user types, with up to 10 brands
+   * ranked by popularity and a ready-to-use logo URL for each. Filter by country and
+   * primary language. Pass a returned `domain` to `POST /brand/retrieve` for the
+   * full brand profile.
    *
    * @example
    * ```ts
@@ -39,17 +44,17 @@ export class Brand extends APIResource {
 
 export interface BrandRetrieveResponse {
   /**
-   * Detailed brand information
+   * The brand's identity, visual assets, and company details.
    */
   brand: BrandRetrieveResponse.Brand;
 
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   cache_metadata: BrandRetrieveResponse.CacheMetadata;
 
   /**
-   * HTTP status code
+   * HTTP status code. Always `200` on success.
    */
   code: number;
 
@@ -70,81 +75,80 @@ export interface BrandRetrieveResponse {
   key_metadata?: BrandRetrieveResponse.KeyMetadata;
 
   /**
-   * True when the timeout ended processing and this response contains the usable
-   * data completed so far. Unfinished fields are omitted.
+   * `true` when the `timeoutOpts` deadline ended processing early. The response
+   * holds the data completed so far; unfinished fields are omitted.
    */
   partial?: boolean;
 }
 
 export namespace BrandRetrieveResponse {
   /**
-   * Detailed brand information
+   * The brand's identity, visual assets, and company details.
    */
   export interface Brand {
     /**
-     * Physical address of the brand
+     * Physical address of the brand. Omitted when unknown.
      */
     address?: Brand.Address;
 
     /**
-     * An array of backdrop images for the brand
+     * Backdrop images for the brand, such as social profile banners.
      */
     backdrops?: Array<Brand.Backdrop>;
 
     /**
-     * An array of brand colors
+     * Brand colors from the website and logos.
      */
     colors?: Array<Brand.Color>;
 
     /**
-     * A brief description of the brand
+     * Short description of the brand.
      */
     description?: string;
 
     /**
-     * The domain name of the brand
+     * Domain of the brand.
      */
     domain?: string;
 
     /**
-     * Company email address
+     * Contact email address for the company.
      */
     email?: string;
 
     /**
-     * Employee headcount information for the brand (will be null if unknown)
+     * Employee headcount. Omitted when unknown.
      */
     employees?: Brand.Employees;
 
     /**
-     * Industry classification information for the brand
+     * Industry classification of the brand.
      */
     industries?: Brand.Industries;
 
     /**
-     * Indicates whether the brand content is not safe for work (NSFW)
+     * Whether the brand's content is not safe for work (NSFW).
      */
     is_nsfw?: boolean;
 
     /**
-     * Important website links for the brand
+     * Key pages on the brand's website.
      */
     links?: Brand.Links;
 
     /**
-     * An array of logos associated with the brand. When a similarly shaped SVG variant
-     * exists, it is returned ahead of its raster equivalent; otherwise relevance order
-     * is preserved
+     * Brand logos, most relevant first. An SVG is listed ahead of a raster logo of the
+     * same shape.
      */
     logos?: Array<Brand.Logo>;
 
     /**
-     * Company phone number
+     * Contact phone number for the company.
      */
     phone?: string;
 
     /**
-     * Language, e.g. `english`.
+     * Lowercase language name, such as `english`.
      */
     primary_language?:
       | 'afrikaans'
@@ -270,81 +274,80 @@ export namespace BrandRetrieveResponse {
       | null;
 
     /**
-     * The brand's slogan
+     * Brand slogan or tagline.
      */
     slogan?: string;
 
     /**
-     * An array of social media links for the brand
+     * Social media profiles of the brand.
      */
     socials?: Array<Brand.Social>;
 
     /**
-     * Stock market information for this brand (will be null if not a publicly traded
-     * company)
+     * Stock listing. Omitted when the company is not publicly traded.
      */
     stock?: Brand.Stock;
 
     /**
-     * The title or name of the brand
+     * Brand name.
      */
     title?: string;
   }
 
   export namespace Brand {
     /**
-     * Physical address of the brand
+     * Physical address of the brand. Omitted when unknown.
      */
     export interface Address {
       /**
-       * City name
+       * City.
        */
       city?: string;
 
       /**
-       * Country name
+       * Country name.
        */
       country?: string;
 
       /**
-       * Country code
+       * Country code, such as `US`.
        */
       country_code?: string;
 
       /**
-       * Postal or ZIP code
+       * Postal or ZIP code.
        */
       postal_code?: string;
 
       /**
-       * State or province code
+       * State or province code.
        */
       state_code?: string;
 
       /**
-       * State or province name
+       * State or province name.
        */
       state_province?: string;
 
       /**
-       * Street address
+       * Street address.
        */
       street?: string;
     }
 
     export interface Backdrop {
       /**
-       * Array of colors in the backdrop image
+       * Colors in the backdrop image.
        */
       colors?: Array<Backdrop.Color>;
 
       /**
-       * Resolution of the backdrop image
+       * Size of the backdrop image.
        */
       resolution?: Backdrop.Resolution;
 
       /**
-       * URL of the backdrop image
+       * URL of the backdrop image.
        */
       url?: string;
     }
@@ -352,32 +355,32 @@ export namespace BrandRetrieveResponse {
     export namespace Backdrop {
       export interface Color {
         /**
-         * Color in hexadecimal format
+         * Hex color code, such as `#635BFF`.
          */
         hex?: string;
 
         /**
-         * Name of the color
+         * Human-readable color name.
          */
         name?: string;
       }
 
       /**
-       * Resolution of the backdrop image
+       * Size of the backdrop image.
        */
       export interface Resolution {
         /**
-         * Aspect ratio of the image (width/height)
+         * Aspect ratio, as width divided by height.
          */
         aspect_ratio?: number;
 
         /**
-         * Height of the image in pixels
+         * Height, in pixels.
          */
         height?: number;
 
         /**
-         * Width of the image in pixels
+         * Width, in pixels.
          */
         width?: number;
       }
@@ -385,34 +388,33 @@ export namespace BrandRetrieveResponse {
 
     export interface Color {
       /**
-       * Color in hexadecimal format
+       * Hex color code, such as `#635BFF`.
        */
       hex?: string;
 
       /**
-       * Name of the color
+       * Human-readable color name.
        */
       name?: string;
 
       /**
-       * Where the color was observed: 'site' colors come from the website's own theme
-       * signals (rendered page colors, manifest, theme-color meta), 'logo' colors from
-       * logo image pixels.
+       * `site` colors come from the website's own theme (rendered page colors, web app
+       * manifest, `theme-color` meta tag); `logo` colors come from logo pixels.
        */
       source?: 'site' | 'logo';
     }
 
     /**
-     * Employee headcount information for the brand (will be null if unknown)
+     * Employee headcount. Omitted when unknown.
      */
     export interface Employees {
       /**
-       * Exact employee count when a precise headcount is known
+       * Exact employee count, when known.
        */
       exact?: number;
 
       /**
-       * Employee count range for the brand (e.g. '11 to 50')
+       * Headcount range, such as `11 to 50`.
        */
       range?:
         | '1 to 10'
@@ -426,11 +428,12 @@ export namespace BrandRetrieveResponse {
     }
 
     /**
-     * Industry classification information for the brand
+     * Industry classification of the brand.
      */
     export interface Industries {
       /**
-       * Easy Industry Classification - array of industry and subindustry pairs
+       * Industry and subindustry pairs from Context.dev's Easy Industry Classification
+       * (EIC).
        */
       eic?: Array<Industries.Eic>;
     }
@@ -438,7 +441,7 @@ export namespace BrandRetrieveResponse {
     export namespace Industries {
       export interface Eic {
         /**
-         * Industry classification enum
+         * Top-level industry in the Easy Industry Classification (EIC).
          */
         industry:
           | 'Aerospace & Defense'
@@ -467,7 +470,7 @@ export namespace BrandRetrieveResponse {
           | 'Consumer Packaged Goods (CPG)';
 
         /**
-         * Subindustry classification enum
+         * Subindustry in the Easy Industry Classification (EIC).
          */
         subindustry:
           | 'Defense Systems & Military Hardware'
@@ -694,65 +697,65 @@ export namespace BrandRetrieveResponse {
     }
 
     /**
-     * Important website links for the brand
+     * Key pages on the brand's website.
      */
     export interface Links {
       /**
-       * URL to the brand's blog or news page
+       * URL of the blog or newsroom. `null` when not found.
        */
       blog?: string | null;
 
       /**
-       * URL to the brand's careers or job opportunities page
+       * URL of the careers page. `null` when not found.
        */
       careers?: string | null;
 
       /**
-       * URL to the brand's contact or contact us page
+       * URL of the contact page. `null` when not found.
        */
       contact?: string | null;
 
       /**
-       * URL to the brand's pricing or plans page
+       * URL of the pricing page. `null` when not found.
        */
       pricing?: string | null;
 
       /**
-       * URL to the brand's privacy policy page
+       * URL of the privacy policy. `null` when not found.
        */
       privacy?: string | null;
 
       /**
-       * URL to the brand's terms of service or terms and conditions page
+       * URL of the terms of service. `null` when not found.
        */
       terms?: string | null;
     }
 
     export interface Logo {
       /**
-       * Array of colors in the logo
+       * Colors in the logo.
        */
       colors?: Array<Logo.Color>;
 
       /**
-       * Indicates when this logo is best used: 'light' = best for light mode, 'dark' =
-       * best for dark mode, 'has_opaque_background' = can be used for either as image
-       * has its own background
+       * `light` works best in light mode, `dark` works best in dark mode, and
+       * `has_opaque_background` works in either because the image has its own
+       * background.
        */
       mode?: 'light' | 'dark' | 'has_opaque_background';
 
       /**
-       * Resolution of the logo image
+       * Size of the logo image.
        */
       resolution?: Logo.Resolution;
 
       /**
-       * Type of the logo based on resolution (e.g., 'icon', 'logo')
+       * Whether the image is an `icon` or a full `logo`, based on its dimensions.
        */
       type?: 'icon' | 'logo';
 
       /**
-       * Hosted logo URL.
+       * URL of the hosted logo image.
        */
       url?: string;
     }
@@ -760,32 +763,32 @@ export namespace BrandRetrieveResponse {
     export namespace Logo {
       export interface Color {
         /**
-         * Color in hexadecimal format
+         * Hex color code, such as `#635BFF`.
          */
         hex?: string;
 
         /**
-         * Name of the color
+         * Human-readable color name.
          */
         name?: string;
       }
 
       /**
-       * Resolution of the logo image
+       * Size of the logo image.
        */
       export interface Resolution {
         /**
-         * Aspect ratio of the image (width/height)
+         * Aspect ratio, as width divided by height.
          */
         aspect_ratio?: number;
 
         /**
-         * Height of the image in pixels
+         * Height, in pixels.
          */
         height?: number;
 
         /**
-         * Width of the image in pixels
+         * Width, in pixels.
          */
         width?: number;
       }
@@ -793,7 +796,7 @@ export namespace BrandRetrieveResponse {
 
     export interface Social {
       /**
-       * Type of social media platform
+       * Social platform.
        */
       type?:
         | 'x'
@@ -829,40 +832,39 @@ export namespace BrandRetrieveResponse {
         | 'playstore';
 
       /**
-       * URL of the social media page
+       * URL of the brand's profile on that platform.
        */
       url?: string;
     }
 
     /**
-     * Stock market information for this brand (will be null if not a publicly traded
-     * company)
+     * Stock listing. Omitted when the company is not publicly traded.
      */
     export interface Stock {
       /**
-       * Stock exchange name
+       * Exchange the stock trades on.
        */
       exchange?: string;
 
       /**
-       * Stock ticker symbol
+       * Stock ticker symbol.
        */
       ticker?: string;
     }
   }
 
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   export interface CacheMetadata {
     /**
-     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+     * Age of the cached data, in milliseconds. `0` for `miss` and `zdr`.
      */
     age_ms: number;
 
     /**
-     * Whether the response was served from cache, required fresh work, or honored
-     * zero-data-retention cache bypass.
+     * `hit` when served from cache, `miss` when fetched fresh, `zdr` when zero data
+     * retention bypassed the cache.
      */
     status: 'hit' | 'miss' | 'zdr';
   }
@@ -877,7 +879,7 @@ export namespace BrandRetrieveResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -891,8 +893,8 @@ export interface BrandSearchResponse {
   request_id: string;
 
   /**
-   * Up to 10 matching brands, name matches first, then domain matches, most popular
-   * first within each group. Empty when nothing matches.
+   * Up to 10 matching brands: name matches first, then domain matches, each group
+   * ordered by popularity. Empty when nothing matches.
    */
   results: Array<BrandSearchResponse.Result>;
 
@@ -905,23 +907,24 @@ export interface BrandSearchResponse {
 export namespace BrandSearchResponse {
   export interface Result {
     /**
-     * The brand's domain.
+     * Domain of the brand.
      */
     domain: string;
 
     /**
-     * Logo link URL that serves the brand's logo, generated per request for the
-     * calling organization.
+     * Logo Link URL that serves the brand's logo with your organization's client ID.
+     * Use it directly as an image source.
      */
     logo: string;
 
     /**
-     * The brand's name. Empty string when unknown.
+     * Name of the brand. Empty string when unknown.
      */
     name: string;
 
     /**
-     * The brand's country, when available, as an uppercase ISO 3166-1 alpha-2 code.
+     * Country of the brand, as an uppercase ISO 3166-1 alpha-2 code. Omitted when
+     * unknown.
      */
     country?:
       | 'AD'
@@ -1175,12 +1178,12 @@ export namespace BrandSearchResponse {
       | 'ZW';
 
     /**
-     * The brand's description, when available.
+     * Short description of the brand. Omitted when unknown.
      */
     description?: string;
 
     /**
-     * The brand's primary language, when available.
+     * Primary language of the brand. Omitted when unknown.
      */
     language?:
       | 'afrikaans'
@@ -1315,7 +1318,7 @@ export namespace BrandSearchResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -1332,15 +1335,18 @@ export type BrandRetrieveParams =
 export declare namespace BrandRetrieveParams {
   export interface BrandRetrieveByDomainRequest {
     /**
-     * Domain name to retrieve brand data for (e.g., 'stripe.com').
+     * Domain of the brand, such as `stripe.com`.
      */
     domain: string;
 
     /**
-     * Discriminator for domain-based brand retrieval.
+     * Set to `by_domain` to look up a brand by domain.
      */
     type: 'by_domain';
 
+    /**
+     * Translate the brand's `title`, `description`, and `slogan` into this language.
+     */
     force_language?:
       | 'afrikaans'
       | 'albanian'
@@ -1465,27 +1471,27 @@ export declare namespace BrandRetrieveParams {
       | null;
 
     /**
-     * Maximum age of cached brand data in ms. Defaults to 3 months; clamped to 0–1
-     * year. `0` refreshes.
+     * Maximum age of cached brand data, in milliseconds. `0` always fetches fresh.
+     * Defaults to 90 days (7776000000 ms). Values above 1 year (31536000000 ms) are
+     * capped at 1 year.
      */
     maxAgeMs?: number;
 
     /**
-     * Optional parameter to optimize the API call for maximum speed. When set to true,
-     * the API will skip time-consuming operations for faster response at the cost of
-     * less comprehensive data.
+     * Skip slower enrichment steps for a faster, less detailed response.
      */
     maxSpeed?: boolean;
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-     * access policies are enabled for your organization; otherwise the request fails
-     * with `ACCESS_POLICIES_NOT_ENABLED`.
+     * Access policy IDs to apply; each URL must pass all of them. Requires access
+     * policies enabled for your organization; otherwise returns
+     * `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 
     /**
-     * Labels for filtering usage in the dashboard.
+     * Labels for this request. Filter usage and request logs by them in the dashboard
+     * or with `GET /org/logs`.
      */
     tags?: Array<string>;
 
@@ -1495,8 +1501,8 @@ export declare namespace BrandRetrieveParams {
     timeoutOpts?: BrandRetrieveByDomainRequest.TimeoutOpts;
 
     /**
-     * `enabled` disables request logs and traces and omits request and response
-     * content from usage logs. Brand data and hosted assets may still be stored.
+     * `enabled` turns off request logs and traces and keeps request and response
+     * content out of usage logs. Brand data and hosted assets may still be stored.
      * Returns 403 `ZDR_NOT_ENABLED` unless your organization has ZDR.
      */
     zdr?: 'enabled' | 'disabled';
@@ -1513,8 +1519,8 @@ export declare namespace BrandRetrieveParams {
       milliseconds: number;
 
       /**
-       * "fail" returns 408 at the deadline. "return-partial" returns available results;
-       * inspect the response’s partial flag.
+       * `fail` returns 408 at the deadline. `return-partial` returns the results
+       * collected so far and marks the response as partial.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -1522,12 +1528,12 @@ export declare namespace BrandRetrieveParams {
 
   export interface BrandRetrieveByNameRequest {
     /**
-     * Company name to retrieve brand data for (e.g., 'Apple Inc').
+     * Company name, such as `Apple Inc`.
      */
     name: string;
 
     /**
-     * Discriminator for name-based brand retrieval.
+     * Set to `by_name` to look up a brand by company name.
      */
     type: 'by_name';
 
@@ -1775,6 +1781,9 @@ export declare namespace BrandRetrieveParams {
       | 'zm'
       | 'zw';
 
+    /**
+     * Translate the brand's `title`, `description`, and `slogan` into this language.
+     */
     force_language?:
       | 'afrikaans'
       | 'albanian'
@@ -1899,27 +1908,27 @@ export declare namespace BrandRetrieveParams {
       | null;
 
     /**
-     * Maximum age of cached brand data in ms. Defaults to 3 months; clamped to 0–1
-     * year. `0` refreshes.
+     * Maximum age of cached brand data, in milliseconds. `0` always fetches fresh.
+     * Defaults to 90 days (7776000000 ms). Values above 1 year (31536000000 ms) are
+     * capped at 1 year.
      */
     maxAgeMs?: number;
 
     /**
-     * Optional parameter to optimize the API call for maximum speed. When set to true,
-     * the API will skip time-consuming operations for faster response at the cost of
-     * less comprehensive data.
+     * Skip slower enrichment steps for a faster, less detailed response.
      */
     maxSpeed?: boolean;
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-     * access policies are enabled for your organization; otherwise the request fails
-     * with `ACCESS_POLICIES_NOT_ENABLED`.
+     * Access policy IDs to apply; each URL must pass all of them. Requires access
+     * policies enabled for your organization; otherwise returns
+     * `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 
     /**
-     * Labels for filtering usage in the dashboard.
+     * Labels for this request. Filter usage and request logs by them in the dashboard
+     * or with `GET /org/logs`.
      */
     tags?: Array<string>;
 
@@ -1929,8 +1938,8 @@ export declare namespace BrandRetrieveParams {
     timeoutOpts?: BrandRetrieveByNameRequest.TimeoutOpts;
 
     /**
-     * `enabled` disables request logs and traces and omits request and response
-     * content from usage logs. Brand data and hosted assets may still be stored.
+     * `enabled` turns off request logs and traces and keeps request and response
+     * content out of usage logs. Brand data and hosted assets may still be stored.
      * Returns 403 `ZDR_NOT_ENABLED` unless your organization has ZDR.
      */
     zdr?: 'enabled' | 'disabled';
@@ -1947,8 +1956,8 @@ export declare namespace BrandRetrieveParams {
       milliseconds: number;
 
       /**
-       * "fail" returns 408 at the deadline. "return-partial" returns available results;
-       * inspect the response’s partial flag.
+       * `fail` returns 408 at the deadline. `return-partial` returns the results
+       * collected so far and marks the response as partial.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -1956,15 +1965,19 @@ export declare namespace BrandRetrieveParams {
 
   export interface BrandRetrieveByEmailRequest {
     /**
-     * Email address to retrieve brand data for (e.g., 'jane@stripe.com').
+     * Work email address, such as `jane@stripe.com`. The brand is looked up from its
+     * domain.
      */
     email: string;
 
     /**
-     * Discriminator for email-based brand retrieval.
+     * Set to `by_email` to look up a brand from a work email address.
      */
     type: 'by_email';
 
+    /**
+     * Translate the brand's `title`, `description`, and `slogan` into this language.
+     */
     force_language?:
       | 'afrikaans'
       | 'albanian'
@@ -2089,27 +2102,27 @@ export declare namespace BrandRetrieveParams {
       | null;
 
     /**
-     * Maximum age of cached brand data in ms. Defaults to 3 months; clamped to 0–1
-     * year. `0` refreshes.
+     * Maximum age of cached brand data, in milliseconds. `0` always fetches fresh.
+     * Defaults to 90 days (7776000000 ms). Values above 1 year (31536000000 ms) are
+     * capped at 1 year.
      */
     maxAgeMs?: number;
 
     /**
-     * Optional parameter to optimize the API call for maximum speed. When set to true,
-     * the API will skip time-consuming operations for faster response at the cost of
-     * less comprehensive data.
+     * Skip slower enrichment steps for a faster, less detailed response.
      */
     maxSpeed?: boolean;
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-     * access policies are enabled for your organization; otherwise the request fails
-     * with `ACCESS_POLICIES_NOT_ENABLED`.
+     * Access policy IDs to apply; each URL must pass all of them. Requires access
+     * policies enabled for your organization; otherwise returns
+     * `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 
     /**
-     * Labels for filtering usage in the dashboard.
+     * Labels for this request. Filter usage and request logs by them in the dashboard
+     * or with `GET /org/logs`.
      */
     tags?: Array<string>;
 
@@ -2119,8 +2132,8 @@ export declare namespace BrandRetrieveParams {
     timeoutOpts?: BrandRetrieveByEmailRequest.TimeoutOpts;
 
     /**
-     * `enabled` disables request logs and traces and omits request and response
-     * content from usage logs. Brand data and hosted assets may still be stored.
+     * `enabled` turns off request logs and traces and keeps request and response
+     * content out of usage logs. Brand data and hosted assets may still be stored.
      * Returns 403 `ZDR_NOT_ENABLED` unless your organization has ZDR.
      */
     zdr?: 'enabled' | 'disabled';
@@ -2137,8 +2150,8 @@ export declare namespace BrandRetrieveParams {
       milliseconds: number;
 
       /**
-       * "fail" returns 408 at the deadline. "return-partial" returns available results;
-       * inspect the response’s partial flag.
+       * `fail` returns 408 at the deadline. `return-partial` returns the results
+       * collected so far and marks the response as partial.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -2146,15 +2159,18 @@ export declare namespace BrandRetrieveParams {
 
   export interface BrandRetrieveByTickerRequest {
     /**
-     * Stock ticker symbol to retrieve brand data for (e.g., 'AAPL').
+     * Stock ticker symbol, such as `AAPL`.
      */
     ticker: string;
 
     /**
-     * Discriminator for ticker-based brand retrieval.
+     * Set to `by_ticker` to look up a brand by stock ticker.
      */
     type: 'by_ticker';
 
+    /**
+     * Translate the brand's `title`, `description`, and `slogan` into this language.
+     */
     force_language?:
       | 'afrikaans'
       | 'albanian'
@@ -2279,32 +2295,32 @@ export declare namespace BrandRetrieveParams {
       | null;
 
     /**
-     * Maximum age of cached brand data in ms. Defaults to 3 months; clamped to 0–1
-     * year. `0` refreshes.
+     * Maximum age of cached brand data, in milliseconds. `0` always fetches fresh.
+     * Defaults to 90 days (7776000000 ms). Values above 1 year (31536000000 ms) are
+     * capped at 1 year.
      */
     maxAgeMs?: number;
 
     /**
-     * Optional parameter to optimize the API call for maximum speed. When set to true,
-     * the API will skip time-consuming operations for faster response at the cost of
-     * less comprehensive data.
+     * Skip slower enrichment steps for a faster, less detailed response.
      */
     maxSpeed?: boolean;
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-     * access policies are enabled for your organization; otherwise the request fails
-     * with `ACCESS_POLICIES_NOT_ENABLED`.
+     * Access policy IDs to apply; each URL must pass all of them. Requires access
+     * policies enabled for your organization; otherwise returns
+     * `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 
     /**
-     * Labels for filtering usage in the dashboard.
+     * Labels for this request. Filter usage and request logs by them in the dashboard
+     * or with `GET /org/logs`.
      */
     tags?: Array<string>;
 
     /**
-     * Stock exchange code.
+     * Stock exchange code, such as `NASDAQ` or `LSE`.
      */
     ticker_exchange?:
       | 'AMEX'
@@ -2386,8 +2402,8 @@ export declare namespace BrandRetrieveParams {
     timeoutOpts?: BrandRetrieveByTickerRequest.TimeoutOpts;
 
     /**
-     * `enabled` disables request logs and traces and omits request and response
-     * content from usage logs. Brand data and hosted assets may still be stored.
+     * `enabled` turns off request logs and traces and keeps request and response
+     * content out of usage logs. Brand data and hosted assets may still be stored.
      * Returns 403 `ZDR_NOT_ENABLED` unless your organization has ZDR.
      */
     zdr?: 'enabled' | 'disabled';
@@ -2404,8 +2420,8 @@ export declare namespace BrandRetrieveParams {
       milliseconds: number;
 
       /**
-       * "fail" returns 408 at the deadline. "return-partial" returns available results;
-       * inspect the response’s partial flag.
+       * `fail` returns 408 at the deadline. `return-partial` returns the results
+       * collected so far and marks the response as partial.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -2413,26 +2429,26 @@ export declare namespace BrandRetrieveParams {
 
   export interface BrandRetrieveByDirectURLRequest {
     /**
-     * Full http(s) URL to fetch brand data from (e.g.,
-     * 'https://stripe.com/enterprise'). Only this URL is fetched — not the entire
-     * internet.
+     * Full `http` or `https` URL of the page to read, such as
+     * `https://stripe.com/enterprise`. Only this page is fetched.
      */
     direct_url: string;
 
     /**
-     * Discriminator for direct-URL-based brand retrieval.
+     * Set to `by_direct_url` to extract brand data from a single page.
      */
     type: 'by_direct_url';
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-     * access policies are enabled for your organization; otherwise the request fails
-     * with `ACCESS_POLICIES_NOT_ENABLED`.
+     * Access policy IDs to apply; each URL must pass all of them. Requires access
+     * policies enabled for your organization; otherwise returns
+     * `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 
     /**
-     * Labels for filtering usage in the dashboard.
+     * Labels for this request. Filter usage and request logs by them in the dashboard
+     * or with `GET /org/logs`.
      */
     tags?: Array<string>;
 
@@ -2442,8 +2458,8 @@ export declare namespace BrandRetrieveParams {
     timeoutOpts?: BrandRetrieveByDirectURLRequest.TimeoutOpts;
 
     /**
-     * `enabled` disables request logs and traces and omits request and response
-     * content from usage logs. Brand data and hosted assets may still be stored.
+     * `enabled` turns off request logs and traces and keeps request and response
+     * content out of usage logs. Brand data and hosted assets may still be stored.
      * Returns 403 `ZDR_NOT_ENABLED` unless your organization has ZDR.
      */
     zdr?: 'enabled' | 'disabled';
@@ -2460,8 +2476,8 @@ export declare namespace BrandRetrieveParams {
       milliseconds: number;
 
       /**
-       * "fail" returns 408 at the deadline. "return-partial" returns available results;
-       * inspect the response’s partial flag.
+       * `fail` returns 408 at the deadline. `return-partial` returns the results
+       * collected so far and marks the response as partial.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -2469,17 +2485,18 @@ export declare namespace BrandRetrieveParams {
 
   export interface BrandRetrieveFromTransactionRequest {
     /**
-     * Transaction information to identify the brand.
+     * Transaction descriptor from a card or bank statement, such as `SQ *COFFEE SHOP`.
      */
     transaction_info: string;
 
     /**
-     * Discriminator for transaction-based brand retrieval.
+     * Set to `by_transaction` to identify the merchant behind a transaction
+     * descriptor.
      */
     type: 'by_transaction';
 
     /**
-     * Optional city name to prioritize when searching for the brand.
+     * City where the transaction took place. Brands in this city are preferred.
      */
     city?: string;
 
@@ -2727,6 +2744,9 @@ export declare namespace BrandRetrieveParams {
       | 'zm'
       | 'zw';
 
+    /**
+     * Translate the brand's `title`, `description`, and `slogan` into this language.
+     */
     force_language?:
       | 'afrikaans'
       | 'albanian'
@@ -2851,38 +2871,37 @@ export declare namespace BrandRetrieveParams {
       | null;
 
     /**
-     * When set to true, the API performs additional verification to ensure the
-     * identified brand matches the transaction with high confidence.
+     * Run extra verification so the returned brand matches the transaction with high
+     * confidence.
      */
     high_confidence_only?: boolean;
 
     /**
-     * Optional parameter to optimize the API call for maximum speed. When set to true,
-     * the API will skip time-consuming operations for faster response at the cost of
-     * less comprehensive data.
+     * Skip slower enrichment steps for a faster, less detailed response.
      */
     maxSpeed?: boolean;
 
     /**
-     * Optional Merchant Category Code (MCC) to help identify the business category or
-     * industry.
+     * Merchant Category Code (MCC) from the transaction. Helps identify the type of
+     * business.
      */
     mcc?: string | number;
 
     /**
-     * Optional phone number from the transaction to help verify brand match.
+     * Merchant phone number from the transaction. Helps confirm the match.
      */
     phone?: string | number;
 
     /**
-     * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-     * access policies are enabled for your organization; otherwise the request fails
-     * with `ACCESS_POLICIES_NOT_ENABLED`.
+     * Access policy IDs to apply; each URL must pass all of them. Requires access
+     * policies enabled for your organization; otherwise returns
+     * `ACCESS_POLICIES_NOT_ENABLED`.
      */
     policies?: Array<string>;
 
     /**
-     * Labels for filtering usage in the dashboard.
+     * Labels for this request. Filter usage and request logs by them in the dashboard
+     * or with `GET /org/logs`.
      */
     tags?: Array<string>;
 
@@ -2892,8 +2911,8 @@ export declare namespace BrandRetrieveParams {
     timeoutOpts?: BrandRetrieveFromTransactionRequest.TimeoutOpts;
 
     /**
-     * `enabled` disables request logs and traces and omits request and response
-     * content from usage logs. Brand data and hosted assets may still be stored.
+     * `enabled` turns off request logs and traces and keeps request and response
+     * content out of usage logs. Brand data and hosted assets may still be stored.
      * Returns 403 `ZDR_NOT_ENABLED` unless your organization has ZDR.
      */
     zdr?: 'enabled' | 'disabled';
@@ -2910,8 +2929,8 @@ export declare namespace BrandRetrieveParams {
       milliseconds: number;
 
       /**
-       * "fail" returns 408 at the deadline. "return-partial" returns available results;
-       * inspect the response’s partial flag.
+       * `fail` returns 408 at the deadline. `return-partial` returns the results
+       * collected so far and marks the response as partial.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -2920,20 +2939,20 @@ export declare namespace BrandRetrieveParams {
 
 export interface BrandSearchParams {
   /**
-   * Search term, matched against the fields selected by queryBy (e.g. 'nike',
-   * 'nike.com', 'nik').
+   * Search term, matched against the fields in `queryBy`, such as `nike`,
+   * `nike.com`, or `nik`.
    */
   query: string;
 
   /**
-   * Whether the search term matches by prefix, so partial words match as they are
-   * typed (e.g. 'nik' matches Nike). Set to false to match whole words only.
+   * Match the search term as a prefix, so `nik` matches Nike while the user is still
+   * typing. Set to `false` to match whole words only.
    */
   autocomplete?: boolean;
 
   /**
    * Only return brands in this country, as an uppercase ISO 3166-1 alpha-2 code such
-   * as US or GB.
+   * as `US` or `GB`.
    */
   country?:
     | 'AD'
@@ -3187,7 +3206,7 @@ export interface BrandSearchParams {
     | 'ZW';
 
   /**
-   * Only return brands with this primary language, such as english or french.
+   * Only return brands with this primary language, such as `english` or `french`.
    */
   language?:
     | 'afrikaans'
@@ -3312,19 +3331,19 @@ export interface BrandSearchParams {
     | 'zulu';
 
   /**
-   * Fields to match the search term against, as a comma-separated list or repeated
-   * parameter: 'name', 'domain', or both. Defaults to both.
+   * Fields to match the search term against: `name`, `domain`, or both. Send a
+   * comma-separated list or repeat the parameter.
    */
   queryBy?: Array<'name' | 'domain'>;
 
   /**
-   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
+   * Comma-separated labels for this request, such as `production,team-alpha`. Filter
+   * usage and request logs by them.
    */
   tags?: Array<string>;
 
   /**
-   * Maximum number of typos tolerated when matching, from 0 to 2. Defaults to 0 (no
-   * typo tolerance).
+   * Maximum number of typos to tolerate when matching. `0` requires exact spelling.
    */
   typoTolerance?: number;
 }

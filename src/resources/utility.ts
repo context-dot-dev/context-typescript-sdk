@@ -4,9 +4,13 @@ import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
+/**
+ * Prefetch brand and styleguide data so later lookups return sooner.
+ */
 export class Utility extends APIResource {
   /**
-   * Queue brand or styleguide data so a later lookup can return sooner.
+   * Start fetching a domain's brand or styleguide data in the background so a later
+   * lookup returns faster. Accepts a domain or a work email.
    *
    * @example
    * ```ts
@@ -29,7 +33,7 @@ export interface UtilityPrefetchResponse {
   request_id: string;
 
   /**
-   * The domain that was queued for prefetching
+   * Domain queued for prefetching.
    */
   domain?: string;
 
@@ -39,7 +43,7 @@ export interface UtilityPrefetchResponse {
   key_metadata?: UtilityPrefetchResponse.KeyMetadata;
 
   /**
-   * Success message
+   * Human-readable confirmation.
    */
   message?: string;
 
@@ -49,7 +53,7 @@ export interface UtilityPrefetchResponse {
   status?: string;
 
   /**
-   * The type of prefetch that was queued, echoed from the request
+   * Data type that was queued, from the request.
    */
   type?: 'brand' | 'styleguide';
 }
@@ -65,7 +69,7 @@ export namespace UtilityPrefetchResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -73,7 +77,7 @@ export namespace UtilityPrefetchResponse {
 
 export interface UtilityPrefetchParams {
   /**
-   * Identifier of the target to prefetch. Provide exactly one of domain or email.
+   * Domain or work email to prefetch. Provide exactly one.
    */
   identifier:
     | UtilityPrefetchParams.UtilityPrefetchDomainIdentifier
@@ -85,19 +89,20 @@ export interface UtilityPrefetchParams {
   type: 'brand' | 'styleguide';
 
   /**
-   * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-   * access policies are enabled for your organization; otherwise the request fails
-   * with `ACCESS_POLICIES_NOT_ENABLED`.
+   * Access policy IDs to apply; each URL must pass all of them. Requires access
+   * policies enabled for your organization; otherwise returns
+   * `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
   /**
-   * Labels for filtering usage in the dashboard.
+   * Labels for this request. Filter usage and request logs by them in the dashboard
+   * or with `GET /org/logs`.
    */
   tags?: Array<string>;
 
   /**
-   * Request deadline and what to return when it passes.
+   * Request deadline. The request fails with 408 when it passes.
    */
   timeoutOpts?: UtilityPrefetchParams.TimeoutOpts;
 }
@@ -108,25 +113,24 @@ export namespace UtilityPrefetchParams {
    */
   export interface UtilityPrefetchDomainIdentifier {
     /**
-     * Domain, e.g. `stripe.com`.
+     * Domain to prefetch, such as `stripe.com`.
      */
     domain: string;
   }
 
   /**
-   * Prefetch by email. The domain will be extracted and validated.
+   * Prefetch by work email. Context.dev uses the email's domain.
    */
   export interface UtilityPrefetchEmailIdentifier {
     /**
-     * Email address to prefetch data for. The domain will be extracted from the email.
-     * Free email providers (gmail.com, yahoo.com, etc.) and disposable email addresses
-     * are not allowed.
+     * Work email whose domain to prefetch. Free email providers such as `gmail.com`
+     * and disposable addresses are rejected with 422.
      */
     email: string;
   }
 
   /**
-   * Request deadline and what to return when it passes.
+   * Request deadline. The request fails with 408 when it passes.
    */
   export interface TimeoutOpts {
     /**
@@ -135,7 +139,7 @@ export namespace UtilityPrefetchParams {
     milliseconds: number;
 
     /**
-     * Only "fail" is supported: return 408 at the deadline.
+     * Only `fail` is supported: the request returns 408 at the deadline.
      */
     behavior?: 'fail';
   }

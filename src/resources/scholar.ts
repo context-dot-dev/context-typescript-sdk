@@ -9,8 +9,9 @@ import { RequestOptions } from '../internal/request-options';
  */
 export class Scholar extends APIResource {
   /**
-   * Search full-text papers from arXiv and Europe PMC. Returns up to 250 relevant
-   * papers with matching passages and full-text links.
+   * Search the full text of papers from arXiv and Europe PMC by topic or question.
+   * Each result includes the matching passage and a direct link to the full text.
+   * Page through up to 250 matches, ranked by relevance or newest first.
    *
    * @example
    * ```ts
@@ -26,22 +27,22 @@ export class Scholar extends APIResource {
 
 export interface ScholarSearchResponse {
   /**
-   * Matching papers in the requested order.
+   * Papers on this page, in the requested order.
    */
   data: Array<ScholarSearchResponse.Data>;
 
   /**
-   * Whether another page is available.
+   * Whether more results are available after this page.
    */
   has_more: boolean;
 
   /**
-   * Page summary.
+   * Summary of this page.
    */
   meta: ScholarSearchResponse.Meta;
 
   /**
-   * Cursor for the next page, or null on the last page.
+   * Pass as `cursor` to fetch the next page. `null` on the last page.
    */
   next_cursor: string | null;
 
@@ -60,47 +61,48 @@ export interface ScholarSearchResponse {
 export namespace ScholarSearchResponse {
   export interface Data {
     /**
-     * Stable paper identifier.
+     * Unique ID of the paper.
      */
     id: string;
 
     /**
-     * Format of the linked full text. jats is XML.
+     * Format of the full text at `full_text_url`. `jats` is JATS XML.
      */
     full_text_format: 'pdf' | 'html' | 'jats';
 
     /**
-     * Direct link to the full text.
+     * Direct URL of the full text.
      */
     full_text_url: string;
 
     /**
-     * Publication time in ISO 8601, or null when unknown.
+     * When the paper was published. `null` when unknown.
      */
     published_at: string | null;
 
     /**
-     * Matching passage, or opening passage for an ID-only query.
+     * Passage that matches the query, or the opening passage when the query is only a
+     * paper ID.
      */
     snippet: string;
 
     /**
-     * Paper title.
+     * Title of the paper.
      */
     title: string;
 
     /**
-     * Paper landing page.
+     * URL of the paper's landing page.
      */
     url: string;
   }
 
   /**
-   * Page summary.
+   * Summary of this page.
    */
   export interface Meta {
     /**
-     * Papers in this page.
+     * Number of papers on this page.
      */
     count: number;
   }
@@ -115,7 +117,7 @@ export namespace ScholarSearchResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -123,13 +125,14 @@ export namespace ScholarSearchResponse {
 
 export interface ScholarSearchParams {
   /**
-   * A topic or question. Append one arxiv:, pmcid:, pmid:, or doi: ID to search
-   * within an indexed paper.
+   * Topic or question to search for. Append one `arxiv:`, `pmcid:`, `pmid:`, or
+   * `doi:` ID to search within that paper, such as `protein folding pmid:34265844`,
+   * or send the ID on its own.
    */
   query: string;
 
   /**
-   * Use next_cursor to fetch the next page.
+   * Cursor from the previous page's `next_cursor`. Omit for the first page.
    */
   cursor?: string | null;
 
@@ -139,18 +142,19 @@ export interface ScholarSearchParams {
   filterBy?: ScholarSearchParams.FilterBy;
 
   /**
-   * Papers per page.
+   * Maximum number of papers to return per page.
    */
   limit?: number;
 
   /**
-   * Order the top 250 matches. date_desc puts newest first, with undated papers
-   * last.
+   * `relevance` puts the closest matches first; `date_desc` puts the newest papers
+   * first, with undated papers last. Both orders apply to the top 250 matches.
    */
   sort?: 'relevance' | 'date_desc';
 
   /**
-   * Labels for filtering usage in the dashboard.
+   * Labels for this request. Filter usage and request logs by them in the dashboard
+   * or with `GET /org/logs`.
    */
   tags?: Array<string>;
 }

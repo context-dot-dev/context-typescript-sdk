@@ -826,23 +826,38 @@ export class ContextDev {
 
   static toFile = Uploads.toFile;
 
+  /**
+   * Convert uploaded files, such as PDFs and Office documents, into Markdown.
+   */
   parse: API.Parse = new API.Parse(this);
   web: API.Web = new API.Web(this);
+  /**
+   * Retrieve a brand's logos, colors, company details, and social links, or find brands by name or domain.
+   */
   brand: API.Brand = new API.Brand(this);
+  /**
+   * Extract structured data, competitors, styleguides, and fonts from any website.
+   */
   industry: API.Industry = new API.Industry(this);
+  /**
+   * Prefetch brand and styleguide data so later lookups return sooner.
+   */
   utility: API.Utility = new API.Utility(this);
   /**
-   * Watch websites for exact or meaningful changes.
+   * Watch websites on a schedule for exact or meaningful changes.
    */
   monitors: API.Monitors = new API.Monitors(this);
   /**
-   * Scrape many pages or crawl a site asynchronously.
+   * Scrape up to 100,000 URLs or crawl a site asynchronously.
    */
   batch: API.Batch = new API.Batch(this);
   webhooks: API.Webhooks = new API.Webhooks(this);
+  /**
+   * Enrich a person from identity clues, or find people with a natural-language query.
+   */
   people: API.People = new API.People(this);
   /**
-   * Search live and historical news about a company.
+   * Search live and historical news by company or with a natural-language query.
    */
   news: API.News = new API.News(this);
   /**
@@ -850,12 +865,12 @@ export class ContextDev {
    */
   scholar: API.Scholar = new API.Scholar(this);
   /**
-   * Read your organization's API request logs.
+   * Inspect your organization's API requests, including retained inputs and responses.
    */
   logs: API.Logs = new API.Logs(this);
   browser: API.Browser = new API.Browser(this);
   /**
-   * Report API issues and documentation mismatches.
+   * Report bugs, wrong results, and docs mismatches to the Context.dev team.
    */
   feedback: API.Feedback = new API.Feedback(this);
 }

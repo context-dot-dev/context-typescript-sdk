@@ -6,12 +6,14 @@ import { type Uploadable } from '../core/uploads';
 import { buildHeaders } from '../internal/headers';
 import { RequestOptions } from '../internal/request-options';
 
+/**
+ * Convert uploaded files, such as PDFs and Office documents, into Markdown.
+ */
 export class Parse extends APIResource {
   /**
-   * Convert uploaded file bytes into Markdown and optional HTML. WARC and WARC.GZ
-   * archives combine HTTP response, resource, and conversion records in archive
-   * order. Revisit and segmented records are skipped. Decoded WARC content is
-   * limited to 50 MiB.
+   * Convert a file to Markdown. Handles PDF, Word, Excel, PowerPoint, HTML, XML,
+   * CSV, JSON, YAML, source code, subtitles, images, and WARC archives. Send the raw
+   * bytes as the request body; set `ocr=true` to read scanned pages and images.
    */
   handle(
     body: Uploadable,
@@ -54,7 +56,7 @@ export class Parse extends APIResource {
 
 export interface ParseHandleResponse {
   /**
-   * Input bytes converted to GitHub Flavored Markdown
+   * The file content as GitHub Flavored Markdown.
    */
   markdown: string;
 
@@ -65,12 +67,12 @@ export interface ParseHandleResponse {
   request_id: string;
 
   /**
-   * Indicates success
+   * Always `true` for a successful parse.
    */
   success: true;
 
   /**
-   * Detected content type used for parsing
+   * File type the input was parsed as.
    */
   type:
     | 'warc'
@@ -133,7 +135,7 @@ export namespace ParseHandleResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -141,13 +143,14 @@ export namespace ParseHandleResponse {
 
 export interface ParseHandleParams {
   /**
-   * Query param: Optional client identifier used for usage attribution.
+   * Query param: Client identifier for usage attribution.
    */
   client?: string;
 
   /**
-   * Query param: Optional file extension hint, such as pdf, docx, xlsx, pptx, html,
-   * json, csv, md, py, rtf, jpg, png, txt, warc, or warc.gz.
+   * Query param: File type hint, such as `pdf`, `docx`, `xlsx`, `pptx`, `html`,
+   * `json`, `csv`, `md`, `py`, `rtf`, `jpg`, `png`, `txt`, `warc`, or `warc.gz`. Use
+   * it when the `Content-Type` header is missing or generic.
    */
   extension?:
     | 'warc'
@@ -224,46 +227,46 @@ export interface ParseHandleParams {
     | 'pnm';
 
   /**
-   * Query param: Include image references in Markdown output
+   * Query param: Include image references in the Markdown.
    */
   includeImages?: boolean;
 
   /**
-   * Query param: Preserve hyperlinks in Markdown output
+   * Query param: Keep link URLs in the Markdown.
    */
   includeLinks?: boolean;
 
   /**
    * Query param: Start each PDF page in the Markdown with a `<!-- page N -->` line,
-   * where N is the original 1-based page number.
+   * where `N` is the original 1-based page number.
    */
   includeNumberedPages?: boolean;
 
   /**
-   * Query param: Read text from images and scanned PDF pages. PDF page ranges still
-   * apply.
+   * Query param: Read text from images and scanned PDF pages with OCR, within the
+   * `pdf` page range. Adds 1 credit per page read.
    */
   ocr?: boolean;
 
   /**
-   * Query param: PDF page-range options as a JSON object, e.g. {"start": 2, "end":
-   * 5}.
+   * Query param: PDF page range as a JSON object, such as `{"start": 2, "end": 5}`.
    */
   pdf?: ParseHandleParams.Pdf;
 
   /**
-   * Query param: Shorten base64-encoded image data in the Markdown output
+   * Query param: Shorten inline base64 image data.
    */
   shortenBase64Images?: boolean;
 
   /**
-   * Query param: Comma-separated labels for filtering usage, e.g.
-   * `production,team-alpha`.
+   * Query param: Comma-separated labels for this request, such as
+   * `production,team-alpha`. Filter usage and request logs by them.
    */
   tags?: Array<string>;
 
   /**
-   * Query param: Extract only the main content from HTML-like inputs
+   * Query param: Keep only the main content, without navigation, headers, footers,
+   * or sidebars. Applies to HTML-like inputs.
    */
   useMainContentOnly?: boolean;
 
@@ -276,17 +279,16 @@ export interface ParseHandleParams {
 
 export namespace ParseHandleParams {
   /**
-   * PDF page-range options as a JSON object, e.g. {"start": 2, "end": 5}.
+   * PDF page range as a JSON object, such as `{"start": 2, "end": 5}`.
    */
   export interface Pdf {
     /**
-     * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
-     * be >= start.
+     * Last page to parse. Defaults to the last page. Must be at least `start`.
      */
     end?: number;
 
     /**
-     * First 1-based PDF page to parse.
+     * First page to parse, starting at 1.
      */
     start?: number;
   }

@@ -6,8 +6,10 @@ import { RequestOptions } from '../internal/request-options';
 
 export class Web extends APIResource {
   /**
-   * Research the web and return a sourced answer in your JSON shape. Choose `fast`
-   * for a short task or `ultra` for deeper research.
+   * Research a task across the live web and Context.dev's company and people data,
+   * and get the answer in the JSON shape you provide, with the URLs it used. `fast`
+   * (10 credits) suits short lookups; `ultra` (100 credits, the default) reads more
+   * sources for deeper research.
    *
    * @example
    * ```ts
@@ -26,8 +28,8 @@ export class Web extends APIResource {
   }
 
   /**
-   * Analyze a company's landing page and web search evidence to return direct
-   * competitors for the same product or market.
+   * Find a company's direct competitors from its website and web search results.
+   * Each competitor comes with a confidence level and the search results behind it.
    *
    * @example
    * ```ts
@@ -44,7 +46,9 @@ export class Web extends APIResource {
   }
 
   /**
-   * Extract colors, typography, spacing, and component styles from a website.
+   * Extract a website's design system: colors, typography, spacing, shadows, button
+   * and card styles, and downloadable font files. Every component style includes
+   * ready-to-use CSS.
    *
    * @example
    * ```ts
@@ -59,8 +63,9 @@ export class Web extends APIResource {
   }
 
   /**
-   * Discover a site's URLs, with page titles, descriptions, keywords, and language
-   * when available. Metadata can be missing on newly discovered URLs.
+   * Map up to 100,000 URLs on a domain, with titles, descriptions, keywords, and
+   * language when available. Filter with regex patterns, or rank by topic with
+   * `search` for 1 extra credit. Newly discovered URLs can lack metadata.
    *
    * @example
    * ```ts
@@ -74,8 +79,10 @@ export class Web extends APIResource {
   }
 
   /**
-   * Scrape anything from a URL on the internet. Returns the outputs you enable in
-   * formats. Handles PDFs, DOCX, PPT, XLSX, and 40 other file formats.
+   * Turn any URL into Markdown, HTML, a screenshot, images, raw bytes, parsed
+   * fields, product data, highlights, or schema-matched JSON in one request. Choose
+   * the outputs in `formats`; each one succeeds or fails on its own. Handles PDF,
+   * Word, Excel, PowerPoint, and 40 other file formats.
    *
    * @example
    * ```ts
@@ -90,7 +97,8 @@ export class Web extends APIResource {
   }
 
   /**
-   * Capture a screenshot of a website.
+   * Capture a screenshot of a website's home page, a page type such as pricing, or
+   * an exact URL. Returns the visible viewport, a scroll slice, or the full page.
    *
    * @example
    * ```ts
@@ -105,8 +113,9 @@ export class Web extends APIResource {
   }
 
   /**
-   * Search the web and optionally return page content or relevant passages with each
-   * result.
+   * Search the web and get ranked results, with optional page Markdown or
+   * query-relevant passages for each one. Supports search operators and filters for
+   * domain, freshness, country, and language.
    *
    * @example
    * ```ts
@@ -121,8 +130,9 @@ export class Web extends APIResource {
   }
 
   /**
-   * Crawl a website and return page content as Markdown. Use a batch for crawls
-   * beyond 500 pages.
+   * Crawl up to 500 pages from a start URL and get each page back as Markdown with
+   * metadata. Control scope with depth limits, regex patterns, and subdomain rules.
+   * For larger crawls, use a batch.
    *
    * @example
    * ```ts
@@ -139,7 +149,7 @@ export class Web extends APIResource {
 
 export interface WebAnswersResponse {
   /**
-   * The answer, in the shape requested by json_format.
+   * The answer, in the shape of `json_format`.
    */
   json_content: { [key: string]: unknown };
 
@@ -150,8 +160,8 @@ export interface WebAnswersResponse {
   request_id: string;
 
   /**
-   * URLs of the pages and company/profile records read for the answer, followed by
-   * URLs cited in json_content.
+   * URLs of the pages and company or profile records read for the answer, followed
+   * by URLs cited in `json_content`.
    */
   sources: Array<string>;
 
@@ -161,7 +171,7 @@ export interface WebAnswersResponse {
   key_metadata?: WebAnswersResponse.KeyMetadata;
 
   /**
-   * True when the answer is incomplete: the request deadline ended research, or a
+   * `true` when the answer is incomplete because the deadline ended research or a
    * requested list item has no researched values.
    */
   partial?: boolean;
@@ -178,7 +188,7 @@ export namespace WebAnswersResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -186,12 +196,12 @@ export namespace WebAnswersResponse {
 
 export interface WebExtractCompetitorsResponse {
   /**
-   * Direct competitors ordered by relevance and confidence.
+   * Direct competitors, ordered by relevance and confidence.
    */
   competitors: Array<WebExtractCompetitorsResponse.Competitor>;
 
   /**
-   * Normalized input domain.
+   * Normalized domain from the request.
    */
   domain: string;
 
@@ -202,12 +212,12 @@ export interface WebExtractCompetitorsResponse {
   request_id: string;
 
   /**
-   * Status of the response.
+   * Always `ok` on success.
    */
   status: 'ok';
 
   /**
-   * Target company profile inferred from the landing page.
+   * Profile of the requested company, inferred from its website.
    */
   target: WebExtractCompetitorsResponse.Target;
 
@@ -217,8 +227,8 @@ export interface WebExtractCompetitorsResponse {
   key_metadata?: WebExtractCompetitorsResponse.KeyMetadata;
 
   /**
-   * True when the timeout ended processing and this response contains only usable
-   * results completed so far. Unfinished results are omitted.
+   * `true` when the deadline passed with `timeoutOpts.behavior` set to
+   * `return-partial`. Only results finished in time are included.
    */
   partial?: boolean;
 }
@@ -231,12 +241,12 @@ export namespace WebExtractCompetitorsResponse {
     confidence: 'high' | 'medium';
 
     /**
-     * Short description of the competitor.
+     * Short description of what the competitor offers.
      */
     description: string;
 
     /**
-     * Competitor's normalized official domain.
+     * Competitor's official domain, normalized.
      */
     domain: string;
 
@@ -251,32 +261,32 @@ export namespace WebExtractCompetitorsResponse {
     sourceUrls: Array<string>;
 
     /**
-     * Competitor website URL.
+     * Competitor's website URL.
      */
     url: string;
   }
 
   /**
-   * Target company profile inferred from the landing page.
+   * Profile of the requested company, inferred from its website.
    */
   export interface Target {
     /**
-     * Company or product name inferred from the landing page.
+     * Company or product name, inferred from its website.
      */
     companyName: string;
 
     /**
-     * Specific operating field, product category, or market.
+     * Product category or market the company operates in.
      */
     field: string;
 
     /**
-     * One-sentence description of what the target company sells and who it serves.
+     * One-sentence summary of what the company sells and who it serves.
      */
     fieldDescription: string;
 
     /**
-     * Resolved URL used for the landing page analysis.
+     * Website URL that was analyzed.
      */
     websiteUrl: string;
   }
@@ -291,7 +301,7 @@ export namespace WebExtractCompetitorsResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -299,7 +309,7 @@ export namespace WebExtractCompetitorsResponse {
 
 export interface WebExtractStyleguideResponse {
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   cache_metadata: WebExtractStyleguideResponse.CacheMetadata;
 
@@ -310,12 +320,12 @@ export interface WebExtractStyleguideResponse {
   request_id: string;
 
   /**
-   * HTTP status code
+   * HTTP status code, repeated in the body.
    */
   code?: number;
 
   /**
-   * The normalized domain that was processed
+   * Normalized domain that was analyzed.
    */
   domain?: string;
 
@@ -336,24 +346,24 @@ export interface WebExtractStyleguideResponse {
   status?: string;
 
   /**
-   * Comprehensive styleguide data extracted from the website
+   * Design tokens and component styles extracted from the website.
    */
   styleguide?: WebExtractStyleguideResponse.Styleguide;
 }
 
 export namespace WebExtractStyleguideResponse {
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   export interface CacheMetadata {
     /**
-     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+     * Age of the cached data, in milliseconds. `0` for `miss` and `zdr`.
      */
     age_ms: number;
 
     /**
-     * Whether the response was served from cache, required fresh work, or honored
-     * zero-data-retention cache bypass.
+     * `hit` when served from cache, `miss` when fetched fresh, `zdr` when zero data
+     * retention bypassed the cache.
      */
     status: 'hit' | 'miss' | 'zdr';
   }
@@ -368,92 +378,92 @@ export namespace WebExtractStyleguideResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
 
   /**
-   * Comprehensive styleguide data extracted from the website
+   * Design tokens and component styles extracted from the website.
    */
   export interface Styleguide {
     /**
-     * Primary colors used on the website
+     * Core colors used on the website.
      */
     colors: Styleguide.Colors;
 
     /**
-     * UI component styles
+     * Styles for buttons and cards.
      */
     components: Styleguide.Components;
 
     /**
-     * Spacing system used on the website
+     * Spacing scale used on the website, from `xs` to `xl`.
      */
     elementSpacing: Styleguide.ElementSpacing;
 
     /**
-     * Font assets keyed by family name as it appears in fontFamily/fontFallbacks
-     * (non-generic names only). Match font style and weight against faces to select a
-     * file URL.
+     * Font files keyed by family name, as it appears in `fontFamily` and
+     * `fontFallbacks`. Generic families are left out. Match style and weight against
+     * `faces` to pick a file.
      */
     fontLinks: { [key: string]: Styleguide.FontLinks };
 
     /**
-     * The primary color mode of the website design
+     * Whether the site's design is mainly light or dark.
      */
     mode: 'light' | 'dark';
 
     /**
-     * Shadow styles used on the website
+     * Box shadow scale used on the website, from `sm` to `xl`, plus `inner`.
      */
     shadows: Styleguide.Shadows;
 
     /**
-     * Typography styles used on the website
+     * Text styles for headings and body text.
      */
     typography: Styleguide.Typography;
   }
 
   export namespace Styleguide {
     /**
-     * Primary colors used on the website
+     * Core colors used on the website.
      */
     export interface Colors {
       /**
-       * Accent color (hex format)
+       * Accent color, in hex.
        */
       accent: string;
 
       /**
-       * Background color (hex format)
+       * Background color, in hex.
        */
       background: string;
 
       /**
-       * Text color (hex format)
+       * Text color, in hex.
        */
       text: string;
     }
 
     /**
-     * UI component styles
+     * Styles for buttons and cards.
      */
     export interface Components {
       /**
-       * Button component styles
+       * Primary, secondary, and link button styles.
        */
       button: Components.Button;
 
       /**
-       * Card component style
+       * Card style.
        */
       card?: Components.Card;
     }
 
     export namespace Components {
       /**
-       * Button component styles
+       * Primary, secondary, and link button styles.
        */
       export interface Button {
         link?: Button.Link;
@@ -468,8 +478,7 @@ export namespace WebExtractStyleguideResponse {
           backgroundColor: string;
 
           /**
-           * Border color as CSS hex (#RRGGBB or #RRGGBBAA when computed border-color has
-           * alpha)
+           * Border color in hex: `#RRGGBB`, or `#RRGGBBAA` when the border is translucent.
            */
           borderColor: string;
 
@@ -480,14 +489,14 @@ export namespace WebExtractStyleguideResponse {
           borderWidth: string;
 
           /**
-           * Computed box-shadow (comma-separated layers when present)
+           * Computed `box-shadow`, with layers separated by commas.
            */
           boxShadow: string;
 
           color: string;
 
           /**
-           * Ready-to-use CSS declaration block for this component style
+           * Ready-to-use CSS declarations for this style.
            */
           css: string;
 
@@ -496,12 +505,12 @@ export namespace WebExtractStyleguideResponse {
           fontWeight: number;
 
           /**
-           * Sampled minimum height of the button box (typically px)
+           * Minimum height as a CSS length, usually in pixels.
            */
           minHeight: string;
 
           /**
-           * Minimum width (usually px).
+           * Minimum width as a CSS length, usually in pixels.
            */
           minWidth: string;
 
@@ -510,17 +519,17 @@ export namespace WebExtractStyleguideResponse {
           textDecoration: string;
 
           /**
-           * Full ordered font list from computed font-family
+           * Full font stack from the computed `font-family`, in order.
            */
           fontFallbacks?: Array<string>;
 
           /**
-           * Primary button typeface (first in fontFallbacks)
+           * Button typeface, the first entry in `fontFallbacks`.
            */
           fontFamily?: string;
 
           /**
-           * Hex color of the underline when it differs from the text color
+           * Underline color in hex, when it differs from the text color.
            */
           textDecorationColor?: string;
         }
@@ -529,8 +538,7 @@ export namespace WebExtractStyleguideResponse {
           backgroundColor: string;
 
           /**
-           * Border color as CSS hex (#RRGGBB or #RRGGBBAA when computed border-color has
-           * alpha)
+           * Border color in hex: `#RRGGBB`, or `#RRGGBBAA` when the border is translucent.
            */
           borderColor: string;
 
@@ -541,14 +549,14 @@ export namespace WebExtractStyleguideResponse {
           borderWidth: string;
 
           /**
-           * Computed box-shadow (comma-separated layers when present)
+           * Computed `box-shadow`, with layers separated by commas.
            */
           boxShadow: string;
 
           color: string;
 
           /**
-           * Ready-to-use CSS declaration block for this component style
+           * Ready-to-use CSS declarations for this style.
            */
           css: string;
 
@@ -557,12 +565,12 @@ export namespace WebExtractStyleguideResponse {
           fontWeight: number;
 
           /**
-           * Sampled minimum height of the button box (typically px)
+           * Minimum height as a CSS length, usually in pixels.
            */
           minHeight: string;
 
           /**
-           * Minimum width (usually px).
+           * Minimum width as a CSS length, usually in pixels.
            */
           minWidth: string;
 
@@ -571,17 +579,17 @@ export namespace WebExtractStyleguideResponse {
           textDecoration: string;
 
           /**
-           * Full ordered font list from computed font-family
+           * Full font stack from the computed `font-family`, in order.
            */
           fontFallbacks?: Array<string>;
 
           /**
-           * Primary button typeface (first in fontFallbacks)
+           * Button typeface, the first entry in `fontFallbacks`.
            */
           fontFamily?: string;
 
           /**
-           * Hex color of the underline when it differs from the text color
+           * Underline color in hex, when it differs from the text color.
            */
           textDecorationColor?: string;
         }
@@ -590,8 +598,7 @@ export namespace WebExtractStyleguideResponse {
           backgroundColor: string;
 
           /**
-           * Border color as CSS hex (#RRGGBB or #RRGGBBAA when computed border-color has
-           * alpha)
+           * Border color in hex: `#RRGGBB`, or `#RRGGBBAA` when the border is translucent.
            */
           borderColor: string;
 
@@ -602,14 +609,14 @@ export namespace WebExtractStyleguideResponse {
           borderWidth: string;
 
           /**
-           * Computed box-shadow (comma-separated layers when present)
+           * Computed `box-shadow`, with layers separated by commas.
            */
           boxShadow: string;
 
           color: string;
 
           /**
-           * Ready-to-use CSS declaration block for this component style
+           * Ready-to-use CSS declarations for this style.
            */
           css: string;
 
@@ -618,12 +625,12 @@ export namespace WebExtractStyleguideResponse {
           fontWeight: number;
 
           /**
-           * Sampled minimum height of the button box (typically px)
+           * Minimum height as a CSS length, usually in pixels.
            */
           minHeight: string;
 
           /**
-           * Minimum width (usually px).
+           * Minimum width as a CSS length, usually in pixels.
            */
           minWidth: string;
 
@@ -632,31 +639,30 @@ export namespace WebExtractStyleguideResponse {
           textDecoration: string;
 
           /**
-           * Full ordered font list from computed font-family
+           * Full font stack from the computed `font-family`, in order.
            */
           fontFallbacks?: Array<string>;
 
           /**
-           * Primary button typeface (first in fontFallbacks)
+           * Button typeface, the first entry in `fontFallbacks`.
            */
           fontFamily?: string;
 
           /**
-           * Hex color of the underline when it differs from the text color
+           * Underline color in hex, when it differs from the text color.
            */
           textDecorationColor?: string;
         }
       }
 
       /**
-       * Card component style
+       * Card style.
        */
       export interface Card {
         backgroundColor: string;
 
         /**
-         * Border color as CSS hex (#RRGGBB or #RRGGBBAA when computed border-color has
-         * alpha)
+         * Border color in hex: `#RRGGBB`, or `#RRGGBBAA` when the border is translucent.
          */
         borderColor: string;
 
@@ -669,7 +675,7 @@ export namespace WebExtractStyleguideResponse {
         boxShadow: string;
 
         /**
-         * Ready-to-use CSS declaration block for this component style
+         * Ready-to-use CSS declarations for this style.
          */
         css: string;
 
@@ -680,7 +686,7 @@ export namespace WebExtractStyleguideResponse {
     }
 
     /**
-     * Spacing system used on the website
+     * Spacing scale used on the website, from `xs` to `xl`.
      */
     export interface ElementSpacing {
       lg: string;
@@ -695,22 +701,25 @@ export namespace WebExtractStyleguideResponse {
     }
 
     export interface FontLinks {
+      /**
+       * `google` for Google Fonts, `custom` for any other font source.
+       */
       type: 'google' | 'custom';
 
       /**
-       * Google Fonts category when type is google (e.g. sans-serif, serif, monospace,
-       * display, handwriting). Omitted for custom fonts when unknown.
+       * Google Fonts category, such as `sans-serif`, `serif`, `monospace`, `display`, or
+       * `handwriting`. Omitted for custom fonts when unknown.
        */
       category?: string;
 
       /**
-       * Human-readable family name. For custom fonts, derived from the fontLinks key;
-       * for Google fonts, the canonical Google Fonts family name.
+       * Human-readable family name: the `fontLinks` key for custom fonts, or the
+       * official Google Fonts name for Google fonts.
        */
       displayName?: string;
 
       /**
-       * Discovered font faces, including style, weight, and distinct Unicode subsets.
+       * Font faces found for this family, one per style, weight, and Unicode subset.
        */
       faces?: Array<FontLinks.Face>;
 
@@ -725,36 +734,36 @@ export namespace WebExtractStyleguideResponse {
     export namespace FontLinks {
       export interface Face {
         /**
-         * CSS font-style descriptor: normal, italic, or oblique, including an optional
-         * oblique angle or angle range (e.g. oblique 10deg 20deg).
+         * CSS `font-style` descriptor: `normal`, `italic`, or `oblique`, with an optional
+         * angle or angle range such as `oblique 10deg 20deg`.
          */
         style: string;
 
         /**
-         * Preferred font file URL or inline font data URL.
+         * URL of the font file, or an inline data URL.
          */
         url: string;
 
         /**
-         * CSS font-weight descriptor. A variable font file can have a range such as "300
-         * 500", covering intermediate weights without separate files.
+         * CSS `font-weight` descriptor. A variable font can have a range such as
+         * `300 500`, which covers every weight in between with one file.
          */
         weight: string;
 
         /**
-         * CSS unicode-range descriptor.
+         * CSS `unicode-range` descriptor.
          */
         unicodeRange?: string;
 
         /**
-         * CSS font-width or font-stretch descriptor.
+         * CSS `font-width` or `font-stretch` descriptor.
          */
         width?: string;
       }
     }
 
     /**
-     * Shadow styles used on the website
+     * Box shadow scale used on the website, from `sm` to `xl`, plus `inner`.
      */
     export interface Shadows {
       inner: string;
@@ -769,11 +778,11 @@ export namespace WebExtractStyleguideResponse {
     }
 
     /**
-     * Typography styles used on the website
+     * Text styles for headings and body text.
      */
     export interface Typography {
       /**
-       * Heading styles
+       * Styles for `h1` through `h4` headings.
        */
       headings: Typography.Headings;
 
@@ -782,7 +791,7 @@ export namespace WebExtractStyleguideResponse {
 
     export namespace Typography {
       /**
-       * Heading styles
+       * Styles for `h1` through `h4` headings.
        */
       export interface Headings {
         h1?: Headings.H1;
@@ -797,7 +806,7 @@ export namespace WebExtractStyleguideResponse {
       export namespace Headings {
         export interface H1 {
           /**
-           * Full ordered font list from resolved computed font-family
+           * Full font stack from the computed `font-family`, in order.
            */
           fontFallbacks: Array<string>;
 
@@ -817,7 +826,7 @@ export namespace WebExtractStyleguideResponse {
 
         export interface H2 {
           /**
-           * Full ordered font list from resolved computed font-family
+           * Full font stack from the computed `font-family`, in order.
            */
           fontFallbacks: Array<string>;
 
@@ -837,7 +846,7 @@ export namespace WebExtractStyleguideResponse {
 
         export interface H3 {
           /**
-           * Full ordered font list from resolved computed font-family
+           * Full font stack from the computed `font-family`, in order.
            */
           fontFallbacks: Array<string>;
 
@@ -857,7 +866,7 @@ export namespace WebExtractStyleguideResponse {
 
         export interface H4 {
           /**
-           * Full ordered font list from resolved computed font-family
+           * Full font stack from the computed `font-family`, in order.
            */
           fontFallbacks: Array<string>;
 
@@ -878,7 +887,7 @@ export namespace WebExtractStyleguideResponse {
 
       export interface P {
         /**
-         * Full ordered font list from resolved computed font-family
+         * Full font stack from the computed `font-family`, in order.
          */
         fontFallbacks: Array<string>;
 
@@ -900,6 +909,9 @@ export namespace WebExtractStyleguideResponse {
 }
 
 export interface WebMapURLsResponse {
+  /**
+   * Normalized domain that was mapped.
+   */
   domain: string;
 
   /**
@@ -908,8 +920,14 @@ export interface WebMapURLsResponse {
    */
   request_id: string;
 
+  /**
+   * Always `true` on success.
+   */
   success: true;
 
+  /**
+   * URLs found on the domain, with page metadata when available.
+   */
   urls: Array<WebMapURLsResponse.URL>;
 
   /**
@@ -917,19 +935,38 @@ export interface WebMapURLsResponse {
    */
   key_metadata?: WebMapURLsResponse.KeyMetadata;
 
+  /**
+   * `true` when the deadline passed with `timeoutOpts.behavior` set to
+   * `return-partial`. Only results finished in time are included.
+   */
   partial?: boolean;
 }
 
 export namespace WebMapURLsResponse {
   export interface URL {
+    /**
+     * Page URL.
+     */
     url: string;
 
+    /**
+     * Page description, when available.
+     */
     description?: string;
 
+    /**
+     * Keywords from the page's `keywords` meta tag.
+     */
     keywords?: Array<string>;
 
+    /**
+     * Page language, when available.
+     */
     language?: string;
 
+    /**
+     * Page title, when available.
+     */
     title?: string;
   }
 
@@ -943,7 +980,7 @@ export namespace WebMapURLsResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -956,7 +993,7 @@ export interface WebScrapeResponse {
   bytes: WebScrapeResponse.Bytes;
 
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   cache_metadata: WebScrapeResponse.CacheMetadata;
 
@@ -967,12 +1004,12 @@ export interface WebScrapeResponse {
   highlights: WebScrapeResponse.Highlights;
 
   /**
-   * Rendered HTML after content filters.
+   * Rendered HTML of the page, after content filters.
    */
   html: WebScrapeResponse.HTML;
 
   /**
-   * Images after content filters. `[]` when none are found.
+   * Images found on the page, after content filters. `[]` when there are none.
    */
   images: WebScrapeResponse.Images;
 
@@ -982,7 +1019,7 @@ export interface WebScrapeResponse {
   json: WebScrapeResponse.Json;
 
   /**
-   * Markdown after content filters.
+   * Page content as Markdown, after content filters.
    */
   markdown: WebScrapeResponse.Markdown;
 
@@ -992,28 +1029,9 @@ export interface WebScrapeResponse {
   metadata: WebScrapeResponse.Metadata;
 
   /**
-   * Custom rules return fields after content filters; unmatched fields are null ([]
-   * for lists). The google-maps parser returns business records in data.results,
-   * google-maps-reviews returns data.reviews, and the google-play parser returns one
-   * app record as data, google-play-reviews returns data.reviews, app-store and
-   * app-store-reviews do the same for the App Store, g2-reviews returns data.reviews
-   * for a G2 product, instagram-profile and instagram-post return one record as
-   * data, instagram-feed returns data.posts, tiktok-profile and tiktok-video return
-   * one record as data, tiktok-feed returns data.videos, tiktok-comments returns
-   * data.comments, tiktok-followers, tiktok-following, and tiktok-user-search return
-   * data.users, yelp-search returns up to 20 ranked organic businesses in
-   * data.businesses, plus total and pagination, from a Yelp search URL; yelp-reviews
-   * returns up to 20 latest public reviews in data.reviews, with business details
-   * and next_offset, from a Yelp business URL; tripadvisor-reviews returns 20
-   * reviews in data.reviews, with data.location and next_offset, from a Tripadvisor
-   * hotel, restaurant, or attraction review URL; car-rental-availability returns
-   * every vehicle with pay-now and pay-later prices in data.vehicles from an
-   * avis.com or budget.com vehicle-availability search URL; car-rental-locations
-   * returns rental branches with codes, addresses, coordinates and hours in
-   * data.locations from an avis.com or budget.com /locations?keyword= URL; emails,
-   * phone-numbers, and links return data.emails, data.phone_numbers, and data.links
-   * from the rendered page; the store, Maps, G2, Instagram, and TikTok parsers read
-   * their data directly, independently of DOM filters and other outputs.
+   * Fields extracted by `parseParams`. Custom rules return each field after content
+   * filters, with `null` when nothing matches (`[]` for `list` rules). Prebuilt
+   * parsers return the record or lists described under `parseParams.parser`.
    */
   parsed: WebScrapeResponse.Parsed;
 
@@ -1023,8 +1041,7 @@ export interface WebScrapeResponse {
   product: WebScrapeResponse.Product;
 
   /**
-   * Authenticated browser profile used for this scrape, or null when no profile was
-   * requested. New and existing profile requests both return the profile ID.
+   * Browser profile used for this scrape. `null` when no profile was requested.
    */
   profile: WebScrapeResponse.Profile | null;
 
@@ -1045,8 +1062,8 @@ export interface WebScrapeResponse {
   url: string;
 
   /**
-   * True when at least one requested output succeeds but the response has failed or
-   * incomplete outputs. Absent when all requested outputs fail.
+   * `true` when at least one requested output succeeded but others failed or are
+   * incomplete. Absent otherwise.
    */
   isPartial?: true;
 
@@ -1063,20 +1080,24 @@ export namespace WebScrapeResponse {
   export interface Bytes {
     data: Bytes.Data | null;
 
+    /**
+     * Whether you requested this output in `formats`.
+     */
     requested: boolean;
 
     /**
-     * `true` if returned, `false` if it failed, `null` if not requested.
+     * `true` when the output succeeded, `false` when it failed, `null` when it was not
+     * requested.
      */
     success: boolean | null;
 
     /**
-     * Why the output failed. Present only when `success` is `false`.
+     * Machine-readable error code. Present only when `success` is `false`.
      */
     error_code?: string;
 
     /**
-     * Explanation of the failure and possible next steps.
+     * Human-readable explanation of the error and how to resolve it.
      */
     message?: string;
   }
@@ -1084,26 +1105,29 @@ export namespace WebScrapeResponse {
   export namespace Bytes {
     export interface Data {
       /**
-       * Body as base64, after HTTP decompression. Up to 50 MiB decoded.
+       * Response body as base64, after HTTP decompression. Up to 50 MiB decoded.
        */
       base64: string;
 
+      /**
+       * `Content-Type` of the response.
+       */
       contentType: string;
     }
   }
 
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   export interface CacheMetadata {
     /**
-     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+     * Age of the cached data, in milliseconds. `0` for `miss` and `zdr`.
      */
     age_ms: number;
 
     /**
-     * Whether the response was served from cache, required fresh work, or honored
-     * zero-data-retention cache bypass.
+     * `hit` when served from cache, `miss` when fetched fresh, `zdr` when zero data
+     * retention bypassed the cache.
      */
     status: 'hit' | 'miss' | 'zdr';
   }
@@ -1115,68 +1139,80 @@ export namespace WebScrapeResponse {
   export interface Highlights {
     data: Array<string> | null;
 
+    /**
+     * Whether you requested this output in `formats`.
+     */
     requested: boolean;
 
     /**
-     * `true` if returned, `false` if it failed, `null` if not requested.
+     * `true` when the output succeeded, `false` when it failed, `null` when it was not
+     * requested.
      */
     success: boolean | null;
 
     /**
-     * Why the output failed. Present only when `success` is `false`.
+     * Machine-readable error code. Present only when `success` is `false`.
      */
     error_code?: string;
 
     /**
-     * Explanation of the failure and possible next steps.
+     * Human-readable explanation of the error and how to resolve it.
      */
     message?: string;
   }
 
   /**
-   * Rendered HTML after content filters.
+   * Rendered HTML of the page, after content filters.
    */
   export interface HTML {
     data: string | null;
 
+    /**
+     * Whether you requested this output in `formats`.
+     */
     requested: boolean;
 
     /**
-     * `true` if returned, `false` if it failed, `null` if not requested.
+     * `true` when the output succeeded, `false` when it failed, `null` when it was not
+     * requested.
      */
     success: boolean | null;
 
     /**
-     * Why the output failed. Present only when `success` is `false`.
+     * Machine-readable error code. Present only when `success` is `false`.
      */
     error_code?: string;
 
     /**
-     * Explanation of the failure and possible next steps.
+     * Human-readable explanation of the error and how to resolve it.
      */
     message?: string;
   }
 
   /**
-   * Images after content filters. `[]` when none are found.
+   * Images found on the page, after content filters. `[]` when there are none.
    */
   export interface Images {
     data: Array<Images.Data> | null;
 
+    /**
+     * Whether you requested this output in `formats`.
+     */
     requested: boolean;
 
     /**
-     * `true` if returned, `false` if it failed, `null` if not requested.
+     * `true` when the output succeeded, `false` when it failed, `null` when it was not
+     * requested.
      */
     success: boolean | null;
 
     /**
-     * Why the output failed. Present only when `success` is `false`.
+     * Machine-readable error code. Present only when `success` is `false`.
      */
     error_code?: string;
 
     /**
-     * Explanation of the failure and possible next steps.
+     * Human-readable explanation of the error and how to resolve it.
      */
     message?: string;
   }
@@ -1184,7 +1220,7 @@ export namespace WebScrapeResponse {
   export namespace Images {
     export interface Data {
       /**
-       * Alt text, if present.
+       * Alt text. `null` when the image has none.
        */
       alt: string | null;
 
@@ -1193,6 +1229,10 @@ export namespace WebScrapeResponse {
        */
       url: string;
 
+      /**
+       * What the image shows, such as a photo, logo, or icon. Requires `classification`
+       * enrichment.
+       */
       classification?:
         | 'photography'
         | 'illustration'
@@ -1204,13 +1244,19 @@ export namespace WebScrapeResponse {
         | 'other';
 
       /**
-       * Hosted image URL, valid for 24 hours after capture. Requires `file` enrichment
-       * and ZDR disabled.
+       * Hosted copy of the image, valid for 24 hours after capture. Requires `file`
+       * enrichment; not returned with ZDR.
        */
       fileUrl?: string;
 
+      /**
+       * Image height in pixels. Requires `dimensions` enrichment.
+       */
       height?: number;
 
+      /**
+       * Image width in pixels. Requires `dimensions` enrichment.
+       */
       width?: number;
     }
   }
@@ -1221,50 +1267,58 @@ export namespace WebScrapeResponse {
   export interface Json {
     data: { [key: string]: unknown } | null;
 
+    /**
+     * Whether you requested this output in `formats`.
+     */
     requested: boolean;
 
     /**
-     * `true` if returned, `false` if it failed, `null` if not requested.
+     * `true` when the output succeeded, `false` when it failed, `null` when it was not
+     * requested.
      */
     success: boolean | null;
 
     /**
-     * Why the output failed. Present only when `success` is `false`.
+     * Machine-readable error code. Present only when `success` is `false`.
      */
     error_code?: string;
 
     /**
-     * True when the page was too long to read in full, so values found only in the
-     * unread parts may be missing.
+     * `true` when the page was too long to read in full, so values that appear only in
+     * the unread part may be missing.
      */
     isTruncated?: true;
 
     /**
-     * Explanation of the failure and possible next steps.
+     * Human-readable explanation of the error and how to resolve it.
      */
     message?: string;
   }
 
   /**
-   * Markdown after content filters.
+   * Page content as Markdown, after content filters.
    */
   export interface Markdown {
     data: string | null;
 
+    /**
+     * Whether you requested this output in `formats`.
+     */
     requested: boolean;
 
     /**
-     * `true` if returned, `false` if it failed, `null` if not requested.
+     * `true` when the output succeeded, `false` when it failed, `null` when it was not
+     * requested.
      */
     success: boolean | null;
 
     /**
-     * Why the output failed. Present only when `success` is `false`.
+     * Machine-readable error code. Present only when `success` is `false`.
      */
     error_code?: string;
 
     /**
-     * Explanation of the failure and possible next steps.
+     * Human-readable explanation of the error and how to resolve it.
      */
     message?: string;
   }
@@ -1274,42 +1328,43 @@ export namespace WebScrapeResponse {
    */
   export interface Metadata {
     /**
-     * Additional non-social meta tags not promoted to top-level metadata fields.
+     * Other non-social meta tags that don't have their own field.
      */
     additionalMeta?: { [key: string]: string | Array<string> };
 
     /**
-     * Resolved alternate links from link rel=alternate tags.
+     * Alternate links from `link rel="alternate"` tags, as absolute URLs.
      */
     alternates?: Array<Metadata.Alternate>;
 
     /**
-     * Author metadata, when present.
+     * Author, when present.
      */
     author?: string;
 
     /**
-     * Resolved canonical URL, when present.
+     * Absolute canonical URL, when present.
      */
     canonicalUrl?: string;
 
     /**
-     * Best description extracted from standard, Open Graph, or Twitter metadata.
+     * Best available description, from standard, Open Graph, or Twitter meta tags.
      */
     description?: string;
 
     /**
-     * Resolved favicon URL, when present.
+     * Absolute favicon URL, when present.
      */
     favicon?: string;
 
     /**
-     * Up to 500 h1–h6 headings in document order, before content filtering.
+     * Headings (`h1` to `h6`) in document order, from the full page before any
+     * filtering. Up to 500. Omitted when the page has none.
      */
     headings?: Array<Metadata.Heading>;
 
     /**
-     * Primary resolved preview image from Open Graph, Twitter, or image metadata.
+     * Main preview image URL, from Open Graph, Twitter, or image meta tags.
      */
     image?: string;
 
@@ -1319,47 +1374,47 @@ export namespace WebScrapeResponse {
     jsonLd?: Array<{ [key: string]: unknown }>;
 
     /**
-     * Keywords extracted from the page's keywords meta tag.
+     * Keywords from the page's `keywords` meta tag.
      */
     keywords?: Array<string>;
 
     /**
-     * Language extracted from html lang or language meta tags.
+     * Page language, from the `html` `lang` attribute or language meta tags.
      */
     language?: string;
 
     /**
-     * Modified timestamp/date from page metadata, when present.
+     * Last-modified date or timestamp from page metadata, when present.
      */
     modifiedTime?: string;
 
     /**
-     * Open Graph metadata with the og: prefix removed and keys camel-cased.
+     * Open Graph tags, with the `og:` prefix removed and keys in camelCase.
      */
     openGraph?: { [key: string]: string | Array<string> };
 
     /**
-     * Published timestamp/date from page metadata, when present.
+     * Publish date or timestamp from page metadata, when present.
      */
     publishedTime?: string;
 
     /**
-     * Robots meta directive, when present.
+     * `robots` meta directive, when present.
      */
     robots?: string;
 
     /**
-     * Site or application name from page metadata.
+     * Site or app name from page metadata.
      */
     siteName?: string;
 
     /**
-     * Best title extracted from the page.
+     * Best available page title.
      */
     title?: string;
 
     /**
-     * Twitter card metadata with the twitter: prefix removed and keys camel-cased.
+     * Twitter card tags, with the `twitter:` prefix removed and keys in camelCase.
      */
     twitter?: { [key: string]: string | Array<string> };
   }
@@ -1367,29 +1422,29 @@ export namespace WebScrapeResponse {
   export namespace Metadata {
     export interface Alternate {
       /**
-       * Resolved alternate URL.
+       * Absolute URL of the alternate version.
        */
       href: string;
 
       /**
-       * Language or locale for the alternate URL, when present.
+       * Language or locale of the alternate version, when present.
        */
       hreflang?: string;
 
       /**
-       * Alternate resource title, when present.
+       * Title of the alternate version, when present.
        */
       title?: string;
 
       /**
-       * Alternate resource MIME type, when present.
+       * MIME type of the alternate version, when present.
        */
       type?: string;
     }
 
     export interface Heading {
       /**
-       * Heading level, 1–6 (from h1–h6).
+       * Heading level, from 1 (`h1`) to 6 (`h6`).
        */
       level: number;
 
@@ -1401,42 +1456,27 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Custom rules return fields after content filters; unmatched fields are null ([]
-   * for lists). The google-maps parser returns business records in data.results,
-   * google-maps-reviews returns data.reviews, and the google-play parser returns one
-   * app record as data, google-play-reviews returns data.reviews, app-store and
-   * app-store-reviews do the same for the App Store, g2-reviews returns data.reviews
-   * for a G2 product, instagram-profile and instagram-post return one record as
-   * data, instagram-feed returns data.posts, tiktok-profile and tiktok-video return
-   * one record as data, tiktok-feed returns data.videos, tiktok-comments returns
-   * data.comments, tiktok-followers, tiktok-following, and tiktok-user-search return
-   * data.users, yelp-search returns up to 20 ranked organic businesses in
-   * data.businesses, plus total and pagination, from a Yelp search URL; yelp-reviews
-   * returns up to 20 latest public reviews in data.reviews, with business details
-   * and next_offset, from a Yelp business URL; tripadvisor-reviews returns 20
-   * reviews in data.reviews, with data.location and next_offset, from a Tripadvisor
-   * hotel, restaurant, or attraction review URL; car-rental-availability returns
-   * every vehicle with pay-now and pay-later prices in data.vehicles from an
-   * avis.com or budget.com vehicle-availability search URL; car-rental-locations
-   * returns rental branches with codes, addresses, coordinates and hours in
-   * data.locations from an avis.com or budget.com /locations?keyword= URL; emails,
-   * phone-numbers, and links return data.emails, data.phone_numbers, and data.links
-   * from the rendered page; the store, Maps, G2, Instagram, and TikTok parsers read
-   * their data directly, independently of DOM filters and other outputs.
+   * Fields extracted by `parseParams`. Custom rules return each field after content
+   * filters, with `null` when nothing matches (`[]` for `list` rules). Prebuilt
+   * parsers return the record or lists described under `parseParams.parser`.
    */
   export interface Parsed {
     data: { [key: string]: unknown } | null;
 
+    /**
+     * Whether you requested this output in `formats`.
+     */
     requested: boolean;
 
     /**
-     * `true` if returned, `false` if it failed, `null` if not requested.
+     * `true` when the output succeeded, `false` when it failed, `null` when it was not
+     * requested.
      */
     success: boolean | null;
 
     /**
-     * The selected prebuilt parser name, or custom when type is omitted, custom rules
-     * are used, or parsing is not requested.
+     * Prebuilt parser that ran, or `custom` for custom rules or when `parse` was not
+     * requested.
      */
     type:
       | 'custom'
@@ -1471,12 +1511,12 @@ export namespace WebScrapeResponse {
       | 'links';
 
     /**
-     * Why the output failed. Present only when `success` is `false`.
+     * Machine-readable error code. Present only when `success` is `false`.
      */
     error_code?: string;
 
     /**
-     * Explanation of the failure and possible next steps.
+     * Human-readable explanation of the error and how to resolve it.
      */
     message?: string;
   }
@@ -1487,20 +1527,24 @@ export namespace WebScrapeResponse {
   export interface Product {
     data: Product.Data | null;
 
+    /**
+     * Whether you requested this output in `formats`.
+     */
     requested: boolean;
 
     /**
-     * `true` if returned, `false` if it failed, `null` if not requested.
+     * `true` when the output succeeded, `false` when it failed, `null` when it was not
+     * requested.
      */
     success: boolean | null;
 
     /**
-     * Why the output failed. Present only when `success` is `false`.
+     * Machine-readable error code. Present only when `success` is `false`.
      */
     error_code?: string;
 
     /**
-     * Explanation of the failure and possible next steps.
+     * Human-readable explanation of the error and how to resolve it.
      */
     message?: string;
   }
@@ -1513,14 +1557,14 @@ export namespace WebScrapeResponse {
       isProductPage: boolean;
 
       /**
-       * The extracted product, or null when the page is not a product detail page.
+       * The extracted product. `null` when the page is not a product detail page.
        */
       product: Data.Product | null;
     }
 
     export namespace Data {
       /**
-       * The extracted product, or null when the page is not a product detail page.
+       * The extracted product. `null` when the page is not a product detail page.
        */
       export interface Product {
         /**
@@ -1547,7 +1591,7 @@ export namespace WebScrapeResponse {
         category: string | null;
 
         /**
-         * ISO 4217 currency code.
+         * ISO 4217 currency code of `price`.
          */
         currency: string | null;
 
@@ -1607,9 +1651,8 @@ export namespace WebScrapeResponse {
         targetAudience: Array<string>;
 
         /**
-         * Product variations, such as different colors or sizes, with their attributes and
-         * images. Empty if none are found. May not include every variation offered by the
-         * store.
+         * Product variants, such as colors or sizes, with their attributes and images.
+         * `[]` when none are found. May not include every variant the store offers.
          */
         variants: Array<Product.Variant>;
       }
@@ -1617,25 +1660,29 @@ export namespace WebScrapeResponse {
       export namespace Product {
         export interface Variant {
           /**
-           * Explicit variant attributes such as color, size, material, pattern and
-           * properties declared by page.
+           * Attributes that define this variant, such as color, size, material, or pattern,
+           * as stated on the page.
            */
           attributes: { [key: string]: string };
 
           /**
-           * Original source image URLs explicitly attached to this variant.
+           * Image URLs the source attaches to this variant.
            */
           images: Array<string>;
 
+          /**
+           * SKU of this variant. `null` when the source does not state one.
+           */
           sku: string | null;
 
           /**
-           * Variant or offer URL when provided by the source. May be shared by variants.
+           * URL of this variant or offer, when the source provides one. Several variants can
+           * share a URL.
            */
           url: string | null;
 
           /**
-           * Normalized stock or ordering availability of this variant.
+           * Stock or ordering availability of this variant.
            */
           availability?:
             | 'in_stock'
@@ -1648,12 +1695,12 @@ export namespace WebScrapeResponse {
             | null;
 
           /**
-           * Currency code for the variant price (e.g., USD, EUR) when stated with it.
+           * Currency code of `price`, such as `USD` or `EUR`, when stated.
            */
           currency?: string | null;
 
           /**
-           * Price of this variant when the source states one per variant.
+           * Price of this variant, when the source states one per variant.
            */
           price?: number | null;
         }
@@ -1662,13 +1709,12 @@ export namespace WebScrapeResponse {
   }
 
   /**
-   * Authenticated browser profile used for this scrape, or null when no profile was
-   * requested. New and existing profile requests both return the profile ID.
+   * Browser profile used for this scrape. `null` when no profile was requested.
    */
   export interface Profile {
     /**
-     * Save this ID after creating a profile, then reuse it as
-     * sharedParams.profile.profileId with type "existing".
+     * ID of the browser profile. After creating a profile, save it and pass it as
+     * `sharedParams.profile.profileId` with `type: "existing"`.
      */
     id: string;
   }
@@ -1679,20 +1725,24 @@ export namespace WebScrapeResponse {
   export interface Screenshot {
     data: string | null;
 
+    /**
+     * Whether you requested this output in `formats`.
+     */
     requested: boolean;
 
     /**
-     * `true` if returned, `false` if it failed, `null` if not requested.
+     * `true` when the output succeeded, `false` when it failed, `null` when it was not
+     * requested.
      */
     success: boolean | null;
 
     /**
-     * Why the output failed. Present only when `success` is `false`.
+     * Machine-readable error code. Present only when `success` is `false`.
      */
     error_code?: string;
 
     /**
-     * Explanation of the failure and possible next steps.
+     * Human-readable explanation of the error and how to resolve it.
      */
     message?: string;
   }
@@ -1707,7 +1757,7 @@ export namespace WebScrapeResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -1715,7 +1765,7 @@ export namespace WebScrapeResponse {
 
 export interface WebScreenshotResponse {
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   cache_metadata: WebScreenshotResponse.CacheMetadata;
 
@@ -1726,12 +1776,12 @@ export interface WebScreenshotResponse {
   request_id: string;
 
   /**
-   * HTTP status code
+   * HTTP status code, repeated in the body.
    */
   code?: number;
 
   /**
-   * The normalized domain that was processed
+   * Normalized domain that was captured.
    */
   domain?: string;
 
@@ -1742,7 +1792,7 @@ export interface WebScreenshotResponse {
   finalDOMState?: 'loaded' | 'still-loading';
 
   /**
-   * Height in pixels of the returned screenshot image
+   * Height of the returned image, in pixels.
    */
   height?: number;
 
@@ -1752,13 +1802,13 @@ export interface WebScreenshotResponse {
   key_metadata?: WebScreenshotResponse.KeyMetadata;
 
   /**
-   * Public image URL for standard requests, or an in-memory data URL when ZDR or
-   * non-empty custom headers are supplied.
+   * URL of the screenshot image. A data URL instead when `zdr` is `enabled` or
+   * `headers` are sent.
    */
   screenshot?: string;
 
   /**
-   * Type of screenshot that was captured
+   * Whether the image covers the viewport or the full page.
    */
   screenshotType?: 'viewport' | 'fullPage';
 
@@ -1768,24 +1818,24 @@ export interface WebScreenshotResponse {
   status?: string;
 
   /**
-   * Width in pixels of the returned screenshot image
+   * Width of the returned image, in pixels.
    */
   width?: number;
 }
 
 export namespace WebScreenshotResponse {
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   export interface CacheMetadata {
     /**
-     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+     * Age of the cached data, in milliseconds. `0` for `miss` and `zdr`.
      */
     age_ms: number;
 
     /**
-     * Whether the response was served from cache, required fresh work, or honored
-     * zero-data-retention cache bypass.
+     * `hit` when served from cache, `miss` when fetched fresh, `zdr` when zero data
+     * retention bypassed the cache.
      */
     status: 'hit' | 'miss' | 'zdr';
   }
@@ -1800,7 +1850,7 @@ export namespace WebScreenshotResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -1808,12 +1858,12 @@ export namespace WebScreenshotResponse {
 
 export interface WebSearchResponse {
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   cache_metadata: WebSearchResponse.CacheMetadata;
 
   /**
-   * Echo of the original query (useful when fanout was enabled).
+   * The query you sent.
    */
   query: string;
 
@@ -1831,34 +1881,33 @@ export interface WebSearchResponse {
   key_metadata?: WebSearchResponse.KeyMetadata;
 
   /**
-   * True when timeoutOpts.behavior=return-partial returned the usable results
-   * collected before the deadline. Partial collections are not cached as complete
-   * results.
+   * `true` when the deadline passed with `timeoutOpts.behavior` set to
+   * `return-partial`. Only results finished in time are included. Partial results
+   * are not cached.
    */
   partial?: boolean;
 }
 
 export namespace WebSearchResponse {
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   export interface CacheMetadata {
     /**
-     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+     * Age of the cached data, in milliseconds. `0` for `miss` and `zdr`.
      */
     age_ms: number;
 
     /**
-     * Whether the response was served from cache, required fresh work, or honored
-     * zero-data-retention cache bypass.
+     * `hit` when served from cache, `miss` when fetched fresh, `zdr` when zero data
+     * retention bypassed the cache.
      */
     status: 'hit' | 'miss' | 'zdr';
   }
 
   export interface Result {
     /**
-     * Snippet excerpt from the page. Empty string when the search provider does not
-     * supply a snippet.
+     * Snippet from the page. Empty string when no snippet is available.
      */
     description: string;
 
@@ -1873,7 +1922,7 @@ export namespace WebSearchResponse {
     markdown: Result.Markdown;
 
     /**
-     * Relevance to the original query.
+     * How relevant the result is to the query.
      */
     relevance: 'high' | 'medium' | 'low';
 
@@ -1894,7 +1943,7 @@ export namespace WebSearchResponse {
      */
     export interface Highlights {
       /**
-       * Per-result highlights outcome. Inspect this before reading `highlights`.
+       * Highlights outcome for this result. Check it before reading `highlights`.
        */
       code:
         | 'SUCCESS'
@@ -1907,8 +1956,8 @@ export namespace WebSearchResponse {
         | 'ERROR';
 
       /**
-       * Passages relevant to the query, in page order. Null unless
-       * highlightsOptions.enabled is true and the page was read.
+       * Passages relevant to the query, in page order. `null` unless
+       * `highlightsOptions.enabled` is `true` and the page was read.
        */
       highlights: Array<string> | null;
 
@@ -1923,7 +1972,7 @@ export namespace WebSearchResponse {
      */
     export interface Markdown {
       /**
-       * Per-result scrape outcome. Inspect this before reading `markdown`.
+       * Scrape outcome for this result. Check it before reading `markdown`.
        */
       code:
         | 'SUCCESS'
@@ -1936,8 +1985,8 @@ export namespace WebSearchResponse {
         | 'ERROR';
 
       /**
-       * GFM Markdown of the page. Null unless markdownOptions.enabled is true and
-       * scraping succeeded.
+       * Page content as GitHub-flavored Markdown. `null` unless
+       * `markdownOptions.enabled` is `true` and the scrape succeeded.
        */
       markdown: string | null;
 
@@ -1964,7 +2013,7 @@ export namespace WebSearchResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -1972,7 +2021,7 @@ export namespace WebSearchResponse {
 
 export interface WebWebCrawlMdResponse {
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   cache_metadata: WebWebCrawlMdResponse.CacheMetadata;
 
@@ -1992,61 +2041,61 @@ export interface WebWebCrawlMdResponse {
   key_metadata?: WebWebCrawlMdResponse.KeyMetadata;
 
   /**
-   * True when timeoutOpts.behavior=return-partial returned the usable results
-   * collected before the deadline. Partial collections are not cached as complete
-   * results.
+   * `true` when the deadline passed with `timeoutOpts.behavior` set to
+   * `return-partial`. Only results finished in time are included. Partial results
+   * are not cached.
    */
   partial?: boolean;
 }
 
 export namespace WebWebCrawlMdResponse {
   /**
-   * Whether this response came from cache.
+   * Cache status of this response.
    */
   export interface CacheMetadata {
     /**
-     * Age of the cached data in milliseconds. Zero for miss and zdr responses.
+     * Age of the cached data, in milliseconds. `0` for `miss` and `zdr`.
      */
     age_ms: number;
 
     /**
-     * Whether the response was served from cache, required fresh work, or honored
-     * zero-data-retention cache bypass.
+     * `hit` when served from cache, `miss` when fetched fresh, `zdr` when zero data
+     * retention bypassed the cache.
      */
     status: 'hit' | 'miss' | 'zdr';
   }
 
   export interface Metadata {
     /**
-     * Maximum crawl depth reached during the crawl
+     * Deepest link depth reached.
      */
     maxCrawlDepth: number;
 
     /**
-     * Number of pages that failed to crawl
+     * Number of pages that failed.
      */
     numFailed: number;
 
     /**
-     * Number of URLs skipped (PDFs when pdf.shouldParse=false, URLs not matching
-     * urlRegex, or URLs matching excludeUrlRegex)
+     * Number of URLs skipped: PDFs when `pdf.shouldParse` is `false`, URLs that do not
+     * match `urlRegex`, and URLs that match `excludeUrlRegex`.
      */
     numSkipped: number;
 
     /**
-     * Number of pages successfully crawled
+     * Number of pages crawled successfully.
      */
     numSucceeded: number;
 
     /**
-     * Total number of URLs crawled
+     * Number of URLs crawled.
      */
     numUrls: number;
   }
 
   export interface Result {
     /**
-     * Extracted page content as Markdown (empty string on failure)
+     * Page content as Markdown. Empty string when the page failed.
      */
     markdown: string;
 
@@ -2056,63 +2105,62 @@ export namespace WebWebCrawlMdResponse {
   export namespace Result {
     export interface Metadata {
       /**
-       * Depth relative to the start URL. 0 = start URL, 1 = one link away.
+       * Link depth from the start URL. `0` is the start URL, `1` is one link away.
        */
       crawlDepth: number;
 
       /**
-       * Final URL scraped after redirects or scraper fallback, when known. Falls back to
-       * sourceUrl when unavailable.
+       * URL that was scraped, after redirects. Same as `sourceUrl` when unknown.
        */
       finalUrl: string;
 
       /**
-       * Original URL requested by the caller.
+       * URL that was requested, before redirects.
        */
       sourceUrl: string;
 
       /**
-       * HTTP status code of the response (0 when the page could not be retrieved)
+       * HTTP status code of the page. `0` when the page could not be retrieved.
        */
       statusCode: number;
 
       /**
-       * true if the page was fetched and parsed successfully
+       * Whether the page was fetched and parsed.
        */
       success: boolean;
 
       /**
-       * Best page title extracted from the page (empty string if unavailable).
+       * Page title. Empty string when unavailable.
        */
       title: string;
 
       /**
-       * The crawl URL fetched for this page.
+       * URL fetched for this page.
        */
       url: string;
 
       /**
-       * Additional non-social meta tags not promoted to top-level metadata fields.
+       * Other non-social meta tags that don't have their own field.
        */
       additionalMeta?: { [key: string]: string | Array<string> };
 
       /**
-       * Resolved alternate links from link rel=alternate tags.
+       * Alternate links from `link rel="alternate"` tags, as absolute URLs.
        */
       alternates?: Array<Metadata.Alternate>;
 
       /**
-       * Author metadata, when present.
+       * Author, when present.
        */
       author?: string;
 
       /**
-       * Resolved canonical URL, when present.
+       * Absolute canonical URL, when present.
        */
       canonicalUrl?: string;
 
       /**
-       * Best description extracted from standard, Open Graph, or Twitter metadata.
+       * Best available description, from standard, Open Graph, or Twitter meta tags.
        */
       description?: string;
 
@@ -2125,18 +2173,18 @@ export namespace WebWebCrawlMdResponse {
       error_code?: string;
 
       /**
-       * Resolved favicon URL, when present.
+       * Absolute favicon URL, when present.
        */
       favicon?: string;
 
       /**
-       * Page headings (h1–h6) in document order, extracted from the unfiltered document.
-       * Capped at the first 500 headings. Omitted when the page has none.
+       * Headings (`h1` to `h6`) in document order, from the full page before any
+       * filtering. Up to 500. Omitted when the page has none.
        */
       headings?: Array<Metadata.Heading>;
 
       /**
-       * Primary resolved preview image from Open Graph, Twitter, or image metadata.
+       * Main preview image URL, from Open Graph, Twitter, or image meta tags.
        */
       image?: string;
 
@@ -2146,42 +2194,42 @@ export namespace WebWebCrawlMdResponse {
       jsonLd?: Array<{ [key: string]: unknown }>;
 
       /**
-       * Keywords extracted from the page's keywords meta tag.
+       * Keywords from the page's `keywords` meta tag.
        */
       keywords?: Array<string>;
 
       /**
-       * Language extracted from html lang or language meta tags.
+       * Page language, from the `html` `lang` attribute or language meta tags.
        */
       language?: string;
 
       /**
-       * Modified timestamp/date from page metadata, when present.
+       * Last-modified date or timestamp from page metadata, when present.
        */
       modifiedTime?: string;
 
       /**
-       * Open Graph metadata with the og: prefix removed and keys camel-cased.
+       * Open Graph tags, with the `og:` prefix removed and keys in camelCase.
        */
       openGraph?: { [key: string]: string | Array<string> };
 
       /**
-       * Published timestamp/date from page metadata, when present.
+       * Publish date or timestamp from page metadata, when present.
        */
       publishedTime?: string;
 
       /**
-       * Robots meta directive, when present.
+       * `robots` meta directive, when present.
        */
       robots?: string;
 
       /**
-       * Site or application name from page metadata.
+       * Site or app name from page metadata.
        */
       siteName?: string;
 
       /**
-       * Twitter card metadata with the twitter: prefix removed and keys camel-cased.
+       * Twitter card tags, with the `twitter:` prefix removed and keys in camelCase.
        */
       twitter?: { [key: string]: string | Array<string> };
     }
@@ -2189,29 +2237,29 @@ export namespace WebWebCrawlMdResponse {
     export namespace Metadata {
       export interface Alternate {
         /**
-         * Resolved alternate URL.
+         * Absolute URL of the alternate version.
          */
         href: string;
 
         /**
-         * Language or locale for the alternate URL, when present.
+         * Language or locale of the alternate version, when present.
          */
         hreflang?: string;
 
         /**
-         * Alternate resource title, when present.
+         * Title of the alternate version, when present.
          */
         title?: string;
 
         /**
-         * Alternate resource MIME type, when present.
+         * MIME type of the alternate version, when present.
          */
         type?: string;
       }
 
       export interface Heading {
         /**
-         * Heading level, 1–6 (from h1–h6).
+         * Heading level, from 1 (`h1`) to 6 (`h6`).
          */
         level: number;
 
@@ -2233,7 +2281,7 @@ export namespace WebWebCrawlMdResponse {
     credits_consumed: number;
 
     /**
-     * Credits remaining for your organization.
+     * Credits your organization has left after this request.
      */
     credits_remaining: number;
   }
@@ -2241,37 +2289,40 @@ export namespace WebWebCrawlMdResponse {
 
 export interface WebAnswersParams {
   /**
-   * Research task, up to 2000 characters. The agent selects company/profile lookups,
-   * web searches, or page reads. Include domains or URLs to focus the research.
+   * What to research, in plain language, up to 2000 characters. Include domains or
+   * URLs to focus the research.
    */
   task: string;
 
   /**
-   * Limits what the research may use.
+   * Limit which sites the research can search, read, and cite.
    */
   controls?: WebAnswersParams.Controls;
 
   /**
-   * Example answer object, not JSON Schema. Up to 8 levels, 500 values, and 16000
-   * characters; unknowns may be null.
+   * Example of the answer object to return, not a JSON Schema. Up to 8 levels deep,
+   * 500 values, and 16,000 characters. Values that cannot be found come back as
+   * `null`. Defaults to `{ "result": "" }`.
    */
   json_format?: { [key: string]: unknown };
 
   /**
-   * `fast` prioritizes speed, with extra verification for people and companies;
-   * `ultra` supports deeper research (default).
+   * `fast` prioritizes speed and adds extra verification for people and companies;
+   * `ultra` searches and reads more sources for deeper research. Defaults to
+   * `ultra`.
    */
   mode?: 'fast' | 'ultra';
 
   /**
-   * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-   * access policies are enabled for your organization; otherwise the request fails
-   * with `ACCESS_POLICIES_NOT_ENABLED`.
+   * Access policy IDs to apply; each URL must pass all of them. Requires access
+   * policies enabled for your organization; otherwise returns
+   * `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
   /**
-   * Labels for filtering usage in the dashboard.
+   * Labels for this request. Filter usage and request logs by them in the dashboard
+   * or with `GET /org/logs`.
    */
   tags?: Array<string>;
 
@@ -2289,20 +2340,19 @@ export interface WebAnswersParams {
 
 export namespace WebAnswersParams {
   /**
-   * Limits what the research may use.
+   * Limit which sites the research can search, read, and cite.
    */
   export interface Controls {
     /**
-     * Never search, read or cite these sites, sections or pages. Same format as
-     * `sources`. Up to 100 entries.
+     * Never search, read, or cite these sites, sections, or pages. Same format as
+     * `sources`.
      */
     excludeSources?: Array<string>;
 
     /**
-     * Only search, read and cite these sites, sections or pages. Each entry is a URL
-     * prefix: "example.com" covers the site and its subdomains, "example.com/docs"
-     * covers that section, and "example.com/docs/setup.html" is one page. Up to 20
-     * entries.
+     * Only search, read, and cite these sites, sections, or pages. Each entry is a URL
+     * prefix: `example.com` covers the site and its subdomains, `example.com/docs`
+     * covers that section, and `example.com/docs/setup.html` is one page.
      */
     sources?: Array<string>;
   }
@@ -2317,8 +2367,8 @@ export namespace WebAnswersParams {
     milliseconds: number;
 
     /**
-     * "fail" returns 408 at the deadline. "return-partial" returns available results;
-     * inspect the response’s partial flag.
+     * `fail` returns 408 at the deadline. `return-partial` returns the results
+     * collected so far and marks the response as partial.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -2326,18 +2376,18 @@ export namespace WebAnswersParams {
 
 export interface WebExtractCompetitorsParams {
   /**
-   * Company domain to analyze, such as `stripe.com`. Full http(s) URLs are accepted
-   * and normalized to their domain.
+   * Company domain, such as `stripe.com`. Full URLs are reduced to their domain.
    */
   domain: string;
 
   /**
-   * Exact number of direct competitors to return. Defaults to 5.
+   * Exact number of direct competitors to return.
    */
   numCompetitors?: number;
 
   /**
-   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
+   * Comma-separated labels for this request, such as `production,team-alpha`. Filter
+   * usage and request logs by them.
    */
   tags?: Array<string>;
 
@@ -2364,8 +2414,8 @@ export namespace WebExtractCompetitorsParams {
     milliseconds: number;
 
     /**
-     * "fail" returns 408 at the deadline. "return-partial" returns available results;
-     * inspect the response’s partial flag.
+     * `fail` returns 408 at the deadline. `return-partial` returns the results
+     * collected so far and marks the response as partial.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -2373,38 +2423,38 @@ export namespace WebExtractCompetitorsParams {
 
 export interface WebExtractStyleguideParams {
   /**
-   * Optional browser color scheme to emulate for websites that respond to
-   * prefers-color-scheme. This value is part of the styleguide cache key.
+   * Emulate a light or dark color scheme. Each scheme is cached separately.
    */
   colorScheme?: 'light' | 'dark';
 
   /**
-   * Exact URL to inspect. Provide either `domain` or `directUrl`, not both.
+   * Exact page URL to analyze. Provide either `domain` or `directUrl`, not both.
    */
   directUrl?: string;
 
   /**
-   * Domain name to extract styleguide from (e.g., 'example.com', 'google.com'). The
-   * domain will be automatically normalized and validated. You must provide either
-   * 'domain' or 'directUrl', but not both.
+   * Domain to analyze, such as `stripe.com`. Provide either `domain` or `directUrl`,
+   * not both.
    */
   domain?: string;
 
   /**
-   * Maximum age of cached brand data in ms. Defaults to 3 months; clamped to 0–1
-   * year. `0` refreshes.
+   * Maximum age of a cached result, in milliseconds. `0` always fetches fresh.
+   * Defaults to 90 days (7776000000 ms). Values above 1 year (31536000000 ms) are
+   * capped at 1 year.
    */
   maxAgeMs?: number | null;
 
   /**
-   * Comma-separated access policy IDs to apply. A URL must pass every policy. Leave
-   * it out unless access policies are enabled for your organization; otherwise the
-   * request fails with `ACCESS_POLICIES_NOT_ENABLED`.
+   * Comma-separated access policy IDs to apply; each URL must pass all of them.
+   * Requires access policies enabled for your organization; otherwise returns
+   * `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
   /**
-   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
+   * Comma-separated labels for this request, such as `production,team-alpha`. Filter
+   * usage and request logs by them.
    */
   tags?: Array<string>;
 
@@ -2414,8 +2464,8 @@ export interface WebExtractStyleguideParams {
   timeoutOpts?: WebExtractStyleguideParams.TimeoutOpts;
 
   /**
-   * `enabled` disables request logs and traces and omits request and response
-   * content from usage logs. Brand data and hosted assets may still be stored.
+   * `enabled` turns off request logs and traces and keeps request and response
+   * content out of usage logs. Brand data and hosted assets may still be stored.
    * Returns 403 `ZDR_NOT_ENABLED` unless your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
@@ -2432,11 +2482,11 @@ export namespace WebExtractStyleguideParams {
     milliseconds: number;
 
     /**
-     * "fail" returns 408 at the deadline. "return-partial" returns available results;
-     * inspect the response’s partial flag. "return-partial" requires at least 5000 ms.
-     * On POST /web/scrape, an output that is not ready in time fails with error_code
-     * REQUEST_TIMEOUT inside a 200 response under either behavior; 408 is returned
-     * only when the whole request cannot respond by the deadline.
+     * `fail` returns 408 at the deadline. `return-partial` returns the results
+     * collected so far and marks the response as partial. `return-partial` requires at
+     * least 5000 ms. On `POST /web/scrape`, an output that is not ready in time fails
+     * with `REQUEST_TIMEOUT` inside a 200 response under either behavior; 408 means
+     * the whole request could not respond by the deadline.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -2444,18 +2494,17 @@ export namespace WebExtractStyleguideParams {
 
 export interface WebMapURLsParams {
   /**
-   * Domain to map, e.g. `stripe.com`.
+   * Domain to map, such as `stripe.com`.
    */
   domain: string;
 
   /**
-   * Regex pattern. URLs matching this pattern are not returned, even when they match
-   * urlRegex.
+   * Leave out URLs matching this regex, even when they match `urlRegex`.
    */
   excludeUrlRegex?: string;
 
   /**
-   * HTTP headers for the target origin. Non-empty headers bypass caching.
+   * HTTP headers to send to the target site. Requests with headers skip the cache.
    */
   headers?: { [key: string]: string };
 
@@ -2470,9 +2519,9 @@ export interface WebMapURLsParams {
   maxLinks?: number;
 
   /**
-   * Comma-separated access policy IDs to apply. A URL must pass every policy. Leave
-   * it out unless access policies are enabled for your organization; otherwise the
-   * request fails with `ACCESS_POLICIES_NOT_ENABLED`.
+   * Comma-separated access policy IDs to apply; each URL must pass all of them.
+   * Requires access policies enabled for your organization; otherwise returns
+   * `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
@@ -2488,7 +2537,8 @@ export interface WebMapURLsParams {
   sitemapUrl?: string;
 
   /**
-   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
+   * Comma-separated labels for this request, such as `production,team-alpha`. Filter
+   * usage and request logs by them.
    */
   tags?: Array<string>;
 
@@ -2498,8 +2548,7 @@ export interface WebMapURLsParams {
   timeoutOpts?: WebMapURLsParams.TimeoutOpts;
 
   /**
-   * Regex pattern. Only URLs matching this pattern are returned and counted against
-   * maxLinks.
+   * Only return URLs matching this regex. Only matches count toward `maxLinks`.
    */
   urlRegex?: string;
 
@@ -2521,8 +2570,8 @@ export namespace WebMapURLsParams {
     milliseconds: number;
 
     /**
-     * "fail" returns 408 at the deadline. "return-partial" returns available results;
-     * inspect the response’s partial flag.
+     * `fail` returns 408 at the deadline. `return-partial` returns the results
+     * collected so far and marks the response as partial.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -2540,50 +2589,53 @@ export interface WebScrapeParams {
   url: string;
 
   /**
-   * Requires `formats.highlights: true`; required when it is set.
+   * Query for the `highlights` output. Required when `formats.highlights` is `true`,
+   * and allowed only then.
    */
   highlightsParams?: WebScrapeParams.HighlightsParams;
 
   /**
-   * Image options. Requires formats.images: true.
+   * Options for the `images` output. Requires `formats.images: true`.
    */
   imageParams?: WebScrapeParams.ImageParams;
 
   /**
-   * Requires `formats.json: true`; required when it is set.
+   * Schema and instructions for the `json` output. Required when `formats.json` is
+   * `true`, and allowed only then.
    */
   jsonParams?: WebScrapeParams.JsonParams;
 
   /**
-   * Markdown options. Requires `formats.markdown`.
+   * Options for the `markdown` output. Requires `formats.markdown: true`.
    */
   markdownParams?: WebScrapeParams.MarkdownParams;
 
   /**
-   * Maximum age of a cached output, in milliseconds. `0` fetches fresh. Defaults to
-   * 3 days (259200000 ms). Maximum: 1 year (31536000000 ms).
+   * Maximum age of a cached result, in milliseconds. `0` always fetches fresh.
+   * Defaults to 3 days (259200000 ms). Maximum: 1 year (31536000000 ms).
    */
   maxAgeMs?: number;
 
   /**
-   * Requires `formats.parse: true`; required when it is set.
+   * Custom rules or a prebuilt parser for the `parsed` output. Required when
+   * `formats.parse` is `true`, and allowed only then.
    */
   parseParams?: WebScrapeParams.CustomParser | WebScrapeParams.PrebuiltParser;
 
   /**
-   * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-   * access policies are enabled for your organization; otherwise the request fails
-   * with `ACCESS_POLICIES_NOT_ENABLED`.
+   * Access policy IDs to apply; each URL must pass all of them. Requires access
+   * policies enabled for your organization; otherwise returns
+   * `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
   /**
-   * Product options. Requires formats.product: true.
+   * Options for the `product` output. Requires `formats.product: true`.
    */
   productParams?: WebScrapeParams.ProductParams;
 
   /**
-   * Screenshot options. Requires formats.screenshot: true.
+   * Options for the `screenshot` output. Requires `formats.screenshot: true`.
    */
   screenshotParams?: WebScrapeParams.ScreenshotParams;
 
@@ -2593,7 +2645,8 @@ export interface WebScrapeParams {
   sharedParams?: WebScrapeParams.SharedParams;
 
   /**
-   * Labels for filtering usage in the dashboard.
+   * Labels for this request. Filter usage and request logs by them in the dashboard
+   * or with `GET /org/logs`.
    */
   tags?: Array<string>;
 
@@ -2603,7 +2656,8 @@ export interface WebScrapeParams {
   timeoutOpts?: WebScrapeParams.TimeoutOpts;
 
   /**
-   * `enabled` turns on zero data retention. Your organization must have ZDR enabled.
+   * `enabled` turns on zero data retention. Returns 403 `ZDR_NOT_ENABLED` unless
+   * your organization has ZDR.
    */
   zdr?: 'enabled' | 'disabled';
 }
@@ -2614,89 +2668,93 @@ export namespace WebScrapeParams {
    */
   export interface Formats {
     /**
-     * The original HTTP response body.
+     * Return the original HTTP response body.
      */
     bytes?: boolean;
 
     /**
-     * Markdown excerpts relevant to `highlightsParams.query`.
+     * Return Markdown excerpts relevant to `highlightsParams.query`.
      */
     highlights?: boolean;
 
     /**
-     * Rendered HTML.
+     * Return the rendered HTML.
      */
     html?: boolean;
 
     /**
-     * Images found on the page.
+     * Return the images found on the page.
      */
     images?: boolean;
 
     /**
-     * An object matching `jsonParams.schema`, extracted from the page text and its
-     * embedded data (JSON-LD, meta tags, framework state).
+     * Return an object matching `jsonParams.schema`, extracted from the page text and
+     * embedded data such as JSON-LD, meta tags, and framework state.
      */
     json?: boolean;
 
     /**
-     * Page content or video transcript as Markdown.
+     * Return the page content, or a video transcript, as Markdown.
      */
     markdown?: boolean;
 
     /**
-     * Fields extracted with custom rules or a prebuilt parser, returned as `parsed`.
+     * Return fields extracted with custom rules or a prebuilt parser, as `parsed`.
      */
     parse?: boolean;
 
     /**
-     * Product details such as name, price, and availability.
+     * Return product details such as name, price, and availability.
      */
     product?: boolean;
 
     /**
-     * A screenshot of the page.
+     * Return a screenshot of the page.
      */
     screenshot?: boolean;
   }
 
   /**
-   * Requires `formats.highlights: true`; required when it is set.
+   * Query for the `highlights` output. Required when `formats.highlights` is `true`,
+   * and allowed only then.
    */
   export interface HighlightsParams {
     /**
-     * The question or topic to find passages for.
+     * Question or topic to find relevant passages for.
      */
     query: string;
 
     /**
-     * Maximum combined length of returned passages.
+     * Maximum combined length of the returned passages, in characters.
      */
     maxCharacters?: number;
   }
 
   /**
-   * Image options. Requires formats.images: true.
+   * Options for the `images` output. Requires `formats.images: true`.
    */
   export interface ImageParams {
     /**
-     * Set `visual` to drop visual duplicates, keeping the largest copy.
+     * Set to `visual` to drop visually duplicate images, keeping the largest copy.
      */
     dedupe?: 'none' | 'visual';
 
     /**
-     * Extra data per image: `dimensions`, `classification`, or a hosted `file` URL.
+     * Extra data to add to each image: `dimensions` adds `width` and `height`,
+     * `classification` adds `classification`, and `file` adds a hosted `fileUrl`.
      */
     enrich?: Array<'dimensions' | 'classification' | 'file'>;
   }
 
   /**
-   * Requires `formats.json: true`; required when it is set.
+   * Schema and instructions for the `json` output. Required when `formats.json` is
+   * `true`, and allowed only then.
    */
   export interface JsonParams {
     /**
-     * JSON Schema (not an example object) for a top-level object, up to 50 KB. Use
-     * optional or nullable fields for missing facts.
+     * JSON Schema for the object to extract, not an example object. Must describe a
+     * top-level object, up to 50 KB. Make fields optional or nullable when the page
+     * may not state them.
      */
     schema: { [key: string]: unknown };
 
@@ -2707,11 +2765,11 @@ export namespace WebScrapeParams {
   }
 
   /**
-   * Markdown options. Requires `formats.markdown`.
+   * Options for the `markdown` output. Requires `formats.markdown: true`.
    */
   export interface MarkdownParams {
     /**
-     * Include images in the Markdown (`html-conversion` only).
+     * Include image references in the Markdown (`html-conversion` only).
      */
     includeImages?: boolean;
 
@@ -2721,7 +2779,8 @@ export namespace WebScrapeParams {
     includeLinks?: boolean;
 
     /**
-     * How base64 images appear when `includeImages` is set (`html-conversion` only).
+     * How to write base64 images when `includeImages` is `true`: `placeholder`
+     * shortens the data, `preserve` keeps it in full (`html-conversion` only).
      */
     inlineImages?: 'placeholder' | 'preserve';
 
@@ -2734,13 +2793,13 @@ export namespace WebScrapeParams {
 
   export interface CustomParser {
     /**
-     * Field names mapped to CSS selectors (`h1`, `a@href`) or rule objects. Max 100
-     * fields, 5 levels.
+     * Output field names mapped to a CSS selector (such as `h1` or `a@href`) or a rule
+     * object. Up to 100 fields, nested up to 5 levels.
      */
     rules: { [key: string]: string | CustomParser.UnionMember1 };
 
     /**
-     * Extract fields using custom CSS rules. This is the default when type is omitted.
+     * Extract fields with custom CSS rules. The default when `type` is omitted.
      */
     type?: 'custom';
   }
@@ -2753,8 +2812,8 @@ export namespace WebScrapeParams {
       selector: string;
 
       /**
-       * Return text, HTML, an attribute such as `@href`, or nested field rules. Defaults
-       * to text.
+       * What to return: `text`, `html`, an attribute such as `@href`, or nested field
+       * rules. Defaults to `text`.
        */
       output?: 'text' | 'html' | string | unknown;
 
@@ -2767,150 +2826,178 @@ export namespace WebScrapeParams {
 
   export interface PrebuiltParser {
     /**
-     * google-maps parses Google Maps business data into data.results. Accepts Maps
-     * place, search, and internal data URLs; a search page returns up to 200 places,
-     * ranked as Google ranks them. Uses an exit in the gl country of the URL (US when
-     * absent) and English labels regardless of hl or Accept-Language.
-     * google-maps-reviews returns the reviews of a place in data.reviews, in the same
-     * shape as the Serper reviews API (rating, date, isoDate, snippet,
-     * translatedSnippet, likes, user, media, response, link, id), plus language,
-     * guided ratings in details, and user.isLocalGuide; data also carries the place
-     * featureId, cid, and sort. sort and limit pick the order and count, and oldest is
-     * exact. It accepts Maps place, search, and ?cid= URLs, plus
-     * search.google.com/local/reviews URLs, so the google_maps_url and
-     * google_reviews_url fields of google-maps results work as input. An unknown place
-     * returns no reviews. google-play parses a Play Store app into data: details,
-     * developer contact, ratings, price, permissions, and data safety, plus the
-     * country storefront the record describes and is_available, whether the app is
-     * offered there. Ratings are counted per storefront, so rating, rating_count, and
-     * rating_histogram are null in a storefront where nobody rated the app.
-     * google-play-reviews returns up to the 200 newest reviews written in the hl
-     * language, with developer replies, in data.reviews; an app with fewer such
-     * reviews returns them all. Both Play parsers accept app details URLs
-     * (play.google.com/store/apps/details?id=…); hl and gl set the language and
-     * storefront, defaulting to en and us. Without gl, google-play reads an app that
-     * is not offered in the US from the country of its developer instead. app-store
-     * parses an App Store app into data: details, developer, ratings, price, version,
-     * and screenshots. app-store-reviews returns up to the 500 newest reviews in
-     * data.reviews. Both App Store parsers accept app URLs
-     * (apps.apple.com/us/app/…/id…); the country in the path sets the storefront,
-     * defaulting to us. g2-reviews returns the 25 most recently published reviews of a
-     * G2 product in data.reviews (rating, title, likes, dislikes, problems_solved,
-     * reviewer role, company size, and industry), plus data.product. It accepts G2
-     * product URLs (g2.com/products/…), follows renamed products, and keeps
-     * star-rating filters from the URL (filters[nps_score][]=1 to 5); other filters,
-     * sort orders, and pages are ignored. instagram-profile parses a public profile
-     * (instagram.com/{username}) into data: bio, links, follower and post counts,
-     * category, business address, similar_accounts, and latest_posts (up to the 12
-     * posts at the top of the profile, newest first). Instagram lists pinned posts
-     * there ahead of newer ones, so posts with is_pinned true can be older; when
-     * Instagram shows only a rounded post count (32K), post_count is that rounded
-     * number and is_post_count_rounded is true. instagram-post parses a post or reel
-     * (/p/…, /reel/…) into data: caption, hashtags, mentions, like, comment, and view
-     * counts (like_count and view_count are null when the owner hides them), media
-     * URLs, tagged users, collaborators, location, and the top ~14 comments in
-     * data.comments. instagram-feed returns the top posts for a hashtag or keyword
-     * (/explore/tags/…, /popular/…) or the recent posts at a location
-     * (/explore/locations/{id}/…) in data.posts; keyword posts carry only the
-     * shortcode, owner, thumbnail, and views, plus the caption when Instagram shows
-     * it. All three Instagram parsers read public data without logging in, so private
-     * accounts return no posts and follower lists are unavailable. tiktok-profile
-     * parses a public profile (tiktok.com/@{username}) into data: nickname, bio, bio
-     * link, follower, following, like, and video counts, verified, private, and
-     * business flags, and business category; it does not list videos. tiktok-video
-     * parses a video or photo post (/@{username}/video/{id} or
-     * /@{username}/photo/{id}) into data: caption, hashtags, mentions, author, view,
-     * like, comment, share, save, and repost counts, duration, thumbnail, a video_url
-     * that downloads without cookies, image_urls for photo posts, music, location, and
-     * ad, paid-partnership, and AI-generated flags. tiktok-feed returns videos in the
-     * tiktok-video shape as data.videos: the latest 15 from a profile URL, the top 30
-     * from a hashtag URL (/tag/{name}), or the top 12 from a search URL
-     * (/search?q={query}). tiktok-comments returns the first 20 comments of a video or
-     * photo post as data.comments: text, posted_at, like and reply counts, whether the
-     * author liked it, and the commenter. tiktok-followers and tiktok-following return
-     * up to 30 accounts of a profile as data.users, in the tiktok-profile shape.
-     * tiktok-user-search returns the top 10 accounts for a user search URL
-     * (/search/user?q={query}) as data.users: id, username, nickname, biography,
-     * avatar_url, sec_uid, follower_count, like_count, and is_verified. The TikTok
-     * parsers accept tiktok.com, www.tiktok.com, and m.tiktok.com URLs but not short
-     * links (vm.tiktok.com, vt.tiktok.com, tiktok.com/t/…). reddit-post parses a post
-     * (reddit.com/r/{subreddit}/comments/{id}, reddit.com/comments/{id}, or
-     * redd.it/{id}) into data.post: title, body as Markdown, type (text, link, image,
-     * gallery, or video), link_url, subreddit, author, flairs, score, upvote_ratio,
-     * comment and crosspost counts, NSFW, spoiler, locked, stickied, and archived
-     * flags, images (every gallery image in order), and video (an MP4 url plus an
-     * hls_url that carries the audio). data.comments holds the comment tree, each
-     * comment with id, author, body as Markdown, score, posted_at, depth, parent_id,
-     * url, is_submitter, is_deleted, and its replies; limit caps the total number of
-     * comments (default 100), filled shallowest first so whole conversations are kept,
-     * and data.has_more_comments says whether the thread has more. The sort query of
-     * the URL (best, top, new, controversial, old, qa) orders the comments.
-     * reddit-search returns search results for a search URL
-     * (reddit.com/search?q={query}, or reddit.com/r/{subreddit}/search?q={query} to
-     * search one subreddit). With type=link or no type it returns posts in the
-     * reddit-post shape as data.posts, ordered by the sort (relevance, hot, top, new,
-     * comments) and limited to the t time range (hour, day, week, month, year, all) of
-     * the URL; type=sr returns communities as data.communities (name, title,
-     * description, sidebar, subscriber_count, created_at, type, NSFW and quarantine
-     * flags, language, category, icon and banner URLs, and allowed post types);
-     * type=user returns accounts as data.users (username, display_name, bio,
-     * created_at, post and comment karma, avatar and banner URLs, and verified,
-     * employee, moderator, premium, and NSFW flags). limit caps the number of results
-     * (default 100), in the order Reddit returns them, and data.has_more says whether
-     * Reddit has more. reddit-subreddit reads a subreddit URL
-     * (reddit.com/r/{subreddit}, optionally followed by /hot, /new, /top, /rising, or
-     * /controversial, with t setting the time range of top and controversial, default
-     * day) into data.subreddit in the community shape of reddit-search, data.rules
-     * (name, description, applies_to, violation_reason, created_at), and data.posts in
-     * the reddit-post shape, ordered like the tab (default hot) and with stickied
-     * posts flagged; r/all and r/popular return posts with a null subreddit and rules.
-     * limit caps the posts (default 100) and data.has_more says whether Reddit has
-     * more. Private and quarantined subreddits return WEBSITE_ACCESS_ERROR.
-     * reddit-user reads a profile URL (reddit.com/user/{username} or
-     * reddit.com/u/{username}, optionally followed by /overview, /submitted, or
-     * /comments, with sort set to new, hot, top, or controversial and t setting the
-     * time range of top and controversial, default all) into data.user (id, username,
-     * display_name, bio, created_at, total, post, comment, awardee, and awarder karma,
-     * avatar and banner URLs, and verified, suspended, employee, moderator, premium,
-     * and NSFW flags), data.trophies (name, description, icon_url, granted_at, url),
-     * data.moderated_communities (name, title, url, subscriber_count, icon_url,
-     * is_nsfw), data.posts in the reddit-post shape, and data.comments, each with id,
-     * author, body as Markdown, score, posted_at, edited_at, url, subreddit, parent_id
-     * (null for a top-level comment), is_submitter, is_stickied, distinguished,
-     * award_count, and the post it was left on (id, title, url, author, is_nsfw). The
-     * overview tab returns both posts and comments; submitted returns null comments
-     * and comments returns null posts. limit caps the posts and comments together
-     * (default 100) and data.has_more says whether Reddit has more. Users who hide
-     * their activity return empty lists, and suspended accounts return their profile
-     * with null posts and comments. yelp-search accepts Yelp search URLs with
-     * find_desc and find_loc, reads start as the result offset, and returns up to 20
-     * ranked organic businesses in data.businesses with total and pagination.
-     * yelp-reviews accepts a Yelp business URL (yelp.com/biz/{alias}), uses optional
-     * start for the offset, and always sorts newest first; unsupported sort and review
-     * filters are rejected, while tracking params are ignored. It returns up to 20
-     * latest public reviews in data.reviews with business details and
-     * pagination.next_offset. Each review has rating, full text, updated_at, and
-     * author (id is the Yelp user id from the reviewer profile URL, url links to that
-     * profile, plus name, location, and review_count); owner replies and photos are
-     * not included. tripadvisor-reviews accepts a Tripadvisor hotel, restaurant, or
-     * attraction review URL (tripadvisor.com/Hotel_Review-g{geo}-d{id}-Reviews-….html,
-     * on any Tripadvisor country domain), reads -or{N}- in the path as the offset, and
-     * returns 20 reviews in data.reviews in the order Tripadvisor shows them, with
-     * data.location (id, name, type, url, review_count) and pagination.next_offset.
-     * Each review has id, url, title, full text, rating, language, published_at,
-     * visit_month, helpful_votes, subratings, photo_urls, owner_response (text,
-     * published_at, author_name), and author (id, username, name, url,
-     * contribution_count); an unknown location returns no reviews. emails accepts any
-     * page and returns its email addresses as data.emails ([{ email }]), read from
-     * mailto links, Cloudflare-protected addresses, and visible text. phone-numbers
-     * accepts any page and returns its valid phone numbers in E.164 as
-     * data.phone_numbers ([{ phone }]), read from tel links and visible text; numbers
-     * without a country code are read for the country of the site TLD, defaulting to
-     * US. links accepts any page and returns its unique http(s) links as data.links
-     * ([{ url, text }]), with absolute URLs; text falls back to aria-label or image
-     * alt and is null when a link has none. The emails parser reads the rendered page
-     * and respects content filters; the other prebuilt parsers read their data
-     * independently of DOM filters.
+     * Prebuilt parser to run. Each one accepts specific URLs and returns its result in
+     * `parsed.data`. `emails`, `phone-numbers`, and `links` read the rendered page and
+     * respect content filters; the others read their source directly, independently of
+     * content filters and other outputs.
+     *
+     * - `google-maps`: Google Maps place, search, and internal data URLs. Returns
+     *   businesses in `data.results`; a search URL returns up to 200 places. Results
+     *   use the country set in the URL, or the US when none is set, and come back with
+     *   English labels.
+     * - `google-maps-reviews`: Google Maps place, search, and `?cid=` URLs, plus
+     *   `search.google.com/local/reviews` URLs, so the `google_maps_url` and
+     *   `google_reviews_url` fields of `google-maps` results work as input. Returns
+     *   the reviews of the place in `data.reviews` (`rating`, `date`, `isoDate`,
+     *   `snippet`, `translatedSnippet`, `likes`, `user`, `media`, `response`, `link`,
+     *   `id`, `language`, guided ratings in `details`, and `user.isLocalGuide`), plus
+     *   the place `featureId`, `cid`, and `sort` in `data`. `sort` and `limit` set the
+     *   order and count; `oldest` is exact. An unknown place returns no reviews.
+     * - `google-play`: Play Store app details URLs
+     *   (`play.google.com/store/apps/details?id=…`). Returns one app in `data`:
+     *   details, developer contact, ratings, price, permissions, data safety, the
+     *   storefront country the record describes, and `is_available` (whether the app
+     *   is offered there). Ratings are counted per storefront, so `rating`,
+     *   `rating_count`, and `rating_histogram` are `null` where nobody rated the app.
+     *   The language and storefront country set in the URL apply (default English and
+     *   the US); without a storefront country, an app not offered in the US is read
+     *   from the country of its developer.
+     * - `google-play-reviews`: Same URLs as `google-play`. Returns up to the 200
+     *   newest reviews in the language set in the URL, with developer replies, in
+     *   `data.reviews`; an app with fewer such reviews returns them all.
+     * - `app-store`: App Store app URLs (`apps.apple.com/us/app/…/id…`). Returns one
+     *   app in `data`: details, developer, ratings, price, version, and screenshots.
+     *   The country in the path sets the storefront (default `us`).
+     * - `app-store-reviews`: Same URLs as `app-store`. Returns up to the 500 newest
+     *   reviews in `data.reviews`.
+     * - `g2-reviews`: G2 product URLs (`g2.com/products/…`), following renamed
+     *   products. Returns the 25 most recently published reviews in `data.reviews`
+     *   (rating, title, likes, dislikes, `problems_solved`, reviewer role, company
+     *   size, and industry), plus `data.product`. Keeps star-rating filters from the
+     *   URL (`filters[nps_score][]=1` to `5`) and ignores other filters, sort orders,
+     *   and pages.
+     * - `instagram-profile`: Public profile URLs (`instagram.com/{username}`). Returns
+     *   one profile in `data`: bio, links, follower and post counts, category,
+     *   business address, `similar_accounts`, and `latest_posts` (up to the 12 posts
+     *   at the top of the profile, newest first). Instagram lists pinned posts first,
+     *   so posts with `is_pinned: true` can be older. When Instagram shows only a
+     *   rounded post count (such as 32K), `post_count` is that rounded number and
+     *   `is_post_count_rounded` is `true`.
+     * - `instagram-post`: Post and reel URLs (`/p/…`, `/reel/…`). Returns one post in
+     *   `data`: caption, hashtags, mentions, like, comment, and view counts
+     *   (`like_count` and `view_count` are `null` when the owner hides them), media
+     *   URLs, tagged users, collaborators, location, and about the top 14 comments in
+     *   `data.comments`.
+     * - `instagram-feed`: Hashtag and keyword URLs (`/explore/tags/…`, `/popular/…`)
+     *   return the top posts; location URLs (`/explore/locations/{id}/…`) return
+     *   recent posts. Posts are in `data.posts`; keyword posts carry only the
+     *   shortcode, owner, thumbnail, and views, plus the caption when Instagram shows
+     *   it. All three Instagram parsers read public data without signing in, so
+     *   private accounts return no posts and follower lists are unavailable.
+     * - `tiktok-profile`: Public profile URLs (`tiktok.com/@{username}`). Returns one
+     *   profile in `data`: nickname, bio, bio link, follower, following, like, and
+     *   video counts, verified, private, and business flags, and business category.
+     *   Does not list videos.
+     * - `tiktok-video`: Video and photo post URLs (`/@{username}/video/{id}`,
+     *   `/@{username}/photo/{id}`). Returns one post in `data`: caption, hashtags,
+     *   mentions, author, view, like, comment, share, save, and repost counts,
+     *   duration, thumbnail, a `video_url` that downloads without cookies,
+     *   `image_urls` for photo posts, music, location, and ad, paid-partnership, and
+     *   AI-generated flags.
+     * - `tiktok-feed`: Returns videos in the `tiktok-video` shape in `data.videos`:
+     *   the latest 15 from a profile URL, the top 30 from a hashtag URL
+     *   (`/tag/{name}`), or the top 12 from a search URL (`/search?q={query}`).
+     * - `tiktok-comments`: Video and photo post URLs. Returns the first 20 comments in
+     *   `data.comments`: text, `posted_at`, like and reply counts, whether the author
+     *   liked it, and the commenter.
+     * - `tiktok-followers`, `tiktok-following`: Profile URLs. Return up to 30 accounts
+     *   in `data.users`, in the `tiktok-profile` shape.
+     * - `tiktok-user-search`: User search URLs (`/search/user?q={query}`). Returns the
+     *   top 10 accounts in `data.users`: `id`, `username`, `nickname`, `biography`,
+     *   `avatar_url`, `sec_uid`, `follower_count`, `like_count`, and `is_verified`.
+     *   The TikTok parsers accept `tiktok.com`, `www.tiktok.com`, and `m.tiktok.com`
+     *   URLs, not short links (`vm.tiktok.com`, `vt.tiktok.com`, `tiktok.com/t/…`).
+     * - `reddit-post`: Post URLs (`reddit.com/r/{subreddit}/comments/{id}`,
+     *   `reddit.com/comments/{id}`, `redd.it/{id}`). Returns the post in `data.post`:
+     *   title, body as Markdown, type (`text`, `link`, `image`, `gallery`, or
+     *   `video`), `link_url`, subreddit, author, flairs, score, `upvote_ratio`,
+     *   comment and crosspost counts, NSFW, spoiler, locked, stickied, and archived
+     *   flags, images (every gallery image in order), and video (an MP4 `url` plus an
+     *   `hls_url` that carries the audio). `data.comments` holds the comment tree;
+     *   each comment has `id`, `author`, `body` (Markdown), `score`, `posted_at`,
+     *   `depth`, `parent_id`, `url`, `is_submitter`, `is_deleted`, and its `replies`.
+     *   `limit` caps the total number of comments (default 100), filled shallowest
+     *   first so whole conversations are kept, and `data.has_more_comments` says
+     *   whether the thread has more. The `sort` in the URL (`best`, `top`, `new`,
+     *   `controversial`, `old`, `qa`) orders the comments.
+     * - `reddit-search`: Search URLs (`reddit.com/search?q={query}`, or
+     *   `reddit.com/r/{subreddit}/search?q={query}` to search one subreddit). With
+     *   `type=link` or no `type`, returns posts in the `reddit-post` shape in
+     *   `data.posts`, ordered by the `sort` in the URL (`relevance`, `hot`, `top`,
+     *   `new`, `comments`) within its `t` time range (`hour`, `day`, `week`, `month`,
+     *   `year`, `all`). `type=sr` returns communities in `data.communities` (name,
+     *   title, description, sidebar, `subscriber_count`, `created_at`, type, NSFW and
+     *   quarantine flags, language, category, icon and banner URLs, and allowed post
+     *   types). `type=user` returns accounts in `data.users` (username,
+     *   `display_name`, bio, `created_at`, post and comment karma, avatar and banner
+     *   URLs, and verified, employee, moderator, premium, and NSFW flags). `limit`
+     *   caps the number of results (default 100), in the order Reddit returns them,
+     *   and `data.has_more` says whether Reddit has more.
+     * - `reddit-subreddit`: Subreddit URLs (`reddit.com/r/{subreddit}`, optionally
+     *   followed by `/hot`, `/new`, `/top`, `/rising`, or `/controversial`, with `t`
+     *   setting the time range of `top` and `controversial`, default `day`). Returns
+     *   `data.subreddit` in the community shape of `reddit-search`, `data.rules`
+     *   (`name`, `description`, `applies_to`, `violation_reason`, `created_at`), and
+     *   `data.posts` in the `reddit-post` shape, ordered like the tab (default `hot`)
+     *   with stickied posts flagged. `r/all` and `r/popular` return posts with `null`
+     *   `subreddit` and `rules`. `limit` caps the posts (default 100) and
+     *   `data.has_more` says whether Reddit has more. Private and quarantined
+     *   subreddits return `WEBSITE_ACCESS_ERROR`.
+     * - `reddit-user`: Profile URLs (`reddit.com/user/{username}` or
+     *   `reddit.com/u/{username}`, optionally followed by `/overview`, `/submitted`,
+     *   or `/comments`, with `sort` set to `new`, `hot`, `top`, or `controversial` and
+     *   `t` setting the time range of `top` and `controversial`, default `all`).
+     *   Returns `data.user` (`id`, `username`, `display_name`, bio, `created_at`,
+     *   total, post, comment, awardee, and awarder karma, avatar and banner URLs, and
+     *   verified, suspended, employee, moderator, premium, and NSFW flags),
+     *   `data.trophies` (`name`, `description`, `icon_url`, `granted_at`, `url`),
+     *   `data.moderated_communities` (`name`, `title`, `url`, `subscriber_count`,
+     *   `icon_url`, `is_nsfw`), `data.posts` in the `reddit-post` shape, and
+     *   `data.comments`, each with `id`, `author`, `body` (Markdown), `score`,
+     *   `posted_at`, `edited_at`, `url`, `subreddit`, `parent_id` (`null` for a
+     *   top-level comment), `is_submitter`, `is_stickied`, `distinguished`,
+     *   `award_count`, and the post it was left on (`id`, `title`, `url`, `author`,
+     *   `is_nsfw`). The overview tab returns both posts and comments; `submitted`
+     *   returns `null` comments and `comments` returns `null` posts. `limit` caps
+     *   posts and comments together (default 100) and `data.has_more` says whether
+     *   Reddit has more. Users who hide their activity return empty lists, and
+     *   suspended accounts return their profile with `null` posts and comments.
+     * - `yelp-search`: Yelp search URLs with `find_desc` and `find_loc`; `start` sets
+     *   the result offset. Returns up to 20 ranked organic businesses in
+     *   `data.businesses`, with `total` and `pagination`.
+     * - `yelp-reviews`: Yelp business URLs (`yelp.com/biz/{alias}`); optional `start`
+     *   sets the offset. Returns up to 20 of the latest public reviews, always newest
+     *   first, in `data.reviews`, with business details and `pagination.next_offset`.
+     *   Each review has rating, full text, `updated_at`, and author (`id` from the
+     *   reviewer profile URL, `url` linking to that profile, `name`, `location`, and
+     *   `review_count`); owner replies and photos are not included. Unsupported sort
+     *   and review filters are rejected; tracking parameters are ignored.
+     * - `tripadvisor-reviews`: Tripadvisor hotel, restaurant, and attraction review
+     *   URLs (`tripadvisor.com/Hotel_Review-g{geo}-d{id}-Reviews-….html`, on any
+     *   Tripadvisor country domain); `-or{N}-` in the path sets the offset. Returns 20
+     *   reviews in `data.reviews` in the order Tripadvisor shows them, with
+     *   `data.location` (`id`, `name`, `type`, `url`, `review_count`) and
+     *   `pagination.next_offset`. Each review has `id`, `url`, `title`, full text,
+     *   `rating`, `language`, `published_at`, `visit_month`, `helpful_votes`,
+     *   `subratings`, `photo_urls`, `owner_response` (`text`, `published_at`,
+     *   `author_name`), and `author` (`id`, `username`, `name`, `url`,
+     *   `contribution_count`). An unknown location returns no reviews.
+     * - `car-rental-availability`: avis.com and budget.com vehicle-availability search
+     *   URLs. Returns every vehicle with pay-now and pay-later prices in
+     *   `data.vehicles`.
+     * - `car-rental-locations`: avis.com and budget.com `/locations?keyword=` URLs.
+     *   Returns rental branches with codes, addresses, coordinates, and hours in
+     *   `data.locations`.
+     * - `emails`: Any page. Returns its email addresses in `data.emails`
+     *   (`[{ email }]`), read from `mailto:` links, Cloudflare-protected addresses,
+     *   and visible text.
+     * - `phone-numbers`: Any page. Returns its valid phone numbers in E.164 format in
+     *   `data.phone_numbers` (`[{ phone }]`), read from `tel:` links and visible text.
+     *   Numbers without a country code are read for the country of the site TLD (US by
+     *   default).
+     * - `links`: Any page. Returns its unique HTTP and HTTPS links as absolute URLs in
+     *   `data.links` (`[{ url, text }]`). `text` falls back to `aria-label` or image
+     *   alt text and is `null` when a link has none.
      */
     parser:
       | 'google-maps'
@@ -2949,23 +3036,22 @@ export namespace WebScrapeParams {
     type: 'prebuilt';
 
     /**
-     * google-maps-reviews and reddit parsers only. Maximum number of reviews
-     * (google-maps-reviews, default 100), comments (reddit-post, default 100), or
-     * results (reddit-search, reddit-subreddit, and reddit-user, default 100) to
-     * return; maximum 1000.
+     * Maximum number of reviews (`google-maps-reviews`, default 100), comments
+     * (`reddit-post`, default 100), or results (`reddit-search`, `reddit-subreddit`,
+     * and `reddit-user`, default 100) to return. Only these parsers accept it.
      */
     limit?: number;
 
     /**
-     * google-maps-reviews only. Order of data.reviews. newest, relevant, highest, and
-     * lowest follow Google; oldest returns the earliest reviews first, which Google
-     * itself does not offer.
+     * Order of `data.reviews` for `google-maps-reviews`. `newest`, `relevant`,
+     * `highest`, and `lowest` use the same orders as Google Maps; `oldest` returns the
+     * earliest reviews first.
      */
     sort?: 'newest' | 'oldest' | 'relevant' | 'highest' | 'lowest';
   }
 
   /**
-   * Product options. Requires formats.product: true.
+   * Options for the `product` output. Requires `formats.product: true`.
    */
   export interface ProductParams {
     /**
@@ -2980,11 +3066,11 @@ export namespace WebScrapeParams {
   }
 
   /**
-   * Screenshot options. Requires formats.screenshot: true.
+   * Options for the `screenshot` output. Requires `formats.screenshot: true`.
    */
   export interface ScreenshotParams {
     /**
-     * What to capture: `viewport`, `fullPage`, one element, or a rectangle. Max 40
+     * What to capture: `viewport`, `fullPage`, one element, or a rectangle. Up to 40
      * megapixels.
      */
     area?: 'viewport' | 'fullPage' | ScreenshotParams.Element | ScreenshotParams.Rectangle;
@@ -3004,7 +3090,7 @@ export namespace WebScrapeParams {
     }
 
     /**
-     * Pixels from the document origin.
+     * Rectangle to capture, in pixels from the document origin.
      */
     export interface Rectangle {
       /**
@@ -3034,13 +3120,14 @@ export namespace WebScrapeParams {
    */
   export interface SharedParams {
     /**
-     * Browser steps run in order before capture. Requires a paid plan. Skips the
+     * Browser steps to run in order before capture. Requires a paid plan. Skips the
      * cache.
      */
     actions?: Array<SharedParams.Perform | SharedParams.Scroll | SharedParams.Wait | SharedParams.WaitFor>;
 
     /**
-     * Proxy country as a two-letter code, such as `US`. Case-insensitive.
+     * Country to fetch from, as an ISO 3166-1 alpha-2 code such as `US`.
+     * Case-insensitive.
      */
     country?: string;
 
@@ -3065,11 +3152,10 @@ export namespace WebScrapeParams {
     headers?: { [key: string]: string };
 
     /**
-     * Which iframe contents to include in HTML and text outputs. Screenshots always
-     * show visible frames. `auto` (default) inlines only iframes that hold page
-     * content, such as same-site documents, framesets, job boards, forms and embedded
-     * documents, and skips ads and widgets. `true` inlines every iframe. `false`
-     * inlines none.
+     * Which iframes to inline in HTML and text outputs. Screenshots always show
+     * visible frames. `auto` inlines only iframes that hold page content, such as
+     * same-site documents, framesets, job boards, forms, and embedded documents, and
+     * skips ads and widgets. `true` inlines every iframe; `false` inlines none.
      */
     includeFrames?: boolean | 'auto';
 
@@ -3079,25 +3165,28 @@ export namespace WebScrapeParams {
     includeSelectors?: Array<string>;
 
     /**
-     * Keep only the main content. Doesn't affect `screenshot`, `bytes`, or `product`.
+     * Keep only the main content, without navigation, headers, footers, or sidebars.
+     * Does not affect `screenshot`, `bytes`, or `product`.
      */
     mainContentOnly?: boolean;
 
     /**
-     * Document parsing options.
+     * Options for parsing documents such as PDFs.
      */
     parsers?: SharedParams.Parsers;
 
     /**
-     * Create or reuse an authenticated browser profile. Requires a paid plan and an
-     * HTTPS target. Profiles persist session state, bypass shared caches, and cannot
-     * be combined with ZDR, custom headers, raw bytes, or prebuilt parsers.
+     * Scrape as a signed-in user. Create a profile with `type: "new"` and your
+     * credentials, then reuse it with `type: "existing"`. Requires a paid plan and an
+     * HTTPS URL. Profiles keep their session between requests, skip the cache, and
+     * cannot be combined with ZDR, custom headers, `formats.bytes`, or prebuilt
+     * parsers other than `emails`, `phone-numbers`, and `links`.
      */
     profile?: SharedParams.Existing | SharedParams.New;
 
     /**
      * Wait for CSS animations to finish before capture. Defaults to `true` when
-     * `screenshot` is requested.
+     * `formats.screenshot` is `true`.
      */
     settleAnimations?: boolean;
 
@@ -3107,14 +3196,15 @@ export namespace WebScrapeParams {
     theme?: 'light' | 'dark';
 
     /**
-     * Browser size in pixels. Omit for 1920 × 1080. When provided, missing dimensions
-     * default to 1440 × 900.
+     * Browser viewport in pixels. Defaults to 1920 × 1080. If you pass `viewport`, a
+     * missing `width` defaults to 1440 and a missing `height` to 900.
      */
     viewport?: SharedParams.Viewport;
 
     /**
-     * Milliseconds, or a CSS selector to wait for, after actions. Defaults to 500
-     * (2000 with frames or XML).
+     * Time to wait after actions, in milliseconds, or a CSS selector to wait for.
+     * Defaults to 500 ms, or 2000 ms when `includeFrames` is `true` or the URL ends in
+     * `.xml`.
      */
     waitFor?: number | string;
   }
@@ -3127,19 +3217,20 @@ export namespace WebScrapeParams {
       action: string;
 
       /**
-       * Use `perform` for a plain-language browser instruction.
+       * Follow a plain-language instruction.
        */
       type: 'perform';
     }
 
     export interface Scroll {
       /**
-       * Use `scroll` to move through the page or a container.
+       * Scroll the page or a container.
        */
       type: 'scroll';
 
       /**
-       * Distance per scroll: pixels, one `viewport`, or `max` to reach the end.
+       * Distance per scroll step: a number of pixels, one `viewport`, or `max` to reach
+       * the end.
        */
       amount?: number | 'viewport' | 'max';
 
@@ -3154,19 +3245,19 @@ export namespace WebScrapeParams {
       maxScrolls?: number;
 
       /**
-       * Scroll this container. Omit to scroll the page.
+       * CSS selector of the container to scroll. Omit to scroll the page.
        */
       selector?: string;
     }
 
     export interface Wait {
       /**
-       * Time to pause in milliseconds before the next action.
+       * How long to pause before the next action, in milliseconds.
        */
       milliseconds: number;
 
       /**
-       * Use `wait` to pause for a fixed duration.
+       * Pause for a fixed time.
        */
       type: 'wait';
     }
@@ -3178,39 +3269,39 @@ export namespace WebScrapeParams {
       selector: string;
 
       /**
-       * Use `waitFor` to wait for a matching element.
+       * Wait for an element matching `selector`.
        */
       type: 'waitFor';
     }
 
     /**
-     * Document parsing options.
+     * Options for parsing documents such as PDFs.
      */
     export interface Parsers {
       /**
-       * PDF page range and OCR.
+       * Page range, OCR, and page markers for PDFs.
        */
       pdf?: Parsers.Pdf;
     }
 
     export namespace Parsers {
       /**
-       * PDF page range and OCR.
+       * Page range, OCR, and page markers for PDFs.
        */
       export interface Pdf {
         /**
-         * Last page to parse. Must be at least `startPage`.
+         * Last page to parse. Defaults to the last page. Must be at least `startPage`.
          */
         endPage?: number;
 
         /**
-         * Start each page in the Markdown with a `<!-- page N -->` line using its original
-         * 1-based page number; these responses are never served from cache.
+         * Start each PDF page in the Markdown with a `<!-- page N -->` line, where `N` is
+         * the original 1-based page number. These responses are never served from cache.
          */
         includeNumberedPages?: boolean;
 
         /**
-         * Set `auto` to read scanned pages with OCR.
+         * Set to `auto` to read scanned pages with OCR. Adds 1 credit per page read.
          */
         ocr?: 'off' | 'auto';
 
@@ -3223,7 +3314,7 @@ export namespace WebScrapeParams {
 
     export interface Existing {
       /**
-       * The ID returned in profile.id by an earlier scrape.
+       * ID of the browser profile, from `profile.id` in an earlier scrape response.
        */
       profileId: string;
 
@@ -3235,29 +3326,29 @@ export namespace WebScrapeParams {
 
     export interface New {
       /**
-       * Username or email for the target website.
+       * Username or email address for the website.
        */
       identifier: string;
 
       /**
-       * Password used to sign in. It is never stored in the profile.
+       * Password for the website. Used to sign in and never stored.
        */
       password: string;
 
       /**
-       * Sign in and create a browser profile.
+       * Sign in and save a new browser profile.
        */
       type: 'new';
 
       /**
-       * Optional label shown when listing profiles with `GET /org/browser/profiles`.
+       * Label for the profile, shown by `GET /org/browser/profiles`.
        */
       description?: string;
     }
 
     /**
-     * Browser size in pixels. Omit for 1920 × 1080. When provided, missing dimensions
-     * default to 1440 × 900.
+     * Browser viewport in pixels. Defaults to 1920 × 1080. If you pass `viewport`, a
+     * missing `width` defaults to 1440 and a missing `height` to 900.
      */
     export interface Viewport {
       /**
@@ -3282,11 +3373,11 @@ export namespace WebScrapeParams {
     milliseconds: number;
 
     /**
-     * "fail" returns 408 at the deadline. "return-partial" returns available results;
-     * inspect the response’s partial flag. "return-partial" requires at least 5000 ms.
-     * On POST /web/scrape, an output that is not ready in time fails with error_code
-     * REQUEST_TIMEOUT inside a 200 response under either behavior; 408 is returned
-     * only when the whole request cannot respond by the deadline.
+     * `fail` returns 408 at the deadline. `return-partial` returns the results
+     * collected so far and marks the response as partial. `return-partial` requires at
+     * least 5000 ms. On `POST /web/scrape`, an output that is not ready in time fails
+     * with `REQUEST_TIMEOUT` inside a 200 response under either behavior; 408 means
+     * the whole request could not respond by the deadline.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -3294,22 +3385,17 @@ export namespace WebScrapeParams {
 
 export interface WebScreenshotParams {
   /**
-   * Optional parameter for comprehensive popup cleanup. If 'true', the browser
-   * dismisses detected cookie/consent UI and clears other detected obstructive
-   * popups and overlays before capture. If 'false' or not provided, this parameter
-   * requests no cleanup; handleCookiePopup can still request cookie/consent handling
-   * independently.
+   * Dismiss cookie banners and close other popups and overlays before capture.
    */
   clearPopups?: boolean;
 
   /**
-   * Optional parameter to choose the site's visual theme in the screenshot. Use
-   * 'light' or 'dark' when the site offers both appearances.
+   * Emulate a light or dark color scheme.
    */
   colorScheme?: 'light' | 'dark';
 
   /**
-   * Fetch from this country (ISO 3166-1 alpha-2).
+   * Country to fetch from, as an ISO 3166-1 alpha-2 code.
    */
   country?:
     | 'ad'
@@ -3518,72 +3604,56 @@ export interface WebScreenshotParams {
     | 'zw';
 
   /**
-   * A specific URL to screenshot directly, bypassing domain resolution (e.g.,
-   * 'https://example.com/pricing'). When provided, the screenshot is taken of this
-   * exact URL. You must provide either 'domain' or 'directUrl', but not both.
+   * Exact URL to capture, such as `https://example.com/pricing`. Provide either
+   * `domain` or `directUrl`, not both.
    */
   directUrl?: string;
 
   /**
-   * Domain name to take screenshot of (e.g., 'example.com', 'google.com'). The
-   * domain will be automatically normalized and validated. You must provide either
-   * 'domain' or 'directUrl', but not both.
+   * Domain to capture, such as `stripe.com`. Provide either `domain` or `directUrl`,
+   * not both.
    */
   domain?: string;
 
   /**
-   * Optional parameter to determine screenshot type. If 'true', takes a full page
-   * screenshot capturing all content. If 'false' or not provided, takes a viewport
-   * screenshot (standard browser view).
+   * Capture the full scrollable page instead of only the viewport.
    */
   fullScreenshot?: 'true' | 'false';
 
   /**
-   * Optional parameter to control cookie/consent popup handling. If 'true', we
-   * dismiss cookie banner before capture. If 'false' or not provided, captures the
-   * page without that step.
+   * Dismiss cookie consent banners before capture.
    */
   handleCookiePopup?: boolean;
 
   /**
-   * Optional outbound HTTP headers, using the same JSON object or deep-object query
-   * format as other scrape endpoints (for example headers[Authorization]=Bearer
-   * token). Headers are scoped to the target origin during capture. For domain/page
-   * requests, discovery receives no custom headers and only pages on the resolved
-   * origin are eligible. Non-empty headers bypass screenshot caching and return an
-   * in-memory data URL; no screenshot is uploaded. Empty objects behave like omitted
-   * headers.
+   * HTTP headers to send to the target origin, such as
+   * `headers[Authorization]=Bearer token`. Requests with headers skip the cache and
+   * return the image as a data URL.
    */
   headers?: { [key: string]: string };
 
   /**
-   * Return a cached screenshot if a prior screenshot for the same parameters exists
-   * and is younger than this many milliseconds. Defaults to 1 day (86400000 ms) when
-   * omitted. Max is 30 days (2592000000 ms). Set to 0 to always capture fresh.
+   * Maximum age of a cached result, in milliseconds. `0` always fetches fresh.
+   * Defaults to 1 day (86400000 ms). Maximum: 30 days (2592000000 ms).
    */
   maxAgeMs?: number | null;
 
   /**
-   * Optional parameter to specify which page type to screenshot. If provided, the
-   * system will scrape the domain's links and use heuristics to find the most
-   * appropriate URL for the specified page type (30 supported languages). If not
-   * provided, screenshots the main domain landing page. Only applicable when using
-   * 'domain', not 'directUrl'.
+   * Capture this type of page instead of the home page. Context.dev finds it among
+   * the domain's links, in 30 languages. Only with `domain`.
    */
   page?: 'login' | 'signup' | 'blog' | 'careers' | 'pricing' | 'terms' | 'privacy' | 'contact';
 
   /**
-   * Optional vertical scroll offset in pixels for capturing a long page in
-   * viewport-sized chunks. When provided, the full page is captured once and the
-   * returned image is the viewport-sized slice that begins at this Y offset (e.g.
-   * request scrollOffset=0, then 1080, then 2160 to walk a 1920x1080 landing page
-   * top to bottom). The final slice may be shorter than the viewport height. Takes
-   * precedence over fullScreenshot. Max: 100000.
+   * Return the viewport-sized slice of the full page that starts this many pixels
+   * from the top. Step by the viewport height, such as `0`, `1080`, `2160`, to walk
+   * a long page. The last slice can be shorter. Overrides `fullScreenshot`.
    */
   scrollOffset?: number | null;
 
   /**
-   * Comma-separated labels for filtering usage, e.g. `production,team-alpha`.
+   * Comma-separated labels for this request, such as `production,team-alpha`. Filter
+   * usage and request logs by them.
    */
   tags?: Array<string>;
 
@@ -3593,16 +3663,14 @@ export interface WebScreenshotParams {
   timeoutOpts?: WebScreenshotParams.TimeoutOpts;
 
   /**
-   * Optional browser viewport dimensions for the screenshot. Defaults to 1920x1080.
+   * Browser viewport size in pixels.
    */
   viewport?: WebScreenshotParams.Viewport;
 
   /**
-   * Optional browser wait time in milliseconds after initial page load before taking
-   * the screenshot. Min: 0. Max: 30000 (30 seconds). Defaults to 3000 ms when
-   * omitted. When combined with timeoutOpts, timeoutOpts.milliseconds must be at
-   * least waitForMs + 10000 ms; a shorter deadline is rejected with 400
-   * TIMEOUT_TOO_SHORT_FOR_WAIT.
+   * Time to wait after the page loads before capturing, in milliseconds. `0` waits
+   * 500 ms. `timeoutOpts.milliseconds` must be at least `waitForMs` plus 10000 ms,
+   * or the request fails with `TIMEOUT_TOO_SHORT_FOR_WAIT`.
    */
   waitForMs?: number | null;
 
@@ -3624,17 +3692,17 @@ export namespace WebScreenshotParams {
     milliseconds: number;
 
     /**
-     * "fail" returns 408 at the deadline. "return-partial" returns available results;
-     * inspect the response’s partial flag. "return-partial" requires at least 5000 ms.
-     * On POST /web/scrape, an output that is not ready in time fails with error_code
-     * REQUEST_TIMEOUT inside a 200 response under either behavior; 408 is returned
-     * only when the whole request cannot respond by the deadline.
+     * `fail` returns 408 at the deadline. `return-partial` returns the results
+     * collected so far and marks the response as partial. `return-partial` requires at
+     * least 5000 ms. On `POST /web/scrape`, an output that is not ready in time fails
+     * with `REQUEST_TIMEOUT` inside a 200 response under either behavior; 408 means
+     * the whole request could not respond by the deadline.
      */
     behavior?: 'fail' | 'return-partial';
   }
 
   /**
-   * Optional browser viewport dimensions for the screenshot. Defaults to 1920x1080.
+   * Browser viewport size in pixels.
    */
   export interface Viewport {
     /**
@@ -3651,14 +3719,14 @@ export namespace WebScreenshotParams {
 
 export interface WebSearchParams {
   /**
-   * Search query. Accepts natural language as well as Google-style search operators
-   * such as `site:`, `-site:`, `inurl:`, `intitle:`, quoted phrases, and `OR`.
+   * Search query. Accepts natural language and search operators such as `site:`,
+   * `-site:`, `inurl:`, `intitle:`, quoted phrases, and `OR`.
    */
   query: string;
 
   /**
-   * Two-letter ISO 3166-1 alpha-2 country code to localize results to a specific
-   * country (maps to Google's `gl` parameter). Example: "us", "gb", "de".
+   * Localize results to this country, as an ISO 3166-1 alpha-2 code such as `us` or
+   * `de`.
    */
   country?:
     | 'af'
@@ -3907,8 +3975,7 @@ export interface WebSearchParams {
   descriptionMaxCharacters?: number | null;
 
   /**
-   * Blocklist — drop results from these domains. Up to 100 domains. Example:
-   * ["pinterest.com", "reddit.com"].
+   * Leave out results from these domains, such as `pinterest.com`.
    */
   excludeDomains?: Array<string>;
 
@@ -3918,20 +3985,19 @@ export interface WebSearchParams {
   freshness?: 'last_24_hours' | 'last_week' | 'last_month' | 'last_year';
 
   /**
-   * Passages from each result page that are relevant to the query. Pages are read
-   * with the `markdownOptions` settings.
+   * Return passages from each result page that are relevant to the query. Pages are
+   * read with the `markdownOptions` settings.
    */
   highlightsOptions?: WebSearchParams.HighlightsOptions | null;
 
   /**
-   * Allowlist — only return results from these domains. Up to 100 domains. Example:
-   * ["arxiv.org", "github.com"].
+   * Only return results from these domains, such as `arxiv.org`.
    */
   includeDomains?: Array<string>;
 
   /**
-   * Languages to return results in, as BCP 47 language codes such as `en` or `de`,
-   * or "all" for any language. Defaults to "all". Example: ["en", "de"].
+   * Languages to return results in, as BCP 47 codes such as `en` or `de`, or `all`
+   * for any language.
    */
   languages?:
     | 'all'
@@ -4013,24 +4079,25 @@ export interface WebSearchParams {
       >;
 
   /**
-   * Inline Markdown scraping for each result. Set `enabled: true` to activate.
+   * Scrape each result page to Markdown. Set `enabled` to `true` to turn it on.
    */
   markdownOptions?: WebSearchParams.MarkdownOptions | null;
 
   /**
-   * Number of results to request and return (1–100). Defaults to 10.
+   * Number of results to return.
    */
   numResults?: number;
 
   /**
-   * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-   * access policies are enabled for your organization; otherwise the request fails
-   * with `ACCESS_POLICIES_NOT_ENABLED`.
+   * Access policy IDs to apply; each URL must pass all of them. Requires access
+   * policies enabled for your organization; otherwise returns
+   * `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
   /**
-   * Labels for filtering usage in the dashboard.
+   * Labels for this request. Filter usage and request logs by them in the dashboard
+   * or with `GET /org/logs`.
    */
   tags?: Array<string>;
 
@@ -4048,8 +4115,8 @@ export interface WebSearchParams {
 
 export namespace WebSearchParams {
   /**
-   * Passages from each result page that are relevant to the query. Pages are read
-   * with the `markdownOptions` settings.
+   * Return passages from each result page that are relevant to the query. Pages are
+   * read with the `markdownOptions` settings.
    */
   export interface HighlightsOptions {
     /**
@@ -4058,53 +4125,53 @@ export namespace WebSearchParams {
     enabled?: boolean;
 
     /**
-     * Maximum combined length of passages per result.
+     * Maximum combined length of passages per result, in characters.
      */
     maxCharacters?: number;
   }
 
   /**
-   * Inline Markdown scraping for each result. Set `enabled: true` to activate.
+   * Scrape each result page to Markdown. Set `enabled` to `true` to turn it on.
    */
   export interface MarkdownOptions {
     /**
-     * Scrape each result to Markdown. Adds 1 credit per result with Markdown.
+     * Scrape each result page to Markdown. Adds 1 credit per result that returns
+     * Markdown.
      */
     enabled?: boolean;
 
     /**
-     * Which iframe contents to render into the Markdown. `auto` (default) inlines only
-     * iframes that hold page content, such as same-site documents, framesets, job
-     * boards, forms and embedded documents, and skips ads and widgets. `true` inlines
-     * every iframe. `false` inlines none.
+     * Which iframe contents to include in the Markdown. `auto` inlines only iframes
+     * that hold page content, such as same-site documents, framesets, job boards,
+     * forms, and embedded documents, and skips ads and widgets. `true` inlines every
+     * iframe; `false` inlines none.
      */
     includeFrames?: boolean | 'auto';
 
     /**
-     * Emit image references in the Markdown.
+     * Include image references in the Markdown.
      */
     includeImages?: boolean;
 
     /**
-     * Keep hyperlinks in the Markdown.
+     * Keep link URLs in the Markdown.
      */
     includeLinks?: boolean;
 
     /**
-     * Maximum cache age in milliseconds for result page content. Defaults to 180 days
-     * (15552000000 ms) when Markdown is requested, or 365 days (31536000000 ms) when
-     * only highlights are requested. Explicit values override either default. Maximum:
-     * 365 days. Set to 0 to force a fresh scrape.
+     * Maximum age of a cached result, in milliseconds. `0` always fetches fresh.
+     * Defaults to 180 days (15552000000 ms) with Markdown, or 365 days (31536000000
+     * ms) with highlights only.
      */
     maxAgeMs?: number | null;
 
     /**
-     * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+     * Whether to parse PDFs and which pages to read.
      */
     pdf?: MarkdownOptions.Pdf;
 
     /**
-     * Truncate inline base64 image payloads to keep responses small.
+     * Shorten inline base64 image data.
      */
     shortenBase64Images?: boolean;
 
@@ -4114,35 +4181,34 @@ export namespace WebSearchParams {
     timeoutOpts?: MarkdownOptions.TimeoutOpts;
 
     /**
-     * Strip nav, header, footer, and sidebar — keep only the primary article content.
+     * Keep only the main content, without navigation, headers, footers, or sidebars.
      */
     useMainContentOnly?: boolean;
 
     /**
-     * Extra wait after page load before rendering, in ms (0–30000). Useful for
-     * JS-heavy pages.
+     * Time to wait after each result page loads before reading it, in milliseconds.
+     * `0` waits 500 ms. Helps with JavaScript-heavy pages.
      */
     waitForMs?: number | null;
   }
 
   export namespace MarkdownOptions {
     /**
-     * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+     * Whether to parse PDFs and which pages to read.
      */
     export interface Pdf {
       /**
-       * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
-       * be >= start.
+       * Last page to parse. Defaults to the last page. Must be at least `start`.
        */
       end?: number;
 
       /**
-       * Parse PDF URLs. When false, PDF results are skipped with WEBSITE_ACCESS_ERROR.
+       * Parse PDF results. When `false`, PDF results fail with `WEBSITE_ACCESS_ERROR`.
        */
       shouldParse?: boolean;
 
       /**
-       * First 1-based PDF page to parse.
+       * First page to parse, starting at 1.
        */
       start?: number;
     }
@@ -4157,11 +4223,11 @@ export namespace WebSearchParams {
       milliseconds: number;
 
       /**
-       * "fail" returns 408 at the deadline. "return-partial" returns available results;
-       * inspect the response’s partial flag. "return-partial" requires at least 5000 ms.
-       * On POST /web/scrape, an output that is not ready in time fails with error_code
-       * REQUEST_TIMEOUT inside a 200 response under either behavior; 408 is returned
-       * only when the whole request cannot respond by the deadline.
+       * `fail` returns 408 at the deadline. `return-partial` returns the results
+       * collected so far and marks the response as partial. `return-partial` requires at
+       * least 5000 ms. On `POST /web/scrape`, an output that is not ready in time fails
+       * with `REQUEST_TIMEOUT` inside a 200 response under either behavior; 408 means
+       * the whole request could not respond by the deadline.
        */
       behavior?: 'fail' | 'return-partial';
     }
@@ -4177,8 +4243,8 @@ export namespace WebSearchParams {
     milliseconds: number;
 
     /**
-     * "fail" returns 408 at the deadline. "return-partial" returns available results;
-     * inspect the response’s partial flag.
+     * `fail` returns 408 at the deadline. `return-partial` returns the results
+     * collected so far and marks the response as partial.
      */
     behavior?: 'fail' | 'return-partial';
   }
@@ -4191,7 +4257,7 @@ export interface WebWebCrawlMdParams {
   url: string;
 
   /**
-   * Fetch from this country (ISO 3166-1 alpha-2).
+   * Country to fetch from, as an ISO 3166-1 alpha-2 code.
    */
   country?:
     | 'ad'
@@ -4400,70 +4466,71 @@ export interface WebWebCrawlMdParams {
     | 'zw';
 
   /**
-   * Remove matching elements after inclusions. Exclusions take precedence.
+   * Remove elements matching these CSS selectors. Overrides `includeSelectors`.
    */
   excludeSelectors?: Array<string> | null;
 
   /**
-   * Regex pattern. URLs matching this pattern are never followed or scraped, even
-   * when they match urlRegex. The starting URL is always scraped.
+   * Never follow or scrape URLs matching this regex, even when they match
+   * `urlRegex`. The start URL is always scraped.
    */
   excludeUrlRegex?: string;
 
   /**
-   * When true, follow links on subdomains of the starting URL's domain (e.g.
-   * docs.example.com when starting from example.com). www and apex are always
-   * treated as equivalent.
+   * Follow links to subdomains of the start URL's domain, such as `docs.example.com`
+   * from `example.com`. `www` and the apex domain always count as the same site.
    */
   followSubdomains?: boolean;
 
   /**
-   * Which iframe contents to render to Markdown for each crawled page. `auto`
-   * (default) inlines only iframes that hold page content, such as same-site
-   * documents, framesets, job boards, forms and embedded documents, and skips ads
-   * and widgets. `true` inlines every iframe. `false` inlines none.
+   * Which iframe contents to include in each page's Markdown. `auto` inlines only
+   * iframes that hold page content, such as same-site documents, framesets, job
+   * boards, forms, and embedded documents, and skips ads and widgets. `true` inlines
+   * every iframe; `false` inlines none.
    */
   includeFrames?: boolean | 'auto';
 
   /**
-   * Include image references in the Markdown output (`html-conversion` only).
+   * Include image references in the Markdown (`html-conversion` only).
    */
   includeImages?: boolean;
 
   /**
-   * Preserve hyperlinks in the Markdown output (`html-conversion` only).
+   * Keep link URLs in the Markdown (`html-conversion` only).
    */
   includeLinks?: boolean;
 
   /**
-   * Keep matching HTML subtrees before converting each page to Markdown.
+   * Keep only elements matching these CSS selectors.
    */
   includeSelectors?: Array<string> | null;
 
   /**
-   * Maximum cache age in milliseconds. Defaults to 1 day; `0` fetches fresh.
+   * Maximum age of a cached result, in milliseconds. `0` always fetches fresh.
+   * Defaults to 1 day (86400000 ms). Maximum: 30 days (2592000000 ms).
    */
   maxAgeMs?: number | null;
 
   /**
-   * Maximum link depth from the starting URL (0 = only the starting page)
+   * Maximum link depth from the start URL. `0` crawls only the start URL. Omit for
+   * no depth limit.
    */
   maxDepth?: number;
 
   /**
-   * Maximum pages to crawl.
+   * Maximum number of pages to crawl.
    */
   maxPages?: number;
 
   /**
-   * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+   * Whether to parse PDFs and which pages to read.
    */
   pdf?: WebWebCrawlMdParams.Pdf;
 
   /**
-   * Access policy IDs to apply. A URL must pass every policy. Leave it out unless
-   * access policies are enabled for your organization; otherwise the request fails
-   * with `ACCESS_POLICIES_NOT_ENABLED`.
+   * Access policy IDs to apply; each URL must pass all of them. Requires access
+   * policies enabled for your organization; otherwise returns
+   * `ACCESS_POLICIES_NOT_ENABLED`.
    */
   policies?: Array<string>;
 
@@ -4474,8 +4541,7 @@ export interface WebWebCrawlMdParams {
   settleAnimations?: boolean;
 
   /**
-   * Truncate base64-encoded image data in the Markdown output (`html-conversion`
-   * only).
+   * Shorten inline base64 image data (`html-conversion` only).
    */
   shortenBase64Images?: boolean;
 
@@ -4486,13 +4552,14 @@ export interface WebWebCrawlMdParams {
   sourcePreference?: Array<'html-conversion' | 'markdown-direct'>;
 
   /**
-   * Soft crawl deadline in milliseconds. Returns pages collected before the next
-   * deadline check.
+   * Soft time budget for the crawl, in milliseconds. When it runs out, the crawl
+   * returns the pages collected so far. Larger values are capped at 110 seconds.
    */
   stopAfterMs?: number;
 
   /**
-   * Labels for filtering usage in the dashboard.
+   * Labels for this request. Filter usage and request logs by them in the dashboard
+   * or with `GET /org/logs`.
    */
   tags?: Array<string>;
 
@@ -4502,21 +4569,20 @@ export interface WebWebCrawlMdParams {
   timeoutOpts?: WebWebCrawlMdParams.TimeoutOpts;
 
   /**
-   * Regex pattern. Only URLs matching this pattern will be followed and scraped. An
-   * automatic prefix scope in the form ^<starting URL> follows a redirect of the
-   * starting page.
+   * Only follow and scrape URLs matching this regex. A prefix pattern of the form
+   * `^<start URL>` also follows a redirect of the start page.
    */
   urlRegex?: string;
 
   /**
-   * Extract only the main content, stripping headers, footers, sidebars, and
-   * navigation
+   * Keep only the main content, without navigation, headers, footers, or sidebars.
    */
   useMainContentOnly?: boolean;
 
   /**
-   * Browser wait time in milliseconds after initial page load for each crawled page.
-   * Defaults to 3500 (3.5 seconds). Min: 0. Max: 30000 (30 seconds).
+   * Time to wait after each page loads before reading it, in milliseconds. `0` waits
+   * 500 ms. `timeoutOpts.milliseconds` must be at least `waitForMs` plus 10000 ms,
+   * or the request fails with `TIMEOUT_TOO_SHORT_FOR_WAIT`.
    */
   waitForMs?: number | null;
 
@@ -4529,28 +4595,27 @@ export interface WebWebCrawlMdParams {
 
 export namespace WebWebCrawlMdParams {
   /**
-   * PDF handling. `start`/`end` limit parsing to an inclusive, 1-based page range.
+   * Whether to parse PDFs and which pages to read.
    */
   export interface Pdf {
     /**
-     * Last PDF page to parse (1-based, inclusive). Defaults to the final page. Must
-     * be >= start.
+     * Last page to parse. Defaults to the last page. Must be at least `start`.
      */
     end?: number;
 
     /**
-     * Read scanned PDF pages with OCR; preserve pages that already have text.
+     * Read scanned PDF pages with OCR. Pages that already have text are kept as is.
      */
     ocr?: boolean;
 
     /**
-     * When true, PDF pages are fetched and parsed. When false, PDF pages are skipped
-     * entirely (not included in results and not counted as failures).
+     * Parse PDF pages. When `false`, PDFs are left out of the results and not counted
+     * as failures.
      */
     shouldParse?: boolean;
 
     /**
-     * First 1-based PDF page to parse.
+     * First page to parse, starting at 1.
      */
     start?: number;
   }
@@ -4565,8 +4630,8 @@ export namespace WebWebCrawlMdParams {
     milliseconds: number;
 
     /**
-     * "fail" returns 408 at the deadline. "return-partial" returns available results;
-     * inspect the response’s partial flag.
+     * `fail` returns 408 at the deadline. `return-partial` returns the results
+     * collected so far and marks the response as partial.
      */
     behavior?: 'fail' | 'return-partial';
   }
